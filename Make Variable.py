@@ -28,80 +28,80 @@ cssdict = {
 
 font = Glyphs.font
 
-	axisMinimum = font.masters[0].weightValue # lightest master stem weight
-	axisRange = font.masters[-1].weightValue - axisMinimum # boldest master stem weight
+axisMinimum = font.masters[0].weightValue # lightest master stem weight
+axisRange = font.masters[-1].weightValue - axisMinimum # boldest master stem weight
 
-	# set USWeightClass values for masters based on naming
-	for master in font.masters:
-		if "Thin" in master.name or "Hair" in master.name:
-			master.weightValue = 100
-		if "Light" in master.name:
-			master.weightValue = 300
-		if "ExtraLight" in master.name or "UltraLight" in master.name:
-			master.weightValue = 200
-		if "Regular" in master.name or "Normal" in master.name:
-			master.weightValue = 400
-		if "Medium" in master.name:
-			master.weightValue = 500
-		if "Bold" in master.name:
-			master.weightValue = 700
-		if "SemiBold" in master.name or "DemiBold" in master.name:
-			master.weightValue = 600
-		if "ExtraBold" in master.name or "UltraBold" in master.name:
-			master.weightValue = 800
-		if "Black" in master.name or "Heavy" in master.name:
-			master.weightValue = 900
+# set USWeightClass values for masters based on naming
+for master in font.masters:
+	if "Thin" in master.name or "Hair" in master.name:
+		master.weightValue = 100
+	if "Light" in master.name:
+		master.weightValue = 300
+	if "ExtraLight" in master.name or "UltraLight" in master.name:
+		master.weightValue = 200
+	if "Regular" in master.name or "Normal" in master.name:
+		master.weightValue = 400
+	if "Medium" in master.name:
+		master.weightValue = 500
+	if "Bold" in master.name:
+		master.weightValue = 700
+	if "SemiBold" in master.name or "DemiBold" in master.name:
+		master.weightValue = 600
+	if "ExtraBold" in master.name or "UltraBold" in master.name:
+		master.weightValue = 800
+	if "Black" in master.name or "Heavy" in master.name:
+		master.weightValue = 900
 
-	cssMinimum = font.masters[0].weightValue # get lightest USWeightClass value
-	cssMaximum = font.masters[-1].weightValue # get boldest USWeightClass value
-	cssRange = cssMaximum - cssMinimum
+cssMinimum = font.masters[0].weightValue # get lightest USWeightClass value
+cssMaximum = font.masters[-1].weightValue # get boldest USWeightClass value
+cssRange = cssMaximum - cssMinimum
 
-	# inputWeight is old stem weight
-	def convertWeight(inputWeight):
-		outputWeight = ((inputWeight - axisMinimum)/axisRange)*cssRange + cssMinimum
-		return int(round(outputWeight, 0)) # calculate reference USWeightClass weight for old stem weight
+# inputWeight is old stem weight
+def convertWeight(inputWeight):
+	outputWeight = ((inputWeight - axisMinimum)/axisRange)*cssRange + cssMinimum
+	return int(round(outputWeight, 0)) # calculate reference USWeightClass weight for old stem weight
 
-	# read only number from a string
-	def int_from_string(string):
-		chars = [char for char in string]		
-		digits = []		
-		for char in chars:
-			if char.isdigit():
-				digits.append(char)		
-		number="".join(digits)
-		return int(number)
+# read only number from a string
+def int_from_string(string):
+	chars = [char for char in string]		
+	digits = []		
+	for char in chars:
+		if char.isdigit():
+			digits.append(char)		
+	number="".join(digits)
+	return int(number)
 
-	# check whether layer is intermediate layer (has numbers)
-	def hasNumbers(layerName):
-		return any(char.isdigit() for char in layerName)
+# check whether layer is intermediate layer (has numbers)
+def hasNumbers(layerName):
+	return any(char.isdigit() for char in layerName)
 
-	# recalculate values in intermediate layers
-	for glyph in font.glyphs:
-		for layer in glyph.layers:
-			if hasNumbers(layer.name) == True:
-				newWeight = str(convertWeight(int_from_string(layer.name)))
-				layer.name = re.sub(r'\d+', newWeight,layer.name)
+# recalculate values in intermediate layers
+for glyph in font.glyphs:
+	for layer in glyph.layers:
+		if hasNumbers(layer.name) == True:
+			newWeight = str(convertWeight(int_from_string(layer.name)))
+			layer.name = re.sub(r'\d+', newWeight,layer.name)
 
-	# create a dictionary which indexes all instances by weight
-	instancedict = {}
+# create a dictionary which indexes all instances by weight
+instancedict = {}
 
-	for i in range(len(font.instances)):
-		instancedict[i] = font.instances[i].weightValue
+for i in range(len(font.instances)):
+	instancedict[i] = font.instances[i].weightValue
 
-	# set USWeightClass values for instances based on weight assignment
-	for instance in font.instances:
-		instance.weightValue = cssdict[instance.weight]
+# set USWeightClass values for instances based on weight assignment
+for instance in font.instances:
+	instance.weightValue = cssdict[instance.weight]
 
-	# create a dictionary which stores the AVAR table
-	avartable = {"wght": {}}
+# create a dictionary which stores the AVAR table
+avartable = {"wght": {}}
 
-	# calculate and write AVAR table
-	for l in range(int(cssRange/100+1)):
-		avartable["wght"][l*100+cssMinimum] = convertWeight(instancedict[l])
+# calculate and write AVAR table
+for l in range(int(cssRange/100+1)):
+	avartable["wght"][l*100+cssMinimum] = convertWeight(instancedict[l])
 
-	# write AVAR table to custom parameters
-	font.customParameters["Axis Mappings"] = avartable
+# write AVAR table to custom parameters
+font.customParameters["Axis Mappings"] = avartable
 
-	# Rename font family
-	if "Variable" not in font.familyName:
-		font.familyName = font.familyName + " Variable"
+# Rename font family
+if "Variable" not in font.familyName:
+	font.familyName = font.familyName + " Variable"
