@@ -26,7 +26,7 @@ cssdict = {
 	"Heavy": 900,
 }
 
-for font in Glyphs.fonts:
+font = Glyphs.font
 
 	axisMinimum = font.masters[0].weightValue # lightest master stem weight
 	axisRange = font.masters[-1].weightValue - axisMinimum # boldest master stem weight
@@ -59,9 +59,9 @@ for font in Glyphs.fonts:
 	# inputWeight is old stem weight
 	def convertWeight(inputWeight):
 		outputWeight = ((inputWeight - axisMinimum)/axisRange)*cssRange + cssMinimum
-		return int(round(outputWeight, 0)) # calculate reference weight for old stem weight
+		return int(round(outputWeight, 0)) # calculate reference USWeightClass weight for old stem weight
 
-	# get only th number in a string
+	# read only number from a string
 	def int_from_string(string):
 		chars = [char for char in string]		
 		digits = []		
@@ -75,8 +75,14 @@ for font in Glyphs.fonts:
 	def hasNumbers(layerName):
 		return any(char.isdigit() for char in layerName)
 
+	# recalculate values in intermediate layers
+	for glyph in font.glyphs:
+		for layer in glyph.layers:
+			if hasNumbers(layer.name) == True:
+				newWeight = str(convertWeight(int_from_string(layer.name)))
+				layer.name = re.sub(r'\d+', newWeight,layer.name)
 
-	# create a dictionary which will index all instances by weight value
+	# create a dictionary which indexes all instances by weight
 	instancedict = {}
 
 	for i in range(len(font.instances)):
@@ -86,20 +92,16 @@ for font in Glyphs.fonts:
 	for instance in font.instances:
 		instance.weightValue = cssdict[instance.weight]
 
-	# create a dictionary which stores the avar table
+	# create a dictionary which stores the AVAR table
 	avartable = {"wght": {}}
 
+	# calculate and write AVAR table
 	for l in range(int(cssRange/100+1)):
 		avartable["wght"][l*100+cssMinimum] = convertWeight(instancedict[l])
-
-	if "Variable" not in font.familyName:
-		font.familyName = font.familyName + " Variable"
 
 	# write AVAR table to custom parameters
 	font.customParameters["Axis Mappings"] = avartable
 
-	for glyph in font.glyphs: # recalculate values in intermediate layers
-		for layer in glyph.layers:
-			if hasNumbers(layer.name) == True:
-				newWeight = str(convertWeight(int_from_string(layer.name)))
-				layer.name = re.sub(r'\d+', newWeight,layer.name)
+	# Rename font family
+	if "Variable" not in font.familyName:
+		font.familyName = font.familyName + " Variable"
