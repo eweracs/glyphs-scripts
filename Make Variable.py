@@ -103,5 +103,3 @@ for font in Glyphs.fonts:
 			if hasNumbers(layer.name) == True:
 				newWeight = str(convertWeight(int_from_string(layer.name)))
 				layer.name = re.sub(r'\d+', newWeight,layer.name)
-	
-	GetSaveFile(ProposedFileName = font.familyName)
