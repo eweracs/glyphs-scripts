@@ -32,7 +32,7 @@ font = Glyphs.font
 weightlist = sorted({font.masters[i].weightValue for i in range(len(font.masters))})
 
 axisMinimum = weightlist[0] # lightest stem weight
-axisRange = weightlist[-1] - axisMinimum # boldest stem weight
+axisRange = weightlist[-1] - axisMinimum # axis range
 
 # set USWeightClass values for masters based on naming
 for master in font.masters:
@@ -55,9 +55,10 @@ for master in font.masters:
 	if "Black" in master.name or "Heavy" in master.name:
 		master.weightValue = 900
 
-cssMinimum = font.masters[0].weightValue # get lightest USWeightClass value
-cssMaximum = font.masters[-1].weightValue # get boldest USWeightClass value
-cssRange = cssMaximum - cssMinimum
+cssweightlist = sorted({font.masters[i].weightValue for i in range(len(font.masters))})
+
+cssMinimum = cssweightlist[0] # lightest USWeightClass value
+cssRange = cssweightlist[-1] - cssMinimum # USWeightClass range
 
 # inputWeight is old stem weight
 def convertWeight(inputWeight):
