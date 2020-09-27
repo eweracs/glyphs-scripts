@@ -89,12 +89,8 @@ instancelist = sorted({font.instances[i].weightValue for i in range(len(font.ins
 for instance in font.instances:
 	instance.weightValue = cssdict[instance.weight]
 
-# create a dictionary which stores the AVAR table
-avartable = {"wght": {}}
-
-# calculate and write AVAR table
-for l in range(int(cssRange/100+1)):
-	avartable["wght"][l*100+cssMinimum] = convertWeight(instancelist[l])
+# calculate AVAR table
+avartable = {"wght" : l*100+cssMinimum:convertWeight(instancelist[l] for l in range(int(cssRange/100+1)))}
 
 # write AVAR table to custom parameters
 font.customParameters["Axis Mappings"] = avartable
