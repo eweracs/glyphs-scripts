@@ -90,7 +90,7 @@ for instance in font.instances:
 	instance.weightValue = cssdict[instance.weight]
 
 # calculate AVAR table
-avartable = {"wght" : l*100+cssMinimum:convertWeight(instancelist[l] for l in range(int(cssRange/100+1)))}
+avartable = {"wght" : {l*100+cssMinimum:convertWeight(instancelist[l]) for l in range(int(cssRange/100+1))}}
 
 # write AVAR table to custom parameters
 font.customParameters["Axis Mappings"] = avartable
