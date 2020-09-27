@@ -78,19 +78,16 @@ def hasNumbers(layerName):
 # recalculate values in intermediate layers
 for glyph in font.glyphs:
 	for layer in glyph.layers:
-		if hasNumbers(layer.name) == True:
+		if hasNumbers(layer.name):
 			newWeight = str(convertWeight(int_from_string(layer.name)))
 			layer.name = re.sub(r'\d+', newWeight,layer.name)
 
-# create a list which indexes all instances by weight
-instancelist = sorted({font.instances[i].weightValue for i in range(len(font.instances))})
+# calculate AVAR table and write to custom parameters
+font.customParameters["Axis Mappings"] = {"wght" : {l*100+cssMinimum:convertWeight(sorted({font.instances[i].weightValue for i in range(len(font.instances))})[l]) for l in range(int(cssRange/100+1))}}
 
 # set USWeightClass values for instances based on weight assignment
 for instance in font.instances:
 	instance.weightValue = cssdict[instance.weight]
-
-# write AVAR table to custom parameters
-font.customParameters["Axis Mappings"] = {"wght" : {l*100+cssMinimum:convertWeight(instancelist[l]) for l in range(int(cssRange/100+1))}}
 
 # Rename font family
 if "Variable" not in font.familyName:
