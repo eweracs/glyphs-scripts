@@ -1,4 +1,4 @@
-#MenuTitle: Make Variable
+#MenuTitle: Make Web Variable
 # -*- coding: utf-8 -*-
 import vanilla
 import re
@@ -83,10 +83,7 @@ for glyph in font.glyphs:
 			layer.name = re.sub(r'\d+', newWeight,layer.name)
 
 # create a dictionary which indexes all instances by weight
-instancedict = {}
-
-for i in range(len(font.instances)):
-	instancedict[i] = font.instances[i].weightValue
+instancedict = {i:font.instances[i].weightValue for i in range(len(font.instances))}
 
 # set USWeightClass values for instances based on weight assignment
 for instance in font.instances:
