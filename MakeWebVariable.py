@@ -58,7 +58,7 @@ for master in font.masters:
 cssweightlist = sorted({font.masters[i].weightValue for i in range(len(font.masters))})
 
 cssMinimum = cssweightlist[0] # lightest USWeightClass value
-cssRange = cssweightlist[-1] - cssMinimum # USWeightClass range
+cssRange = cssweightlist[-1] - cssMinimum # USWeightClassrange
 
 # inputWeight is old stem weight
 def convertWeight(inputWeight):
