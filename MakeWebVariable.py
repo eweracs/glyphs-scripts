@@ -82,8 +82,8 @@ for glyph in font.glyphs:
 			newWeight = str(convertWeight(int_from_string(layer.name)))
 			layer.name = re.sub(r'\d+', newWeight,layer.name)
 
-# create a dictionary which indexes all instances by weight
-instancedict = {i:font.instances[i].weightValue for i in range(len(font.instances))}
+# create a list which indexes all instances by weight
+instancelist = sorted({font.instances[i].weightValue for i in range(len(font.instances))})
 
 # set USWeightClass values for instances based on weight assignment
 for instance in font.instances:
@@ -94,7 +94,7 @@ avartable = {"wght": {}}
 
 # calculate and write AVAR table
 for l in range(int(cssRange/100+1)):
-	avartable["wght"][l*100+cssMinimum] = convertWeight(instancedict[l])
+	avartable["wght"][l*100+cssMinimum] = convertWeight(instancelist[l])
 
 # write AVAR table to custom parameters
 font.customParameters["Axis Mappings"] = avartable

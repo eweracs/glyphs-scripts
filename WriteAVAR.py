@@ -8,7 +8,7 @@
 
 	font = Glyphs.font
 
-	# create a dictionary which indexes all instances by weight
+	# create a list which indexes all instances by weight
 	instancelist = sorted({font.instances[i].weightValue for i in range(len(font.instances))})
 
 	axisMinimum = instancelist[0] # lightest stem weight
