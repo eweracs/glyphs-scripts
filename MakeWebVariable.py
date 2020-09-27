@@ -59,7 +59,7 @@ cssRange = cssMaximum - cssMinimum
 # inputWeight is old stem weight
 def convertWeight(inputWeight):
 	outputWeight = ((inputWeight - axisMinimum)/axisRange)*cssRange + cssMinimum
-	return int(round(outputWeight, 0)) # calculate reference USWeightClass weight for old stem weight
+	return int(outputWeight) # calculate reference USWeightClass weight for old stem weight
 
 # read only number from a string
 def int_from_string(string):
