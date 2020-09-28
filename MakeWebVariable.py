@@ -29,7 +29,7 @@ cssdict = {
 font = Glyphs.font
 
 # create a list which indexes all masters by weight
-weightlist = sorted({font.masters[i].weightValue for i in range(len(font.masters))})
+weightlist = sorted({master.weightValue for master in font.masters})
 
 axisMinimum = weightlist[0] # lightest stem weight
 axisRange = weightlist[-1] - axisMinimum # axis range
@@ -55,7 +55,7 @@ for master in font.masters:
 	if "Black" in master.name or "Heavy" in master.name:
 		master.weightValue = 900
 
-cssweightlist = sorted({font.masters[i].weightValue for i in range(len(font.masters))})
+cssweightlist = sorted({master.weightValue for master in font.masters})
 
 cssMinimum = cssweightlist[0] # lightest USWeightClass value
 cssRange = cssweightlist[-1] - cssMinimum # USWeightClass range
