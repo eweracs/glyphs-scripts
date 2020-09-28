@@ -4,15 +4,15 @@ __doc__="""
 Names pre-defined instances based on weight and width values
 """
 
-for i in Font.instances:
+for i in Glyphs.font.instances:
 	if i.active:
-		if "Medium" in i.width:
+		if i"Medium" in i.width:
 			i.name = i.weight
 		else:
-			if "Regular" in i.weight:
+			if i.weight == "Regular" or i.weight == "Normal":
 				i.name = i.width
 			else:
-				if "Ultra" in i.width:
+				if i.width == "Ultra Condensed":
 					i.name = i.weight + " Compressed"
 				else:
-					i.name = i.weight + ' ' + i.width
+					i.name = i.weight + " " + i.width
