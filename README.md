@@ -15,3 +15,18 @@ Converts master and instance weight values into USWeightClass values based on na
 
 ## Write AVAR
 Writes an AVAR table based on stem weights. Affects only weight, regardless of axis count.
+
+
+# License
+
+Copyright 2020 The eweracs Glyphs-Scripts Project Authors.
+
+Some code samples by Georg Seifert (@schriftgestalt) and Rainer Scheichelbauer (@mekkablue).
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use the software provided here except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+See the License file included in this repository for further details.
