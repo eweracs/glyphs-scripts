@@ -9,7 +9,7 @@ Writes an AVAR table based on current weight distribution
 font = Glyphs.font
 
 # create a list which indexes all instances by weight
-instancelist = sorted({font.instances[i].weightValue for i in range(len(font.instances))})
+instancelist = sorted({instance.weightValue for instance in font.instances})
 
 axisMinimum = instancelist[0] # lightest stem weight
 axisRange = instancelist[-1] - axisMinimum # axis range 
