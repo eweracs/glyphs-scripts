@@ -87,7 +87,7 @@ for glyph in font.glyphs:
 			layer.name = re.sub(r'\d+', newWeight,layer.name)
 
 # calculate AVAR table and write to custom parameters
-font.customParameters["Axis Mappings"] = {"wght" : {l*100+cssMinimum:convertWeight(sorted({font.instances[i].weightValue for i in range(len(font.instances))})[l]) for l in range(int(cssRange/100+1))}}
+font.customParameters["Axis Mappings"] = {"wght" : {l*100+cssMinimum:convertWeight(sorted({instance.weightValue for instance in font.instances})[l]) for l in range(int(cssRange/100+1))}}
 
 # set USWeightClass values for instances based on weight assignment
 for instance in font.instances:
