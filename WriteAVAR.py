@@ -12,7 +12,7 @@ font = Glyphs.font
 instancelist = sorted({font.instances[i].weightValue for i in range(len(font.instances))})
 
 axisMinimum = instancelist[0] # lightest stem weight
-axisRange = instancelist[-1] - axisMinimum # boldest stem weight 
+axisRange = instancelist[-1] - axisMinimum # axis range 
 
 # calculate and write AVAR table to custom parameters
 font.customParameters["Axis Mappings"] = {"wght": {int(axisRange/(len(instancelist)-1)*l+axisMinimum):instancelist[l] for l in range(len(instancelist))}}
