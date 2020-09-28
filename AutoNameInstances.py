@@ -6,7 +6,7 @@ Names pre-defined instances based on weight and width values
 
 for i in Glyphs.font.instances:
 	if i.active:
-		if i"Medium" in i.width:
+		if "Medium" in i.width:
 			i.name = i.weight
 		else:
 			if i.weight == "Regular" or i.weight == "Normal":
