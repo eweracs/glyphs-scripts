@@ -1,7 +1,7 @@
 #MenuTitle: Auto-name instances
 # -*- coding: utf-8 -*-
 __doc__="""
-Names pre-defined instances based on weight and width values
+Names pre-defined instances based on set weight and width names
 """
 
 for i in Glyphs.font.instances:
