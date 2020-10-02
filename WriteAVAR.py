@@ -16,3 +16,5 @@ axisRange = instancelist[-1] - axisMinimum # axis range
 
 # calculate and write AVAR table to custom parameters
 font.customParameters["Axis Mappings"] = {"wght": {int(axisRange/(len(instancelist)-1)*l+axisMinimum):instancelist[l] for l in range(len(instancelist))}}
+
+Glyphs.showNotification(title="Wrote AVAR table", message="For " + str(len(instancelist)) + " instances")
