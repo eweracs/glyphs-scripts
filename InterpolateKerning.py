@@ -9,16 +9,16 @@ Interpolates custom kern feature for instances
 
 font = Glyphs.font
 
+# the amount of kerning to be applied per master
 M1 = 30
 M2 = 20
 
+# pos class1 [value] class2;
 class1 = "@Uppercase"
 class2 = "@Uppercase"
 
 minWeight = font.masters[0].weightValue
-maxWeight = font.masters[-1].weightValue
-
-weightRange = maxWeight - minWeight
+weightRange = font.masters[-1].weightValue - minWeight
 
 for instance in font.instances:
 
