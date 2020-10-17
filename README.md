@@ -8,7 +8,7 @@ Names instances based on assigned names. Useful for batch-renaming large familie
 Same as clicking Re-Interpolate in the layers panel, but only affects anchors.
 
 ## Interpolate Kerning (WIP)
-Adds Replace Feature custom parameter for every instance for kerning (editable to replace with different values). Useful for hard-coded capital/sc spacing. Currently only works for two-master setups (weight). Values and classes need to be entered directly into the script. UI in the works. Use at your own risk.
+Adds Replace Feature custom parameter for every instance for kerning (editable to replace with different values). Useful for hard-coded capital/sc spacing. Currently only works for two-master setups (weight). Values and classes need to be entered directly into the script. UI in the works. Use at your own risk. Currently requires you to write the kern code to be replaced into the features. 
 
 ## Make Web Variable
 Converts master and instance weight values into USWeightClass values based on naming. Calculates AVAR table for correct interpolation. Takes care of intermediate layer values as well.
