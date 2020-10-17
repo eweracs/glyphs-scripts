@@ -1,11 +1,4 @@
-#MenuTitle: Instance Kerner
-# -*- coding: utf-8 -*-
-
 import vanilla
-
-__doc__="""
-Interpolates custom kern feature for instances
-"""
 
 
 class KernWindow:
@@ -86,6 +79,9 @@ class KernWindow:
 
 		self.axis_1_range = self.master2 - self.master1
 
+		if Font.features["kern"] != True:
+			Font.features["kern"] = "pos @{} {} @{};".format(class1, int(self.master_1_kern), class2)
+
 		for instance in Font.instances:
 
 			kern = float((self.master_2_kern - self.master_1_kern)/self.axis_1_range*(instance.axes[0] - self.master1))\
@@ -95,7 +91,7 @@ class KernWindow:
 				kern_text = "{}\npos @{} {} @{};".format(instance.customParameters["Replace Feature"], class1, int(kern), class2)
 
 			else:
-				kern_text = "kern;\npos @{} {} @{};".format(class1, str(int(kern)), class2)
+				kern_text = "kern;\npos @{} {} @{};".format(class1, int(kern), class2)
 
 			instance.customParameters["Replace Feature"] = kern_text
 
