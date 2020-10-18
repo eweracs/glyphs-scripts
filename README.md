@@ -8,7 +8,7 @@ Names instances based on assigned names. Useful for batch-renaming large familie
 Same as clicking Re-Interpolate in the layers panel, but only affects anchors.
 
 ## Instance Kerner (WIP, one axis only)
-Adds Replace Feature custom parameter for every instance for kerning. Useful for hard-coded capital/sc spacing. Currently only works for single-axis setups.
+Adds Replace Feature custom parameter for every instance for kerning. Useful for hard-coded capital/sc spacing. Currently only works for single-axis setups, still trying to figure out how to make this work for multiple axes. Todo: more than two kerning values per axis
 
 ## Make Web Variable
 Converts master and instance weight values into USWeightClass values based on naming. Calculates AVAR table for correct interpolation. Takes care of intermediate layer values as well.
