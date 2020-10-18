@@ -1,3 +1,10 @@
+# MenuTitle: Instance Kerner
+# -*- coding: utf-8 -*-
+
+__doc__ = """
+Writes Replace Feature custom parameter to instances for kern/cpsp
+"""
+
 import vanilla
 
 
