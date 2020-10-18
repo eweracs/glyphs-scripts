@@ -12,17 +12,20 @@ class KernWindow:
 		self.class1 = 0
 		self.class2 = 0
 		self.master1 = self.font.masters[0].axes[0]
-		self.master2 = self.font.masters[0].axes[0]
+		self.master2 = self.font.masters[-1].axes[0]
 		self.master_1_kern = 0
 		self.master_2_kern = 0
 
 		self.w = vanilla.FloatingWindow((0, 0), "Instance Kerner")
 
-		self.w.otclass_name = vanilla.TextBox((10, y, 200, 20), "Select left and right OT Classes:", sizeStyle="small")
+		self.w.otclass_title = vanilla.TextBox((10, y, 200, 20), "Select left and right OT Classes:", sizeStyle="small")
 		y += 18
 
 		self.ot_classes = [otclass.name for otclass in self.font.classes]
 		self.masternames = [master.name for master in self.font.masters]
+		self.kern_features = ["kern", "cpsp"]
+
+		self.feature_selection = self.kern_features[0]
 
 		self.axes_master_values = [[master.axes[a] for master in self.font.masters] for a in range(len(self.font.axes))]
 
@@ -33,20 +36,24 @@ class KernWindow:
 		x -= 160
 		y += 28
 
-		self.w.master_name = vanilla.TextBox((10, y, 200, 20), "Master kerning values:", sizeStyle="small")
+		self.w.master_title = vanilla.TextBox((10, y, 200, 20), "Master kerning values:", sizeStyle="small")
 		y += 18
 
-		self.w.master_1 = vanilla.TextBox((x + 50 , y + 2, 92, 20), self.masternames[0], sizeStyle="small")
+		self.w.master_1 = vanilla.TextBox((x + 50, y + 2, 92, 20), self.masternames[0], sizeStyle="small")
 		self.w.master_1_kern = vanilla.EditText((x, y, 40, 20), "", sizeStyle="small", callback=self.get_master_1_kern)
 		x += 160
 		self.w.master_2 = vanilla.TextBox((x + 50, y + 2, 92, 20), self.masternames[-1], sizeStyle="small")
 		self.w.master_2_kern = vanilla.EditText((x, y, 40, 20), "", sizeStyle="small", callback=self.get_master_2_kern)
-		y += 22
+		y += 28
 		x -= 160
 
-		y += 10
+		self.w.select_feature_title = vanilla.TextBox((x, y, 200, 20), "Kern feature:", sizeStyle="small")
+		y += 18
 
-		self.w.button = vanilla.Button((10, y, -10, 20), "Write to instances", callback=self.write_kerning)
+		self.w.select_feature = vanilla.PopUpButton((x, y, 80, 20), self.kern_features, sizeStyle="small", callback=self.get_feature_selection)
+		x += 90
+
+		self.w.button = vanilla.Button((x, y, -10, 20), "Write to instances", callback=self.write_kerning)
 
 		y += 30
 
@@ -67,11 +74,8 @@ class KernWindow:
 	def get_master_2_kern(self, sender):
 		self.master_2_kern = int(sender.get())
 
-	def get_master_1(self, sender):
-		self.master1 = self.axes_master_values[0][sender.get()]
-
-	def get_master_2(self, sender):
-		self.master2 = self.axes_master_values[0][sender.get()]
+	def get_feature_selection(self, sender):
+		self.feature_selection = self.kern_features[sender.get()]
 
 	def write_kerning(self, sender):
 		class1 = str(self.ot_classes[self.class1])
@@ -79,8 +83,11 @@ class KernWindow:
 
 		self.axis_1_range = self.master2 - self.master1
 
-		if Font.features["kern"] != True:
-			Font.features["kern"] = "pos @{} {} @{};".format(class1, int(self.master_1_kern), class2)
+		if not Font.features[self.feature_selection]:
+			if self.feature_selection == "kern":
+				Font.features["kern"] = "pos @{} {} @{};".format(class1, self.master_1_kern, class2)
+			elif self.feature_selection == "cpsp":
+				Font.features["cpsp"] = "pos @Uppercase <{} 0 {} 0>;".format(self.master_1_kern, self.master_1_kern*2)
 
 		for instance in Font.instances:
 
@@ -88,10 +95,24 @@ class KernWindow:
 			       + self.master_1_kern
 
 			if instance.customParameters["Replace Feature"]:
-				kern_text = "{}\npos @{} {} @{};".format(instance.customParameters["Replace Feature"], class1, int(kern), class2)
+				if self.feature_selection == "kern":
+					if "kern" in instance.customParameters["Replace Feature"]:
+						kern_text = "{}\npos @{} {} @{};".format(instance.customParameters["Replace Feature"], class1, int(kern), class2)
+					else:
+						kern_text = "{}\nkern;\npos @{} {} @{};".format(instance.customParameters["replace Feature"], class1, int(kern), class2)
+
+				if self.feature_selection == "cpsp":
+					if "cpsp" in instance.customParameters["Replace Feature"]:
+						kern_text = "{}\npos @Uppercase <{} 0 {} 0>;".format(instance.customParameters["Replace Feature"], int(kern), int(kern)*2)
+					else:
+						kern_text = "{}\ncpsp;\npos @Uppercase <{} 0 {} 0>;".format(instance.customParameters["Replace Feature"], int(kern), int(kern)*2)
 
 			else:
-				kern_text = "kern;\npos @{} {} @{};".format(class1, int(kern), class2)
+				if self.feature_selection == "kern":
+					kern_text = "kern;\npos @{} {} @{};".format(class1, int(kern), class2)
+				else:
+					kern_text = "cpsp;\npos @Uppercase <{} 0 {} 0>;".format(int(kern), int(kern)*2)
+
 
 			instance.customParameters["Replace Feature"] = kern_text
 
