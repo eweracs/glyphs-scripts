@@ -36,11 +36,11 @@ class KernWindow:
 		self.w.master_name = vanilla.TextBox((10, y, 200, 20), "Master kerning values:", sizeStyle="small")
 		y += 18
 
-		self.w.master_1 = vanilla.PopUpButton((x, y, 92, 20), self.masternames, sizeStyle="small", callback=self.get_master_1)
-		self.w.master_1_kern = vanilla.EditText((110, y, 40, 20), "", sizeStyle="small", callback=self.get_master_1_kern)
+		self.w.master_1 = vanilla.TextBox((x + 50 , y + 2, 92, 20), self.masternames[0], sizeStyle="small")
+		self.w.master_1_kern = vanilla.EditText((x, y, 40, 20), "", sizeStyle="small", callback=self.get_master_1_kern)
 		x += 160
-		self.w.master_2 = vanilla.PopUpButton((x, y, 92, 20), self.masternames, sizeStyle="small", callback=self.get_master_2)
-		self.w.master_2_kern = vanilla.EditText((270, y, 40, 20), "", sizeStyle="small", callback=self.get_master_2_kern)
+		self.w.master_2 = vanilla.TextBox((x + 50, y + 2, 92, 20), self.masternames[-1], sizeStyle="small")
+		self.w.master_2_kern = vanilla.EditText((x, y, 40, 20), "", sizeStyle="small", callback=self.get_master_2_kern)
 		y += 22
 		x -= 160
 
