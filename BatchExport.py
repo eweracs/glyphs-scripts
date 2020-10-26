@@ -1,4 +1,4 @@
-# MenuTitle: Batch Export
+# MenuTitle: Export Profiles
 # -*- coding: utf-8 -*-
 
 __doc__ = """
@@ -75,7 +75,7 @@ class ExportWindow:
         self.w.eot_checkbox = vanilla.CheckBox((x, y, 200, 20), "EOT", callback=self.eot_select)
         y += 30
 
-        self.w.export_button = vanilla.Button((10, y, -10, 20), "Export", callback=self.export_selection)
+        self.w.export_button = vanilla.Button((10, y, -10, 20), "Export...", callback=self.export_selection)
         y = 200
 
         self.w.resize(320, y)
@@ -143,17 +143,20 @@ class ExportWindow:
         if self.woff_status == 1:
             if not os.path.exists(self.export_path + "/Web/WOFF"):  # create WOFF file directory if not present yet
                 os.makedirs(self.export_path + "/Web/WOFF")
-            self.generate_fonts(self.web_source_status, self.export_path + "/Web/WOFF", self.web_autohint_status, Containers=[WOFF])
+            self.generate_fonts(self.web_source_status, self.export_path + "/Web/WOFF",
+                                self.web_autohint_status, Containers=[WOFF])
 
         if self.woff2_status == 1:
             if not os.path.exists(self.export_path + "/Web/WOFF2"):  # create WOFF2 file directory if not present yet
                 os.makedirs(self.export_path + "/Web/WOFF2")
-            self.generate_fonts(self.web_source_status, self.export_path + "/Web/WOFF2", self.web_autohint_status, Containers=[WOFF2])
+            self.generate_fonts(self.web_source_status, self.export_path + "/Web/WOFF2",
+                                self.web_autohint_status, Containers=[WOFF2])
 
         if self.eot_status == 1:
             if not os.path.exists(self.export_path + "/Web/EOT"):  # create EOT file directory if not present yet
                 os.makedirs(self.export_path + "/Web/EOT")
-            self.generate_fonts(self.web_source_status, self.export_path + "/Web/EOT", self.web_autohint_status, Containers=[EOT])
+            self.generate_fonts(self.web_source_status, self.export_path + "/Web/EOT",
+                                self.web_autohint_status, Containers=[EOT])
 
         self.w.close()
 
