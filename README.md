@@ -4,6 +4,9 @@ Scripts for Glyphs.
 ## Auto-Name Instances
 Names instances based on assigned names. Useful for batch-renaming large families.
 
+## Batch Export
+Opens a dialogue to choose multiple export formats. Sorts exported files into respective sub-directories (/Desktop/TTF, /Web/WOFF2, ...). To-do: Save preferences
+
 ## Interpolate Anchors
 Same as clicking Re-Interpolate in the layers panel, but only affects anchors.
 
