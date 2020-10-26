@@ -15,16 +15,17 @@ class ExportWindow:
         self.font = Font
         self.export_path = None
         self.otf_status = 0
-        self.otf_autohint_status = 0
+        self.otf_autohint_status = False
         self.ttf_status = 0
-        self.ttf_autohint_status = 0
+        self.ttf_autohint_status = False
         self.variable_status = 0
         self.web_source_status = "OTF"
+        self.web_autohint_status = False
         self.woff_status = 0
         self.woff2_status = 0
         self.eot_status = 0
-        self.web_autohint_status = 0
 
+        # UI elements indent init
         x = 10
         y = 10
 
@@ -88,8 +89,6 @@ class ExportWindow:
     def otf_autohint_select(self, sender):
         if sender.get() == 1:
             self.otf_autohint_status = True
-        else:
-            self.otf_autohint_status = False
 
     def ttf_select(self, sender):
         self.ttf_status = sender.get()
@@ -97,8 +96,6 @@ class ExportWindow:
     def ttf_autohint_select(self, sender):
         if sender.get() == 1:
             self.ttf_autohint_status = True
-        else:
-            self.ttf_autohint_status = False
 
     def variable_select(self, sender):
         self.variable_status = sender.get()
@@ -110,8 +107,6 @@ class ExportWindow:
     def web_autohint_select(self, sender):
         if sender.get() == 1:
             self.web_autohint_status = True
-        else:
-            self.web_autohint_status = False
 
     def woff_select(self, sender):
         self.woff_status = sender.get()
@@ -128,35 +123,35 @@ class ExportWindow:
                 instance.generate(fontformat, path, autohint_status, **kwargs)
 
     def export_selection(self, sender):
-        self.export_path = GetFolder()
+        self.export_path = GetFolder()  # open parent directory to write files to
 
         if self.otf_status == 1:
-            if not os.path.exists(self.export_path + "/Desktop/OTF"):
+            if not os.path.exists(self.export_path + "/Desktop/OTF"):  # create OTF file directory if not present yet
                 os.makedirs(self.export_path + "/Desktop/OTF")
             self.generate_fonts("OTF", self.export_path + "/Desktop/OTF", self.otf_autohint_status)
 
         if self.ttf_status == 1:
-            if not os.path.exists(self.export_path + "/Desktop/TTF"):
+            if not os.path.exists(self.export_path + "/Desktop/TTF"):  # create TTF file directory if not present yet
                 os.makedirs(self.export_path + "/Desktop/TTF")
             self.generate_fonts("TTF", self.export_path + "/Desktop/TTF", self.ttf_autohint_status)
 
         if self.variable_status == 1:
-            if not os.path.exists(self.export_path + "/Desktop/Variable"):
+            if not os.path.exists(self.export_path + "/Desktop/Variable"):  # create Variable file directory if not present yet
                 os.makedirs(self.export_path + "/Desktop/Variable")
             self.font.export(VARIABLE, FontPath=self.export_path + "/Desktop/Variable")
 
         if self.woff_status == 1:
-            if not os.path.exists(self.export_path + "/Web/WOFF"):
+            if not os.path.exists(self.export_path + "/Web/WOFF"):  # create WOFF file directory if not present yet
                 os.makedirs(self.export_path + "/Web/WOFF")
             self.generate_fonts(self.web_source_status, self.export_path + "/Web/WOFF", self.web_autohint_status, Containers=[WOFF])
 
         if self.woff2_status == 1:
-            if not os.path.exists(self.export_path + "/Web/WOFF2"):
+            if not os.path.exists(self.export_path + "/Web/WOFF2"):  # create WOFF2 file directory if not present yet
                 os.makedirs(self.export_path + "/Web/WOFF2")
             self.generate_fonts(self.web_source_status, self.export_path + "/Web/WOFF2", self.web_autohint_status, Containers=[WOFF2])
 
         if self.eot_status == 1:
-            if not os.path.exists(self.export_path + "/Web/EOT"):
+            if not os.path.exists(self.export_path + "/Web/EOT"):  # create EOT file directory if not present yet
                 os.makedirs(self.export_path + "/Web/EOT")
             self.generate_fonts(self.web_source_status, self.export_path + "/Web/EOT", self.web_autohint_status, Containers=[EOT])
 
