@@ -1,4 +1,4 @@
-# MenuTitle: Export Profiles
+# MenuTitle: Batch Export
 # -*- coding: utf-8 -*-
 
 __doc__ = """
