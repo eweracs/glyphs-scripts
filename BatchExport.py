@@ -147,19 +147,19 @@ class ExportWindow:
 
     def export_selection(self, sender):
         self.export_path = GetFolder()  # open parent directory to write files to
-        for i in self.selected_formats:
-            if i == "TTF" or i == "OTF" or i == "Variable":
-                if not os.path.exists(self.export_path + "/Desktop/" + i):
-                    os.makedirs(self.export_path + "/Desktop/" + i)
-                self.font.export(self.selected_formats[i][0], FontPath=self.export_path + "/Desktop/" + i,
-                                 AutoHint=self.selected_formats[i][1],
-                                 Containers=[self.selected_formats[i][2]])
+        for format in self.selected_formats:
+            if format == "TTF" or format == "OTF" or format == "Variable":
+                if not os.path.exists(self.export_path + "/Desktop/" + format):
+                    os.makedirs(self.export_path + "/Desktop/" + format)
+                self.font.export(self.selected_formats[format][0], FontPath=self.export_path + "/Desktop/" + format,
+                                 AutoHint=self.selected_formats[format][1],
+                                 Containers=[self.selected_formats[format][2]])
             else:
-                if not os.path.exists(self.export_path + "/Web/" + i):
-                    os.makedirs(self.export_path + "/Web/" + i)
-                self.font.export(self.selected_formats[i][0], FontPath=self.export_path + "/Web/" + i,
-                                 AutoHint=self.selected_formats[i][1],
-                                 Containers=[self.selected_formats[i][2]])
+                if not os.path.exists(self.export_path + "/Web/" + format):
+                    os.makedirs(self.export_path + "/Web/" + format)
+                self.font.export(self.selected_formats[format][0], FontPath=self.export_path + "/Web/" + format,
+                                 AutoHint=self.selected_formats[format][1],
+                                 Containers=[self.selected_formats[format][2]])
 
         self.w.close()
 
