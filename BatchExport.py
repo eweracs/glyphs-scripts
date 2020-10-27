@@ -25,6 +25,8 @@ class ExportWindow:
         self.woff2_status = 0
         self.eot_status = 0
 
+        self.selected_formats = {}
+
         # UI elements indent init
         x = 10
         y = 10
@@ -84,79 +86,80 @@ class ExportWindow:
         self.w.makeKey()
 
     def otf_select(self, sender):
-        self.otf_status = sender.get()
+        if sender.get() == 1:
+            self.selected_formats["OTF"] = [OTF, False, PLAIN]
+        else:
+            del self.selected_formats["OTF"]
 
     def otf_autohint_select(self, sender):
         if sender.get() == 1:
-            self.otf_autohint_status = True
+            self.selected_formats["OTF"][1] = True
+        else:
+            self.selected_formats["OTF"][1] = False
 
     def ttf_select(self, sender):
-        self.ttf_status = sender.get()
+        if sender.get() == 1:
+            self.selected_formats["TTF"] = [TTF, False, PLAIN]
+        else:
+            del self.selected_formats["TTF"]
 
     def ttf_autohint_select(self, sender):
         if sender.get() == 1:
-            self.ttf_autohint_status = True
+            self.selected_formats["TTF"][1] = True
+        else:
+            self.selected_formats["TTF"][1] = False
 
     def variable_select(self, sender):
-        self.variable_status = sender.get()
+        if sender.get() == 1:
+            self.selected_formats["Variable"] = [VARIABLE, False, PLAIN]
+        else:
+            del self.selected_formats[VARIABLE]
 
     def web_source_select(self, sender):
         if sender.get() == 1:
-            self.web_source_status = "TTF"
+            self.web_source_status = TTF
+        else:
+            self.web_source_status = OTF
 
     def web_autohint_select(self, sender):
         if sender.get() == 1:
             self.web_autohint_status = True
+        else:
+            self.web_autohint_status = False
 
     def woff_select(self, sender):
-        self.woff_status = sender.get()
+        if sender.get() == 1:
+            self.selected_formats["WOFF"] = [self.web_source_status, self.web_autohint_status, WOFF]
+        else:
+            del self.selected_formats["WOFF"]
 
     def woff2_select(self, sender):
-        self.woff2_status = sender.get()
+        if sender.get() == 1:
+            self.selected_formats["WOFF2"] = [self.web_source_status, self.web_autohint_status, WOFF2]
+        else:
+            del self.selected_formats["WOFF2"]
 
     def eot_select(self, sender):
-        self.eot_status = sender.get()
-
-    def generate_fonts(self, fontformat, path, autohint_status, **kwargs):
-        for instance in self.font.instances:
-            if instance.active:
-                instance.generate(fontformat, path, autohint_status, **kwargs)
+        if sender.get() == 1:
+            self.selected_formats["EOT"] = [self.web_source_status, self.web_autohint_status, EOT]
+        else:
+            del self.selected_formats["EOT"]
 
     def export_selection(self, sender):
         self.export_path = GetFolder()  # open parent directory to write files to
-
-        if self.otf_status == 1:
-            if not os.path.exists(self.export_path + "/Desktop/OTF"):  # create OTF file directory if not present yet
-                os.makedirs(self.export_path + "/Desktop/OTF")
-            self.generate_fonts("OTF", self.export_path + "/Desktop/OTF", self.otf_autohint_status)
-
-        if self.ttf_status == 1:
-            if not os.path.exists(self.export_path + "/Desktop/TTF"):  # create TTF file directory if not present yet
-                os.makedirs(self.export_path + "/Desktop/TTF")
-            self.generate_fonts("TTF", self.export_path + "/Desktop/TTF", self.ttf_autohint_status)
-
-        if self.variable_status == 1:
-            if not os.path.exists(self.export_path + "/Desktop/Variable"):  # create Variable file directory if not present yet
-                os.makedirs(self.export_path + "/Desktop/Variable")
-            self.font.export(VARIABLE, FontPath=self.export_path + "/Desktop/Variable")
-
-        if self.woff_status == 1:
-            if not os.path.exists(self.export_path + "/Web/WOFF"):  # create WOFF file directory if not present yet
-                os.makedirs(self.export_path + "/Web/WOFF")
-            self.generate_fonts(self.web_source_status, self.export_path + "/Web/WOFF",
-                                self.web_autohint_status, Containers=[WOFF])
-
-        if self.woff2_status == 1:
-            if not os.path.exists(self.export_path + "/Web/WOFF2"):  # create WOFF2 file directory if not present yet
-                os.makedirs(self.export_path + "/Web/WOFF2")
-            self.generate_fonts(self.web_source_status, self.export_path + "/Web/WOFF2",
-                                self.web_autohint_status, Containers=[WOFF2])
-
-        if self.eot_status == 1:
-            if not os.path.exists(self.export_path + "/Web/EOT"):  # create EOT file directory if not present yet
-                os.makedirs(self.export_path + "/Web/EOT")
-            self.generate_fonts(self.web_source_status, self.export_path + "/Web/EOT",
-                                self.web_autohint_status, Containers=[EOT])
+        for i in self.selected_formats:
+            if i == "TTF" or i == "OTF" or i == "Variable":
+                if not os.path.exists(self.export_path + "/Desktop/" + i):
+                    os.makedirs(self.export_path + "/Desktop/" + i)
+                self.font.export(self.selected_formats[i][0], FontPath=self.export_path + "/Desktop/" + i,
+                                 AutoHint=self.selected_formats[i][1],
+                                 Containers=[self.selected_formats[i][2]])
+            else:
+                if not os.path.exists(self.export_path + "/Web/" + i):
+                    os.makedirs(self.export_path + "/Web/" + i)
+                self.font.export(self.selected_formats[i][0], FontPath=self.export_path + "/Web/" + i,
+                                 AutoHint=self.selected_formats[i][1],
+                                 Containers=[self.selected_formats[i][2]])
 
         self.w.close()
 
