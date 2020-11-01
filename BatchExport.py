@@ -11,157 +11,235 @@ import vanilla
 
 class ExportWindow:
 
-    def __init__(self):
-        self.font = Font
-        self.export_path = None
-        self.otf_status = 0
-        self.otf_autohint_status = False
-        self.ttf_status = 0
-        self.ttf_autohint_status = False
-        self.variable_status = 0
-        self.web_source_status = "OTF"
-        self.web_autohint_status = False
-        self.woff_status = 0
-        self.woff2_status = 0
-        self.eot_status = 0
+	def __init__(self):
 
-        self.selected_formats = {}
+		self.font = Font
+		self.export_path = None
+		self.otf_status = 0
+		self.otf_autohint_status = False
+		self.ttf_status = 0
+		self.ttf_autohint_status = False
+		self.variable_status = 0
+		self.web_source_status = "OTF"
+		self.web_autohint_status = False
+		self.woff_status = 0
+		self.woff2_status = 0
+		self.eot_status = 0
 
-        # UI elements indent init
-        x = 10
-        y = 10
+		self.otf_checkbox_status = 0
+		self.ttf_checkbox_status = 0
+		self.variable_checkbox_status = 0
+		self.woff_checkbox_status = 0
+		self.woff2_checkbox_status = 0
+		self.eot_checkbox_status = 0
+		self.otf_autohint_checkbox_status = 0
+		self.ttf_autohint_checkbox_status = 0
+		self.web_autohint_checkbox_status = 0
+		self.web_source_selector_status = 0
 
-        self.w = vanilla.FloatingWindow((0, 0), "Batch Export")
+		self.selected_formats = {}
 
-        self.w.desktop_title = vanilla.TextBox((x, y, 200, 20), "Desktop")
-        y += 24
+		if Glyphs.defaults["com.eweracs.BatchExport.exportprefs"]:
+			self.selected_formats = Glyphs.defaults["com.eweracs.BatchExport.exportprefs"]
+			if self.selected_formats["Web"]["Output"] == "OTF":
+				self.web_source_selector_status = 0
+			else:
+				self.web_source_selector_status = 1
+			if WOFF in self.selected_formats["Web"]["Containers"]:
+				self.woff_checkbox_status = 1
+			if WOFF2 in self.selected_formats["Web"]["Containers"]:
+				self.woff2_checkbox_status = 1
+			if EOT in self.selected_formats["Web"]["Containers"]:
+				self.eot_checkbox_status = 1
+		else:
+			self.selected_formats = {"OTF": {"Export": False, "Type": "Desktop", "Output": "OTF", "Autohint": False, "Containers": [PLAIN]},
+			                         "TTF": {"Export": False, "Type": "Desktop", "Output": "TTF", "Autohint": False, "Containers": [PLAIN]},
+			                         "VAR": {"Export": False, "Type": "Desktop", "Output": VARIABLE, "Autohint": False, "Containers": [PLAIN]},
+			                         "Web": {"Export": False, "Type": "Web", "Output": "OTF", "Autohint": False, "Containers": []}
+			                         }
 
-        self.w.otf_checkbox = vanilla.CheckBox((x, y, 200, 22), "OTF",
-                                               callback=self.otf_select)
-        x += 16
-        y += 26
-        self.w.otf_autohint = vanilla.CheckBox((x, y, 200, 18), "Autohint",
-                                               sizeStyle="small", callback=self.otf_autohint_select)
-        x -= 16
-        y += 26
+		# UI elements indent init
+		x = 10
+		y = 10
 
-        self.w.ttf_checkbox = vanilla.CheckBox((x, y, 200, 22), "TTF",
-                                               callback=self.ttf_select)
-        x += 16
-        y += 26
-        self.w.ttf_autohint = vanilla.CheckBox((x, y, 200, 18), "Autohint",
-                                               sizeStyle="small", callback=self.ttf_autohint_select)
-        x -= 16
-        y += 26
+		self.w = vanilla.FloatingWindow((0, 0), "Batch Export")
 
-        self.w.variable_checkbox = vanilla.CheckBox((x, y, 200, 22), "Variable",
-                                                    callback=self.variable_select)
-        y = 10
+		self.w.desktop_title = vanilla.TextBox((x, y, 200, 20), "Desktop")
+		y += 24
 
-        x += 150
-        self.w.web_title = vanilla.TextBox((x, y, 200, 20), "Web")
-        y += 24
+		self.w.otf_checkbox = vanilla.CheckBox((x, y, 200, 22), "OTF",
+		                                       callback=self.otf_select, value=int(self.selected_formats["OTF"]["Export"]))
+		x += 16
+		y += 26
+		self.w.otf_autohint = vanilla.CheckBox((x, y, 200, 18), "Autohint",
+		                                       sizeStyle="small", callback=self.otf_autohint_select,
+		                                       value=int(self.selected_formats["OTF"]["Autohint"]))
+		x -= 16
+		y += 26
 
-        self.w.web_source = vanilla.PopUpButton((x, y, 100, 22), ["OTF", "TTF"], callback=self.web_source_select)
-        y += 26
-        x += 16
-        self.w.web_autohint = vanilla.CheckBox((x, y, 200, 18), "Autohint",
-                                               sizeStyle="small", callback=self.web_autohint_select)
-        x -= 16
-        y += 26
+		self.w.ttf_checkbox = vanilla.CheckBox((x, y, 200, 22), "TTF",
+		                                       callback=self.ttf_select, value=int(self.selected_formats["TTF"]["Export"]))
+		x += 16
+		y += 26
+		self.w.ttf_autohint = vanilla.CheckBox((x, y, 200, 18), "Autohint",
+		                                       sizeStyle="small", callback=self.ttf_autohint_select,
+		                                       value=int(self.selected_formats["TTF"]["Autohint"]))
+		x -= 16
+		y += 26
 
-        self.w.woff_checkbox = vanilla.CheckBox((x, y, 200, 20), "WOFF", callback=self.woff_select)
-        y += 26
-        self.w.woff2_checkbox = vanilla.CheckBox((x, y, 200, 20), "WOFF2", callback=self.woff2_select)
-        y += 26
-        self.w.eot_checkbox = vanilla.CheckBox((x, y, 200, 20), "EOT", callback=self.eot_select)
-        y += 30
+		self.w.variable_checkbox = vanilla.CheckBox((x, y, 200, 22), "VAR",
+		                                            callback=self.variable_select,
+		                                            value=int(self.selected_formats["VAR"]["Export"]))
+		y = 10
 
-        self.w.export_button = vanilla.Button((10, y, -10, 20), "Export...", callback=self.export_selection)
-        y = 200
+		x += 150
+		self.w.web_title = vanilla.TextBox((x, y, 200, 20), "Web")
+		y += 24
 
-        self.w.resize(320, y)
-        self.w.center()
-        self.w.open()
-        self.w.makeKey()
+		self.w.web_source = vanilla.PopUpButton((x, y, 100, 22), ["OTF", "TTF"], callback=self.web_source_select)
+		self.w.web_source.set(self.web_source_selector_status)
+		y += 26
+		x += 16
+		self.w.web_autohint = vanilla.CheckBox((x, y, 200, 18), "Autohint",
+		                                       sizeStyle="small", callback=self.web_autohint_select,
+		                                       value=int(self.selected_formats["Web"]["Autohint"]))
+		x -= 16
+		y += 26
 
-    def otf_select(self, sender):
-        if sender.get() == 1:
-            self.selected_formats["OTF"] = [OTF, False, PLAIN]
-        else:
-            del self.selected_formats["OTF"]
+		self.w.woff_checkbox = vanilla.CheckBox((x, y, 200, 20), "WOFF", callback=self.woff_select,
+		                                        value=self.woff_checkbox_status)
+		y += 26
+		self.w.woff2_checkbox = vanilla.CheckBox((x, y, 200, 20), "WOFF2", callback=self.woff2_select,
+		                                         value=self.woff2_checkbox_status)
+		y += 26
+		self.w.eot_checkbox = vanilla.CheckBox((x, y, 200, 20), "EOT", callback=self.eot_select,
+		                                       value=self.eot_checkbox_status)
+		y += 30
 
-    def otf_autohint_select(self, sender):
-        if sender.get() == 1:
-            self.selected_formats["OTF"][1] = True
-        else:
-            self.selected_formats["OTF"][1] = False
+		self.w.export_button = vanilla.Button((10, y, -10, 20), "Export...", callback=self.export_selection)
+		y = 200
 
-    def ttf_select(self, sender):
-        if sender.get() == 1:
-            self.selected_formats["TTF"] = [TTF, False, PLAIN]
-        else:
-            del self.selected_formats["TTF"]
+		self.export_button_toggle()
+		self.w.resize(320, y)
+		self.w.center()
+		self.w.open()
+		self.w.makeKey()
 
-    def ttf_autohint_select(self, sender):
-        if sender.get() == 1:
-            self.selected_formats["TTF"][1] = True
-        else:
-            self.selected_formats["TTF"][1] = False
+	def export_button_toggle(self):
+		if self.w.otf_checkbox.get() + self.w.ttf_checkbox.get() + self.w.variable_checkbox.get() + \
+		   self.w.woff_checkbox.get() + self.w.woff2_checkbox.get() + self.w.eot_checkbox.get() > 0:
+			self.w.export_button.enable(True)
+		else:
+			self.w.export_button.enable(False)
 
-    def variable_select(self, sender):
-        if sender.get() == 1:
-            self.selected_formats["Variable"] = [VARIABLE, False, PLAIN]
-        else:
-            del self.selected_formats[VARIABLE]
+	def otf_select(self, sender):
+		if sender.get() == 1:
+			self.selected_formats["OTF"]["Export"] = True
+		else:
+			self.selected_formats["OTF"]["Export"] = False
+		self.export_button_toggle()
+		return
 
-    def web_source_select(self, sender):
-        if sender.get() == 1:
-            self.web_source_status = TTF
-        else:
-            self.web_source_status = OTF
+	def otf_autohint_select(self, sender):
+		if sender.get() == 1:
+			self.selected_formats["OTF"]["Autohint"] = True
+		else:
+			self.selected_formats["OTF"]["Autohint"] = False
+		return
 
-    def web_autohint_select(self, sender):
-        if sender.get() == 1:
-            self.web_autohint_status = True
-        else:
-            self.web_autohint_status = False
+	def ttf_select(self, sender):
+		if sender.get() == 1:
+			self.selected_formats["TTF"]["Export"] = True
+		else:
+			self.selected_formats["TTF"]["Export"] = False
+		self.export_button_toggle()
+		return
 
-    def woff_select(self, sender):
-        if sender.get() == 1:
-            self.selected_formats["WOFF"] = [self.web_source_status, self.web_autohint_status, WOFF]
-        else:
-            del self.selected_formats["WOFF"]
+	def ttf_autohint_select(self, sender):
+		if sender.get() == 1:
+			self.selected_formats["TTF"]["Autohint"] = True
+		else:
+			self.selected_formats["TTF"]["Autohint"] = False
+		return
 
-    def woff2_select(self, sender):
-        if sender.get() == 1:
-            self.selected_formats["WOFF2"] = [self.web_source_status, self.web_autohint_status, WOFF2]
-        else:
-            del self.selected_formats["WOFF2"]
+	def variable_select(self, sender):
+		if sender.get() == 1:
+			self.selected_formats["VAR"]["Export"] = True
+		else:
+			self.selected_formats["VAR"]["Export"] = False
+		self.export_button_toggle()
+		return
 
-    def eot_select(self, sender):
-        if sender.get() == 1:
-            self.selected_formats["EOT"] = [self.web_source_status, self.web_autohint_status, EOT]
-        else:
-            del self.selected_formats["EOT"]
+	def web_source_select(self, sender):
+		if sender.get() == 1:
+			self.selected_formats["Web"]["Output"] = "TTF"
+		else:
+			self.selected_formats["Web"]["Output"] = "OTF"
+		return
 
-    def export_selection(self, sender):
-        self.export_path = GetFolder()  # open parent directory to write files to
-        for i in self.selected_formats:
-            if i == "TTF" or i == "OTF" or i == "Variable":
-                if not os.path.exists(self.export_path + "/Desktop/" + i):
-                    os.makedirs(self.export_path + "/Desktop/" + i)
-                self.font.export(self.selected_formats[i][0], FontPath=self.export_path + "/Desktop/" + i,
-                                 AutoHint=self.selected_formats[i][1],
-                                 Containers=[self.selected_formats[i][2]])
-            else:
-                if not os.path.exists(self.export_path + "/Web/" + i):
-                    os.makedirs(self.export_path + "/Web/" + i)
-                self.font.export(self.selected_formats[i][0], FontPath=self.export_path + "/Web/" + i,
-                                 AutoHint=self.selected_formats[i][1],
-                                 Containers=[self.selected_formats[i][2]])
+	def web_autohint_select(self, sender):
+		if sender.get() == 1:
+			self.selected_formats["Web"]["Autohint"] = True
+		else:
+			self.selected_formats["Web"]["Autohint"] = False
+		return
 
-        self.w.close()
+	def woff_select(self, sender):
+		if sender.get() == 1:
+			self.selected_formats["Web"]["Containers"].append(WOFF)
+		else:
+			self.selected_formats["Web"]["Containers"].remove(WOFF)
+		if len(self.selected_formats["Web"]["Containers"]) == 0:
+			self.selected_formats["Web"]["Export"] = False
+		else:
+			self.selected_formats["Web"]["Export"] = True
+		self.export_button_toggle()
+		return
+
+	def woff2_select(self, sender):
+		if sender.get() == 1:
+			self.selected_formats["Web"]["Containers"].append(WOFF2)
+		else:
+			self.selected_formats["Web"]["Containers"].remove(WOFF2)
+		if len(self.selected_formats["Web"]["Containers"]) == 0:
+			self.selected_formats["Web"]["Export"] = False
+		else:
+			self.selected_formats["Web"]["Export"] = True
+		self.export_button_toggle()
+		return
+
+	def eot_select(self, sender):
+		if sender.get() == 1:
+			self.selected_formats["Web"]["Containers"].append(EOT)
+		else:
+			self.selected_formats["Web"]["Containers"].remove(EOT)
+		if len(self.selected_formats["Web"]["Containers"]) == 0:
+			self.selected_formats["Web"]["Export"] = False
+		else:
+			self.selected_formats["Web"]["Export"] = True
+		self.export_button_toggle()
+		return
+
+	def export_selection(self, sender):
+		self.export_path = GetFolder()  # open parent directory to write files to
+		for i in self.selected_formats:
+			if self.selected_formats[i]["Export"]:
+				if self.selected_formats[i]["Type"] == "Desktop":
+					if not os.path.exists(self.export_path + "/Desktop/" + i):
+						os.makedirs(self.export_path + "/Desktop/" + i)
+					self.font.export(self.selected_formats[i]["Output"], FontPath=self.export_path + "/Desktop/" + i,
+					                 AutoHint=self.selected_formats[i]["Autohint"],
+					                 Containers=[PLAIN])
+				else:
+					if not os.path.exists(self.export_path + "/Web/"):
+						os.makedirs(self.export_path + "/Web/")
+					self.font.export(self.web_source_status, FontPath=self.export_path + "/Web/",
+					                 AutoHint=self.selected_formats[i]["Autohint"],
+					                 Containers=self.selected_formats["Web"]["Containers"])
+
+		Glyphs.defaults["com.eweracs.BatchExport.exportprefs"] = self.selected_formats  # write selection to saved preferences
+
+		self.w.close()
 
 
 ExportWindow()
