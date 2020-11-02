@@ -40,7 +40,12 @@ class ExportWindow:
 		self.selected_formats = {}
 
 		if Glyphs.defaults["com.eweracs.BatchExport.exportprefs"]:
-			self.selected_formats = Glyphs.defaults["com.eweracs.BatchExport.exportprefs"]
+			for key1 in Glyphs.defaults["com.eweracs.BatchExport.exportprefs"]:
+				for key2 in Glyphs.defaults["com.eweracs.BatchExport.exportprefs"][key1]:
+					self.selected_formats[key1] = dict(Glyphs.defaults["com.eweracs.BatchExport.exportprefs"][key1])
+					self.selected_formats[key1][key2] = Glyphs.defaults["com.eweracs.BatchExport.exportprefs"][key1][key2]
+
+			# self.selected_formats = copy.copy(dict(Glyphs.defaults["com.eweracs.BatchExport.exportprefs"]))
 			if self.selected_formats["Web"]["Output"] == "OTF":
 				self.web_source_selector_status = 0
 			else:
@@ -133,40 +138,25 @@ class ExportWindow:
 			self.w.export_button.enable(False)
 
 	def otf_select(self, sender):
-		if sender.get() == 1:
-			self.selected_formats["OTF"]["Export"] = True
-		else:
-			self.selected_formats["OTF"]["Export"] = False
+		self.selected_formats["OTF"]["Export"] = sender.get() == 1
 		self.export_button_toggle()
 		return
 
 	def otf_autohint_select(self, sender):
-		if sender.get() == 1:
-			self.selected_formats["OTF"]["Autohint"] = True
-		else:
-			self.selected_formats["OTF"]["Autohint"] = False
+		self.selected_formats["OTF"]["Autohint"] = sender.get() == 1
 		return
 
 	def ttf_select(self, sender):
-		if sender.get() == 1:
-			self.selected_formats["TTF"]["Export"] = True
-		else:
-			self.selected_formats["TTF"]["Export"] = False
+		self.selected_formats["TTF"]["Export"] = sender.get() == 1
 		self.export_button_toggle()
 		return
 
 	def ttf_autohint_select(self, sender):
-		if sender.get() == 1:
-			self.selected_formats["TTF"]["Autohint"] = True
-		else:
-			self.selected_formats["TTF"]["Autohint"] = False
+		self.selected_formats["TTF"]["Autohint"] = sender.get() == 1
 		return
 
 	def variable_select(self, sender):
-		if sender.get() == 1:
-			self.selected_formats["VAR"]["Export"] = True
-		else:
-			self.selected_formats["VAR"]["Export"] = False
+		self.selected_formats["VAR"]["Export"] = sender.get() == 1
 		self.export_button_toggle()
 		return
 
@@ -178,10 +168,7 @@ class ExportWindow:
 		return
 
 	def web_autohint_select(self, sender):
-		if sender.get() == 1:
-			self.selected_formats["Web"]["Autohint"] = True
-		else:
-			self.selected_formats["Web"]["Autohint"] = False
+		self.selected_formats["Web"]["Autohint"] = sender.get() == 1
 		return
 
 	def woff_select(self, sender):
@@ -189,10 +176,7 @@ class ExportWindow:
 			self.selected_formats["Web"]["Containers"].append(WOFF)
 		else:
 			self.selected_formats["Web"]["Containers"].remove(WOFF)
-		if len(self.selected_formats["Web"]["Containers"]) == 0:
-			self.selected_formats["Web"]["Export"] = False
-		else:
-			self.selected_formats["Web"]["Export"] = True
+		self.selected_formats["Web"]["Export"] = len(self.selected_formats["Web"]["Containers"]) > 0
 		self.export_button_toggle()
 		return
 
@@ -201,10 +185,7 @@ class ExportWindow:
 			self.selected_formats["Web"]["Containers"].append(WOFF2)
 		else:
 			self.selected_formats["Web"]["Containers"].remove(WOFF2)
-		if len(self.selected_formats["Web"]["Containers"]) == 0:
-			self.selected_formats["Web"]["Export"] = False
-		else:
-			self.selected_formats["Web"]["Export"] = True
+		self.selected_formats["Web"]["Export"] = len(self.selected_formats["Web"]["Containers"]) > 0
 		self.export_button_toggle()
 		return
 
@@ -213,10 +194,7 @@ class ExportWindow:
 			self.selected_formats["Web"]["Containers"].append(EOT)
 		else:
 			self.selected_formats["Web"]["Containers"].remove(EOT)
-		if len(self.selected_formats["Web"]["Containers"]) == 0:
-			self.selected_formats["Web"]["Export"] = False
-		else:
-			self.selected_formats["Web"]["Export"] = True
+		self.selected_formats["Web"]["Export"] = len(self.selected_formats["Web"]["Containers"]) > 0
 		self.export_button_toggle()
 		return
 
