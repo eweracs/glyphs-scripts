@@ -1,9 +1,4 @@
 .DS_Store
-<<<<<<< HEAD
-
+.idea
 venv/
-
 Test.py
-=======
-venv
->>>>>>> master
