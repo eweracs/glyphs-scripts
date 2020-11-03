@@ -21,6 +21,7 @@ class InstanceKerner:
 		self.class2 = 0
 		self.master1 = self.font.masters[0].axes[0]
 		self.master2 = self.font.masters[-1].axes[0]
+		self.axis_1_range = self.master2 - self.master1
 		self.master_1_kern = 0
 		self.master_2_kern = 0
 
@@ -32,7 +33,7 @@ class InstanceKerner:
 
 		self.w = vanilla.FloatingWindow((0, 0), "Instance Kerner")
 
-		self.w.otclass_title = vanilla.TextBox((10, y, 200, 20), "Select left and right OT Classes:", sizeStyle="small")
+		self.w.otclass_title = vanilla.TextBox((10, y, 200, 20), "Left and right OT Classes:", sizeStyle="small")
 		y += 18
 
 		self.w.otClass1 = vanilla.PopUpButton((x, y, 140, 20), self.ot_classes, sizeStyle="small", callback=self.get_class_1)
@@ -82,11 +83,9 @@ class InstanceKerner:
 	def get_feature_selection(self, sender):
 		self.feature_selection = self.kern_features[sender.get()]
 
-	def write_kerning(self, sender):
+	def write_kerning(self):
 		class1 = str(self.ot_classes[self.class1])
 		class2 = str(self.ot_classes[self.class2])
-
-		self.axis_1_range = self.master2 - self.master1
 
 		if not Font.features[self.feature_selection]:
 			if self.feature_selection == "kern":
@@ -99,8 +98,10 @@ class InstanceKerner:
 			kern = float((self.master_2_kern - self.master_1_kern)/self.axis_1_range*(instance.axes[0] - self.master1))\
 			       + self.master_1_kern
 
+			# if Replace Feature already exists, append kern_text
 			if instance.customParameters["Replace Feature"]:
 				if self.feature_selection == "kern":
+					# check whether kern; is already set (does not work for e.g. kern; cpsp; kern; order, to-do
 					if "kern" in instance.customParameters["Replace Feature"]:
 						kern_text = "{}\npos @{} {} @{};".format(instance.customParameters["Replace Feature"], class1,
 						                                         int(kern), class2)
@@ -108,14 +109,13 @@ class InstanceKerner:
 						kern_text = "{}\nkern;\npos @{} {} @{};".format(instance.customParameters["replace Feature"],
 						                                                class1, int(kern), class2)
 
-				if self.feature_selection == "cpsp":
+				else:
 					if "cpsp" in instance.customParameters["Replace Feature"]:
 						kern_text = "{}\npos @Uppercase <{} 0 {} 0>;".format(instance.customParameters["Replace Feature"],
 						                                                     int(kern), int(kern)*2)
 					else:
 						kern_text = "{}\ncpsp;\npos @Uppercase <{} 0 {} 0>;".format(instance.customParameters["Replace Feature"],
 						                                                            int(kern), int(kern)*2)
-
 			else:
 				if self.feature_selection == "kern":
 					kern_text = "kern;\npos @{} {} @{};".format(class1, int(kern), class2)
