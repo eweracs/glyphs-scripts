@@ -17,8 +17,6 @@ class InstanceKerner:
 		x = 10
 		y = 10
 
-		self.class1 = 0
-		self.class2 = 0
 		self.master1 = self.font.masters[0].axes[0]
 		self.master2 = self.font.masters[-1].axes[0]
 		self.axis_1_range = self.master2 - self.master1
@@ -36,9 +34,9 @@ class InstanceKerner:
 		self.w.otclass_title = vanilla.TextBox((10, y, 200, 20), "Left and right OT Classes:", sizeStyle="small")
 		y += 18
 
-		self.w.otClass1 = vanilla.PopUpButton((x, y, 140, 20), self.ot_classes, sizeStyle="small", callback=self.get_class_1)
+		self.w.otClass1 = vanilla.PopUpButton((x, y, 140, 20), self.ot_classes, sizeStyle="small")
 		x += 160
-		self.w.otClass2 = vanilla.PopUpButton((x, y, 140, 20), self.ot_classes, sizeStyle="small", callback=self.get_class_2)
+		self.w.otClass2 = vanilla.PopUpButton((x, y, 140, 20), self.ot_classes, sizeStyle="small")
 		x -= 160
 		y += 28
 
@@ -46,21 +44,21 @@ class InstanceKerner:
 		y += 18
 
 		self.w.master_1 = vanilla.TextBox((x + 50, y + 2, 92, 20), self.masternames[0], sizeStyle="small")
-		self.w.master_1_kern = vanilla.EditText((x, y, 40, 20), "", sizeStyle="small", callback=self.get_master_1_kern)
+		self.w.master_1_kern = vanilla.EditText((x, y, 40, 20), "", sizeStyle="small", callback=self.button_toggle)
 		x += 160
 		self.w.master_2 = vanilla.TextBox((x + 50, y + 2, 92, 20), self.masternames[-1], sizeStyle="small")
-		self.w.master_2_kern = vanilla.EditText((x, y, 40, 20), "", sizeStyle="small", callback=self.get_master_2_kern)
+		self.w.master_2_kern = vanilla.EditText((x, y, 40, 20), "", sizeStyle="small", callback=self.button_toggle)
 		y += 28
 		x -= 160
 
 		self.w.select_feature_title = vanilla.TextBox((x, y, 200, 20), "Kern feature:", sizeStyle="small")
 		y += 18
 
-		self.w.select_feature = vanilla.PopUpButton((x, y, 80, 20), self.kern_features, sizeStyle="small",
-		                                            callback=self.get_feature_selection)
+		self.w.select_feature = vanilla.PopUpButton((x, y, 80, 20), self.kern_features, sizeStyle="small")
 		x += 90
 
 		self.w.button = vanilla.Button((x, y, -10, 20), "Write to instances", callback=self.write_kerning)
+		self.w.button.enable(False)
 		y += 30
 
 		self.w.resize(320, y)
@@ -68,37 +66,28 @@ class InstanceKerner:
 		self.w.open()
 		self.w.makeKey()
 
-	def get_class_1(self, sender):
-		self.class1 = sender.get()
+	def button_toggle(self, sender):
+		self.w.button.enable(self.w.master_1_kern.get() and self.w.master_2_kern.get())
 
-	def get_class_2(self, sender):
-		self.class2 = sender.get()
+	def write_kerning(self, sender):
+		self.master_1_kern = int(self.w.master_1_kern.get())
+		self.master_2_kern = int(self.w.master_2_kern.get())
+		self.feature_selection = self.kern_features[self.w.select_feature.get()]
+		class1 = str(self.ot_classes[self.w.otClass1.get()])
+		class2 = str(self.ot_classes[self.w.otClass2.get()])
 
-	def get_master_1_kern(self, sender):
-		self.master_1_kern = int(sender.get())
-
-	def get_master_2_kern(self, sender):
-		self.master_2_kern = int(sender.get())
-
-	def get_feature_selection(self, sender):
-		self.feature_selection = self.kern_features[sender.get()]
-
-	def write_kerning(self):
-		class1 = str(self.ot_classes[self.class1])
-		class2 = str(self.ot_classes[self.class2])
-
-		if not Font.features[self.feature_selection]:
+		if not Font.features[self.feature_selection]:  # if the feature to be replaced doesn't exist yet, write it
 			if self.feature_selection == "kern":
 				Font.features["kern"] = "pos @{} {} @{};".format(class1, self.master_1_kern, class2)
 			elif self.feature_selection == "cpsp":
 				Font.features["cpsp"] = "pos @Uppercase <{} 0 {} 0>;".format(self.master_1_kern, self.master_1_kern*2)
 
-		for instance in Font.instances:
+		for number, instance in enumerate(Font.instances):
 
 			kern = float((self.master_2_kern - self.master_1_kern)/self.axis_1_range*(instance.axes[0] - self.master1))\
-			       + self.master_1_kern
+			       + self.master_1_kern  # calculate the kern value for current instance
 
-			# if Replace Feature already exists, append kern_text
+			# if Replace Feature already exists, append kern text
 			if instance.customParameters["Replace Feature"]:
 				if self.feature_selection == "kern":
 					# check whether kern; is already set (does not work for e.g. kern; cpsp; kern; order, to-do
@@ -123,6 +112,7 @@ class InstanceKerner:
 					kern_text = "cpsp;\npos @Uppercase <{} 0 {} 0>;".format(int(kern), int(kern)*2)
 
 			instance.customParameters["Replace Feature"] = kern_text
+			Glyphs.showNotification(title="Replace Feature parameter added", message="Values calculated for " + str(number) + " instances.")
 
 
 InstanceKerner()
