@@ -1,6 +1,6 @@
-#MenuTitle: Re-interpolate anchors
+# MenuTitle: Re-interpolate anchors
 # -*- coding: utf-8 -*-
-__doc__="""
+__doc__ = """
 Re-interpolates anchors for currently selected layer.
 """
 
