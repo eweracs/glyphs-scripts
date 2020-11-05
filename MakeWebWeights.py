@@ -93,5 +93,5 @@ font.customParameters["Axis Mappings"] = {
 for instance in font.instances:
 	instance.axes[0] = cssdict[instance.weight]
 
-Glyphs.showNotification(title="Weights converted",
+Glyphs.showNotification(title="Converted to web weights",
                         message="AVAR table calculated for " + str(len(font.instances)) + " instances")
