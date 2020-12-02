@@ -62,7 +62,7 @@ cssRange = cssweightlist[-1] - cssMinimum  # USWeightClass range
 
 # input_weight is old stem weight
 def convert_weight(input_weight):
-	output_weight = (input_weight - axisMinimum) / axisRange * cssRange + cssMinimum
+	output_weight = (input_weight - axisMinimum)/axisRange*cssRange + cssMinimum
 	return int(output_weight)  # calculate reference USWeightClass weight for old stem weight
 
 
@@ -85,9 +85,10 @@ for glyph in font.glyphs:
 			layer.name = re.sub(r'\d+', str(convert_weight(int_from_string(layer.name))), layer.name)
 
 # calculate AVAR table and write to custom parameters
+print(int(cssRange/100 + 1))
 font.customParameters["Axis Mappings"] = {
-	"wght": {w * 100 + cssMinimum: convert_weight(sorted({instance.axes[0] for instance in font.instances})[w]) for
-	         w in range(int(cssRange / 100 + 1))}}
+	"wght": {cssdict[i.weight]: convert_weight(sorted({instance.axes[0] for instance in font.instances})[index]) for
+	         index, i in enumerate(font.instances)}}
 
 # set USWeightClass values for instances based on weight assignment
 for instance in font.instances:

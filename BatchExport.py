@@ -1,4 +1,4 @@
-# MenuTitle: Export Profiles
+# MenuTitle: Batch Export
 # -*- coding: utf-8 -*-
 
 __doc__ = """
@@ -138,18 +138,25 @@ class ExportWindow:
 
 	def export_selection(self, sender):  # iterates through the dictionary and exports fonts based on set values
 		self.parent_path = GetFolder()  # open parent directory to write files to
-		for format in self.selected_formats:
-			if self.selected_formats[format]["Export"]:
-				self.export_path = self.parent_path + "/" + str(self.selected_formats[format]["Type"]) + "/" + format
-				if not os.path.exists(self.export_path):  # create export directory if it doesn’t exist yet
-					os.makedirs(self.export_path)
-				self.font.export(self.selected_formats[format]["Output"], FontPath=self.export_path,
-				                 AutoHint=self.selected_formats[format]["Autohint"],
-				                 Containers=self.selected_formats[format]["Containers"])
+		for output in self.selected_formats:
+			if self.selected_formats[output]["Export"]:
+				if self.selected_formats[output]["Containers"]:
+					for container in self.selected_formats[output]["Containers"]:
+						path = self.parent_path + "/" + str(self.selected_formats[output]["Type"]) + "/" + str(container) + "/"
+						self.export_to_location(self.selected_formats[output]["Output"], self.selected_formats[output]["Autohint"], path, [str(container)])
+				else:
+					path = self.parent_path + "/" + str(self.selected_formats[output]["Type"]) + "/" + output + "/"
+					self.export_to_location(self.selected_formats[output]["Output"], self.selected_formats[output]["Autohint"], path, self.selected_formats[output]["Containers"])
+
+
+	def export_to_location(self, output, autohint, path, container):
+		if not os.path.exists(path):  # create export directory if it doesn’t exist yet
+			os.makedirs(path)
+		print(container)
+		self.font.export(output, FontPath=path, AutoHint=autohint, Containers=container)
 
 		Glyphs.defaults["com.eweracs.BatchExport.exportprefs"] = self.selected_formats  # write selection to saved preferences
-
-		self.w.close()
+		# self.w.close()
 
 
 ExportWindow()
