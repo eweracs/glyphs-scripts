@@ -97,6 +97,8 @@ class ExportWindow:
 		self.w.export_button = vanilla.Button((10, y, -10, 20), "Export...", callback=self.export_selection)
 		y = 200
 
+		self.w.setDefaultButton(self.w.export_button)
+
 		self.export_button_toggle()
 		self.w.resize(320, y)
 		self.w.center()
