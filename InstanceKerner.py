@@ -57,9 +57,11 @@ class InstanceKerner:
 		self.w.select_feature = vanilla.PopUpButton((x, y, 80, 20), self.kern_features, sizeStyle="small")
 		x += 90
 
-		self.w.button = vanilla.Button((x, y, -10, 20), "Write to instances", callback=self.write_kerning)
-		self.w.button.enable(False)
+		self.w.write_button = vanilla.Button((x, y, -10, 20), "Write to instances", callback=self.write_kerning)
+		self.w.write_button.enable(False)
 		y += 30
+
+		self.w.setDefaultButton(self.w.write_button)
 
 		self.w.resize(320, y)
 		self.w.center()
@@ -67,7 +69,7 @@ class InstanceKerner:
 		self.w.makeKey()
 
 	def button_toggle(self, sender):
-		self.w.button.enable(self.w.master_1_kern.get() and self.w.master_2_kern.get())
+		self.w.write_button.enable(self.w.master_1_kern.get() and self.w.master_2_kern.get())
 
 	def write_kerning(self, sender):
 		self.master_1_kern = int(self.w.master_1_kern.get())
