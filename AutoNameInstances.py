@@ -14,3 +14,7 @@ for i in Font.instances:
 			i.name = i.weight + " Compressed"
 		else:
 			i.name = i.weight + " " + i.width
+		if i.isItalic:
+			i.name += " Italic"
+			if "Regular" in i.name:
+				i.name = i.name.replace("Regular ", "")
