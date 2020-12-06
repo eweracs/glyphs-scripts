@@ -149,6 +149,7 @@ class ExportWindow:
 				else:
 					path = self.parent_path + "/" + str(self.selected_formats[output]["Type"]) + "/" + output + "/"
 					self.export_to_location(self.selected_formats[output]["Output"], self.selected_formats[output]["Autohint"], path, self.selected_formats[output]["Containers"])
+		self.w.close()
 
 
 	def export_to_location(self, output, autohint, path, container):
