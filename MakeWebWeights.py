@@ -66,23 +66,13 @@ def convert_weight(input_weight):
 	return int(output_weight)  # calculate reference USWeightClass weight for old stem weight
 
 
-# read only number from a string
-def int_from_string(string):
-	chars = [char for char in string]
-	digits = []
-	for char in chars:
-		if char.isdigit():
-			digits.append(char)
-	number = "".join(digits)
-	return int(number)
-
-
 # recalculate values in intermediate layers
 for glyph in font.glyphs:
 	for layer in glyph.layers:
 		if layer.isSpecialLayer:
 			# rename the layer by converting the old number to new weight assignment
-			layer.name = re.sub(r'\d+', str(convert_weight(int_from_string(layer.name))), layer.name)
+			# convert the layer name by reading only the digits from the layer
+			layer.name = re.sub(r'\d+', str(convert_weight(int("".join([char for char in layer.name if char.isdigit()])))), layer.name)
 
 # calculate AVAR table and write to custom parameters
 print(int(cssRange/100 + 1))
