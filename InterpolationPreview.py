@@ -13,7 +13,7 @@ class Interpolator:
 
 		self.font = Font
 
-		self.w = vanilla.FloatingWindow((0, 0), "Interpolator")
+		self.w = vanilla.FloatingWindow((0, 0), "Interpolation Preview")
 
 		self.axesRanges = []  # create a list to contain tuples with the min and max of an axis
 		self.currentCoords = []
@@ -74,8 +74,10 @@ class Interpolator:
 
 		self.ypos += 25
 
-		setattr(self.w, "addMenu", vanilla.Button((155, self.ypos, -10, 20), "Instance...", callback=self.add_instance_menu))
-		setattr(self.w, "addIntermediate", vanilla.Button((10, self.ypos, -155, 20), "Intermediate...", callback=self.intermediate_menu))
+		setattr(self.w, "addMenu", vanilla.Button((155, self.ypos, -10, 20), "Instance...",
+		                                          callback=self.add_instance_menu))
+		setattr(self.w, "addIntermediate", vanilla.Button((10, self.ypos, -155, 20), "Intermediate...",
+		                                                  callback=self.intermediate_menu))
 
 		self.w.resize(300, self.w.addMenu.getPosSize()[1] + 30)
 
@@ -93,7 +95,7 @@ class Interpolator:
 		self.ypos = self.w.addMenu.getPosSize()[1] + 40
 
 		try:
-			setattr(self.w, "instanceName", vanilla.TextBox((10, self.ypos, 60, 14), "Name", sizeStyle="small"))
+			setattr(self.w, "instanceName", vanilla.TextBox((10, self.ypos, 60, 14), "Name", sizeStyle="small", value=))
 			setattr(self.w, "nameSelector", vanilla.EditText((60, self.ypos, -10, 19), placeholder=self.namePlaceholder,
 			                                                 callback=self.instance_name))
 
@@ -187,7 +189,8 @@ class Interpolator:
 			        vanilla.PopUpButton((60, self.ypos, -10, 17), [master.name for master in self.font.masters],
 			                            callback=self.parent_selector))
 			self.ypos += 30
-			setattr(self.w, "makeIntermediate", vanilla.Button((10, self.ypos, -10, 20), "Make Intermediate", callback=self.make_intermediate))
+			setattr(self.w, "makeIntermediate", vanilla.Button((10, self.ypos, -10, 20), "Make Intermediate",
+			                                                   callback=self.make_intermediate))
 
 			self.w.setDefaultButton(self.w.makeIntermediate)
 			self.w.resize(300, self.w.makeIntermediate.getPosSize()[1] + 30)
