@@ -76,7 +76,8 @@ for glyph in font.glyphs:
 
 # calculate AVAR table and write to custom parameters
 font.customParameters["Axis Mappings"] = {
-	"wght": {cssdict[instance.weight]: convert_weight(instance.axes[0]) for instance in font.instances}}
+	"wght": {cssdict[instance.weight]: convert_weight(instance.axes[0]) for instance in font.instances}
+}
 
 # set USWeightClass values for instances based on weight assignment
 for instance in font.instances:
