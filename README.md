@@ -10,6 +10,9 @@ Opens a dialogue to choose multiple export formats. Sorts exported files into re
 ## Interpolate Anchors
 Same as clicking Re-Interpolate in the layers panel, but only affects anchors.
 
+## Interpolation Preview
+Allows for visual interpolation, in order to add the interpolation as an instance or an intermediate layer. Respects multi-axis design spaces.
+
 ## Instance Kerner (WIP, one axis only)
 Adds Replace Feature custom parameter for every instance for kerning. Useful for hard-coded capital/sc spacing. Currently only works for single-axis setups, still trying to figure out how to make this work for multiple axes. Todo: more than two kerning values per axis
 
