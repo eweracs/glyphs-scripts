@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 __doc__ = """
-Exports font in specified formats, nicely sorted into folders
+Exports font in specified formats, nicely sorted into folders.
 """
 
 import os

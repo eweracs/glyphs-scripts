@@ -83,6 +83,7 @@ class Interpolator:
 
 		self.w.open()
 		self.w.makeKey()
+		self.w.bind("close", self.remove_preview)
 
 	def add_instance_menu(self, sender):
 		try:
@@ -95,7 +96,7 @@ class Interpolator:
 		self.ypos = self.w.addMenu.getPosSize()[1] + 40
 
 		try:
-			setattr(self.w, "instanceName", vanilla.TextBox((10, self.ypos, 60, 14), "Name", sizeStyle="small", value=))
+			setattr(self.w, "instanceName", vanilla.TextBox((10, self.ypos, 60, 14), "Name", sizeStyle="small"))
 			setattr(self.w, "nameSelector", vanilla.EditText((60, self.ypos, -10, 19), placeholder=self.namePlaceholder,
 			                                                 callback=self.instance_name))
 
@@ -208,6 +209,10 @@ class Interpolator:
 
 	def parent_selector(self, sender):
 		self.selectedParent = sender.get()
+
+	def remove_preview(self, sender):
+		if "Preview" in self.font.instances[-1].name:
+			del self.font.instances[-1]
 
 
 Interpolator()

@@ -4,7 +4,8 @@
 import re
 
 __doc__ = """
-Prepares a file for web use, assigning USWeightClass values.
+Prepares a file for web use, assigning USWeightClass values. Requires master naming based on weight classes and proper
+weight class assignment for instances
 """
 
 cssdict = {
@@ -72,7 +73,8 @@ for glyph in font.glyphs:
 		if layer.isSpecialLayer:
 			# rename the layer by converting the old number to new weight assignment
 			# convert the layer name by reading only the digits from the layer
-			layer.name = re.sub(r'\d+', str(convert_weight(int("".join([char for char in layer.name if char.isdigit()])))), layer.name)
+			layer.name = re.sub(r'\d+', str(convert_weight(int("".join(
+				[char for char in layer.name if char.isdigit()])))), layer.name)
 
 # calculate AVAR table and write to custom parameters
 font.customParameters["Axis Mappings"] = {
