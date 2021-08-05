@@ -113,7 +113,6 @@ class AutoNamer:
 		Glyphs.defaults["com.eweracs.AutoNameInstances.exceptionprefs"] = self.widthExceptions
 
 	def clear_exception(self, sender):
-		self.update_widths()
 
 		for i, item in enumerate(self.widthExButtonList):
 			if item is sender:
@@ -127,6 +126,7 @@ class AutoNamer:
 				del self.widthExButtonList[i]
 				del self.widthExceptions[list(self.widthExceptions.items())[i][0]]
 
+		self.update_widths()
 		self.redraw_items()
 		Glyphs.defaults["com.eweracs.AutoNameInstances.exceptionprefs"] = self.widthExceptions
 
@@ -135,7 +135,7 @@ class AutoNamer:
 			"Ultra Condensed",
 			"Extra Condensed",
 			"Condensed",
-			"Semi Condensed",
+			"SemiCondensed",
 			"Medium (normal)",
 			"Semi Expanded",
 			"Expanded",
@@ -173,26 +173,21 @@ class AutoNamer:
 		self.w.resize(390, self.ypos)
 
 	def auto_name_instances(self, sender):
-		for i in Font.instances:
+		for i in self.font.instances:
 			if i.active:
-				print()
+				if "Medium" in i.width:
+					i.name = i.weight
+				elif i.weight == "Regular" or i.weight == "Normal":
+					i.name = i.width
+				for exception in self.widthExceptions:
+					if str(exception) in i.width:
+						i.name = i.weight + " " + self.widthExceptions[exception]
+				if i.isItalic:
+					i.name += " Italic"
+					if "Regular" in i.name:
+						i.name = i.name.replace("Regular ", "")
 
 		Glyphs.defaults["com.eweracs.AutoNameInstances.exceptionprefs"] = self.widthExceptions
 
 
 AutoNamer()
-
-# for i in Font.instances:
-# 	if i.active:
-# 		if "Medium" in i.width:
-# 			i.name = i.weight
-# 		elif i.weight == "Regular" or i.weight == "Normal":
-# 			i.name = i.width
-# 		elif i.width == "Ultra Condensed":
-# 			i.name = i.weight + " Compressed"
-# 		else:
-# 			i.name = i.weight + " " + i.width
-# 		if i.isItalic:
-# 			i.name += " Italic"
-# 			if "Regular" in i.name:
-# 				i.name = i.name.replace("Regular ", "")
