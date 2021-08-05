@@ -82,9 +82,6 @@ class AutoNamer:
 		self.w.open()
 		self.w.makeKey()
 
-	def exception_line(self, ypos, title, text, callback):
-		print()
-
 	def list_exceptions(self, sender):
 		self.selectedWidthClass = self.widths[sender.get()]
 
@@ -108,7 +105,6 @@ class AutoNamer:
 		self.widthExButtonList.append(b)
 
 		self.update_widths()
-		print(self.widthExceptions)
 		self.redraw_items()
 		Glyphs.defaults["com.eweracs.AutoNameInstances.exceptionprefs"] = self.widthExceptions
 
