@@ -2,7 +2,7 @@
 Scripts for Glyphs.
 
 ## Auto-Name Instances
-Names instances based on assigned names. Useful for batch-renaming large families.
+Names instances based on assigned names. Useful for batch-renaming large families. Allows defining of naming exceptions for width classes.
 
 ## Batch Export
 Opens a dialogue to choose multiple export formats. Sorts exported files into respective sub-directories (/Desktop/TTF, /Web/WOFF2, ...).
