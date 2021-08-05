@@ -19,6 +19,7 @@ class Interpolator:
 		self.currentCoords = []
 		self.sliderList = []  # create a list of the slider objects
 		self.popUpButtonList = []
+		self.inputFieldList = []
 
 		self.instanceName = "Regular"
 		self.selectedClasses = ["Medium (normal)", "Regular"]
@@ -43,7 +44,7 @@ class Interpolator:
 				1: "Ultra Condensed",
 				2: "Extra Condensed",
 				3: "Condensed",
-				4: "Semi Condensed",
+				4: "SemiCondensed",
 				5: "Medium (normal)",
 				6: "Semi Expanded",
 				7: "Expanded",
@@ -58,15 +59,23 @@ class Interpolator:
 			self.axesRanges.append(set())  # for each axis in the font, create an empty tuple to store the axis range
 			for master in self.font.masters:  # first, build a list of the axis ranges
 				self.axesRanges[i].add(master.axes[i])
+			self.axesRanges = [sorted(list(a)) for a in self.axesRanges]
+			for axisRange in self.axesRanges:
+				del axisRange[1:-1]  # delete intermediate master coordinates
+
 			setattr(self.w, axis["Tag"] + "title", vanilla.TextBox((10, 20 + i * 30, -10, 14),
 			                                                       axis["Name"], sizeStyle="small"))
-			s = vanilla.Slider((60, 20 + i * 30, -10, 15),
+			s = vanilla.Slider((60, 20 + i * 30, -70, 15),
 			                   minValue=sorted(self.axesRanges[i])[0],
 			                   maxValue=sorted(self.axesRanges[i])[1],
 			                   value=self.currentCoords[i],
-			                   callback=self.axis_selector)
+			                   callback=self.axis_slider)
 			setattr(self.w, axis["Tag"] + "slider", s)
 			self.sliderList.append(s)
+
+			t = vanilla.EditText((-60, 20 + i * 30 - 1, -10, 22), callback=self.axis_input, text=self.currentCoords[i])
+			self.inputFieldList.append(t)
+			setattr(self.w, axis["Tag"] + "input", t)
 
 		self.ypos = s.getPosSize()[1] + 36
 
@@ -119,10 +128,24 @@ class Interpolator:
 		except Exception as e:
 			print(e)
 
-	def axis_selector(self, sender):
+	def axis_slider(self, sender):
 		for i, item in enumerate(self.sliderList):
 			if item is sender:
 				self.currentCoords[i] = int(sender.get())
+				self.inputFieldList[i].set(str(int(sender.get())))
+		self.preview_instance()
+
+	def axis_input(self, sender):
+		for i, item in enumerate(self.inputFieldList):
+			if item is sender:
+				try:
+					if sender.get().isnumeric():
+						self.currentCoords[i] = int(sender.get())
+						self.sliderList[i].set(int(sender.get()))
+				except Exception as e:
+					print(e)
+					self.currentCoords[i] = 0
+					self.sliderList[i].set(0)
 		self.preview_instance()
 
 	def class_selector(self, sender):
@@ -136,8 +159,6 @@ class Interpolator:
 			self.namePlaceholder = self.selectedClasses[1]
 		elif self.selectedClasses[1] == "Regular" or self.selectedClasses[1] == "Normal":
 			self.namePlaceholder = self.selectedClasses[0]
-		elif self.selectedClasses[0] == "Ultra Condensed":
-			self.namePlaceholder = self.selectedClasses[1] + " Compressed"
 		else:
 			self.namePlaceholder = self.selectedClasses[1] + " " + self.selectedClasses[0]
 		self.w.nameSelector.setPlaceholder(self.namePlaceholder)
