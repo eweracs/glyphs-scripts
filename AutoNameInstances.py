@@ -62,14 +62,14 @@ class AutoNamer:
 		if len(self.widths) > 0:
 			self.selectedWidthClass = self.widths[0]
 			setattr(self.w, "widthExceptions", vanilla.PopUpButton((10, self.ypos, 140, 20), self.widths,
-			                                                       callback=self.list_exceptions))
+			                                                       callback=self.list_width_exceptions))
 			setattr(self.w, "widthExceptionsArrow", vanilla.TextBox((160, self.ypos, -10, 14), u"\u2192",
 			                                                        sizeStyle="regular"))
 
 			setattr(self.w, "widthExceptionName", vanilla.EditText((190, self.ypos - 1, 130, 22),
-			                                                       callback=self.exception_name))
+			                                                       callback=self.width_exception_name))
 			setattr(self.w, "addWidthException", vanilla.Button((330, self.ypos, 50, 20), "Add",
-			                                                    callback=self.add_exception))
+			                                                    callback=self.add_width_exception))
 
 			self.ypos = self.w.widthExceptions.getPosSize()[1] + 32
 
@@ -82,17 +82,17 @@ class AutoNamer:
 		self.w.open()
 		self.w.makeKey()
 
-	def list_exceptions(self, sender):
+	def list_width_exceptions(self, sender):
 		self.selectedWidthClass = self.widths[sender.get()]
 
-	def exception_name(self, sender):
+	def width_exception_name(self, sender):
 		self.exceptionName = sender.get()
 
-	def add_exception(self, sender):
+	def add_width_exception(self, sender):
 		self.widthExceptions[self.selectedWidthClass] = self.exceptionName
 		n = vanilla.TextBox((10, self.ypos, -10, 17), self.selectedWidthClass)
 		a = vanilla.TextBox((160, self.ypos, -10, 14), u"\u2192", sizeStyle="regular")
-		e = vanilla.TextBox((190, self.ypos -1, 130, 22), str(self.widthExceptions[self.selectedWidthClass]))
+		e = vanilla.TextBox((190, self.ypos - 1, 130, 22), str(self.widthExceptions[self.selectedWidthClass]))
 		b = vanilla.Button((330, self.ypos, 50, 20), "Clear", callback=self.clear_exception)
 
 		setattr(self.w, self.selectedWidthClass + "Selection", n)
@@ -171,17 +171,19 @@ class AutoNamer:
 	def auto_name_instances(self, sender):
 		for i in self.font.instances:
 			if i.active:
-				if "Medium" in i.width:
-					i.name = i.weight
-				elif i.weight == "Regular" or i.weight == "Normal":
-					i.name = i.width
-				for exception in self.widthExceptions:
-					if str(exception) in i.width:
-						i.name = i.weight + " " + self.widthExceptions[exception]
+				weightName = i.weight
+				widthName = i.width
+				if "Medium" in i.width and "Medium" not in self.widthExceptions:
+					widthName = ""
+				if i.width in self.widthExceptions:
+					widthName = self.widthExceptions[i.width]
+				if i.weight == "Regular" or i.weight == "Normal":
+					weightName = ""
+				i.name = weightName + widthName
+				if i.name == "":
+					i.name = "Regular"
 				if i.isItalic:
 					i.name += " Italic"
-					if "Regular" in i.name:
-						i.name = i.name.replace("Regular ", "")
 
 		Glyphs.defaults["com.eweracs.AutoNameInstances.exceptionprefs"] = self.widthExceptions
 
