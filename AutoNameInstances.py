@@ -9,11 +9,7 @@ import vanilla
 
 class AutoNamer:
 	def __init__(self):
-		try:
-			self.font = Font
-		except Exception:
-			print("Open a font file!")
-			quit()
+		self.font = Font
 		self.prefs = []
 		self.widthExceptions = {}
 		self.selectedWidthClass = None
@@ -75,6 +71,8 @@ class AutoNamer:
 
 		setattr(self.w, "generate", vanilla.Button((10, self.ypos, -10, 20), "Auto-name instances",
 		                                           callback=self.auto_name_instances))
+
+		self.w.setDefaultButton(self.w.generate)
 
 		self.ypos += 32
 
@@ -139,7 +137,8 @@ class AutoNamer:
 			"Ultra Expanded"
 		] if width not in self.widthExceptions]
 
-		self.selectedWidthClass = self.widths[0]
+		if len(self.widths) > 0:
+			self.selectedWidthClass = self.widths[0]
 
 	def redraw_items(self):
 		self.ypos = 32
@@ -152,6 +151,11 @@ class AutoNamer:
 			self.ypos = self.widthExTitleList[i].getPosSize()[1] + 32
 		except Exception as e:
 			print(e)
+
+		if len(self.widths) == 0:
+			del self.w.widthExceptions
+			del self.w.widthExceptionsArrow
+			del self.w.widthExceptionName
 
 		self.w.widthExceptions.setItems(self.widths)
 		self.w.widthExceptions.setPosSize((10, self.ypos, 140, 20))
@@ -169,17 +173,25 @@ class AutoNamer:
 		self.w.resize(390, self.ypos)
 
 	def auto_name_instances(self, sender):
+		if self.font is None:
+			Message("Open a font file!", title="Error")
+		self.w.close()
 		for i in self.font.instances:
 			if i.active:
-				weightName = i.weight
-				widthName = i.width
+				weight_name = i.weight
+				width_name = i.width
 				if "Medium" in i.width and "Medium" not in self.widthExceptions:
-					widthName = ""
+					width_name = ""
 				if i.width in self.widthExceptions:
-					widthName = self.widthExceptions[i.width]
+					width_name = self.widthExceptions[i.width]
 				if i.weight == "Regular" or i.weight == "Normal":
-					weightName = ""
-				i.name = weightName + widthName
+					weight_name = ""
+				if len(weight_name) > 1 and len(width_name) > 1:
+					i.name = " ".join([weight_name, width_name])
+				elif len(weight_name) > 1:
+					i.name = weight_name
+				elif len(width_name) > 1:
+					i.name = width_name
 				if i.name == "":
 					i.name = "Regular"
 				if i.isItalic:

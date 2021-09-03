@@ -71,10 +71,13 @@ def convert_weight(input_weight):
 for glyph in font.glyphs:
 	for layer in glyph.layers:
 		if layer.isSpecialLayer:
-			# rename the layer by converting the old number to new weight assignment
-			# convert the layer name by reading only the digits from the layer
-			layer.name = re.sub(r'\d+', str(convert_weight(int("".join(
-				[char for char in layer.name if char.isdigit()])))), layer.name)
+			try:
+				# rename the layer by converting the old number to new weight assignment
+				# convert the layer name by reading only the digits from the layer
+				specialLayerValue = int(float("".join([char for char in layer.name if char.isdigit()])))
+				layer.name = re.sub(r'\d+', str(convert_weight(specialLayerValue)), layer.name)
+			except Exception as e:
+				print(e)
 
 # calculate AVAR table and write to custom parameters
 font.customParameters["Axis Mappings"] = {
