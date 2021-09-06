@@ -154,14 +154,21 @@ class Interpolator:
 				self.selectedClasses[i] = list(self.styleClasses.items())[i][1].values()[sender.get()]
 		self.instance_autonamer()
 
-	def instance_autonamer(self):  # shamelessly copied from AutoNameInstances.py
-		if "Medium" in self.selectedClasses[0]:
-			self.namePlaceholder = self.selectedClasses[1]
-		elif self.selectedClasses[1] == "Regular" or self.selectedClasses[1] == "Normal":
-			self.namePlaceholder = self.selectedClasses[0]
+	def instance_autonamer(self):  # basically copied from AutoNameInstances.py
+		if len(self.w.nameSelector.get()) > 0:
+			self.instanceName = self.w.nameSelector.get()
+			print(len(self.w.nameSelector.get()))
 		else:
-			self.namePlaceholder = self.selectedClasses[1] + " " + self.selectedClasses[0]
-		self.w.nameSelector.setPlaceholder(self.namePlaceholder)
+			if "Medium" in self.selectedClasses[0]:
+				self.namePlaceholder = self.selectedClasses[1]
+				self.instanceName = self.namePlaceholder
+			elif self.selectedClasses[1] == "Regular" or self.selectedClasses[1] == "Normal":
+				self.namePlaceholder = self.selectedClasses[0]
+				self.instanceName = self.namePlaceholder
+			else:
+				self.namePlaceholder = self.selectedClasses[1] + " " + self.selectedClasses[0]
+				self.instanceName = self.namePlaceholder
+			self.w.nameSelector.setPlaceholder(self.namePlaceholder)
 
 	def preview_instance(self):
 		if self.font.instances:
@@ -181,6 +188,8 @@ class Interpolator:
 
 	def instance_name(self, sender):
 		self.instanceName = sender.get()
+		if len(self.instanceName) == 0:
+			self.instanceName = self.namePlaceholder
 
 	def write_instance(self, sender):
 		self.font.instances[-1].axes = self.currentCoords
