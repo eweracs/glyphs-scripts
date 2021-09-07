@@ -63,19 +63,36 @@ class Interpolator:
 			for axisRange in self.axesRanges:
 				del axisRange[1:-1]  # delete intermediate master coordinates
 
-			setattr(self.w, axis["Tag"] + "title", vanilla.TextBox((10, 20 + i * 30, -10, 14),
-			                                                       axis["Name"], sizeStyle="small"))
-			s = vanilla.Slider((60, 20 + i * 30, -70, 15),
-			                   minValue=sorted(self.axesRanges[i])[0],
-			                   maxValue=sorted(self.axesRanges[i])[1],
-			                   value=self.currentCoords[i],
-			                   callback=self.axis_slider)
-			setattr(self.w, axis["Tag"] + "slider", s)
-			self.sliderList.append(s)
+			try:  # Glyphs 3
+				setattr(self.w, axis.axisTag + "title", vanilla.TextBox((10, 20 + i * 30, -10, 14),
+			                                                       axis.name, sizeStyle="small"))
+				s = vanilla.Slider((60, 20 + i * 30, -70, 15),
+				                   minValue=sorted(self.axesRanges[i])[0],
+				                   maxValue=sorted(self.axesRanges[i])[1],
+				                   value=self.currentCoords[i],
+				                   callback=self.axis_slider)
+				setattr(self.w, axis.axisTag + "slider", s)
+				self.sliderList.append(s)
 
-			t = vanilla.EditText((-60, 20 + i * 30 - 1, -10, 22), callback=self.axis_input, text=self.currentCoords[i])
-			self.inputFieldList.append(t)
-			setattr(self.w, axis["Tag"] + "input", t)
+				t = vanilla.EditText((-60, 20 + i * 30 - 1, -10, 22), callback=self.axis_input,
+				                     text=self.currentCoords[i])
+				self.inputFieldList.append(t)
+				setattr(self.w, axis.axisTag + "input", t)
+
+			except: # Glyphs 2
+				setattr(self.w, axis["Tag"] + "title", vanilla.TextBox((10, 20 + i * 30, -10, 14),
+				                                                       axis["Name"], sizeStyle="small"))
+				s = vanilla.Slider((60, 20 + i * 30, -70, 15),
+				                   minValue=sorted(self.axesRanges[i])[0],
+				                   maxValue=sorted(self.axesRanges[i])[1],
+				                   value=self.currentCoords[i],
+				                   callback=self.axis_slider)
+				setattr(self.w, axis["Tag"] + "slider", s)
+				self.sliderList.append(s)
+
+				t = vanilla.EditText((-60, 20 + i * 30 - 1, -10, 22), callback=self.axis_input, text=self.currentCoords[i])
+				self.inputFieldList.append(t)
+				setattr(self.w, axis["Tag"] + "input", t)
 
 		self.ypos = s.getPosSize()[1] + 36
 
