@@ -64,8 +64,8 @@ class Interpolator:
 				del axisRange[1:-1]  # delete intermediate master coordinates
 
 			try:  # Glyphs 3
-				setattr(self.w, axis.axisTag + "title", vanilla.TextBox((10, 20 + i * 30, -10, 14),
-			                                                       axis.name, sizeStyle="small"))
+				setattr(self.w, axis.axisTag + "title", vanilla.TextBox((10, 20 + i * 30, -10, 14), axis.name,
+				                                                        sizeStyle="small"))
 				s = vanilla.Slider((60, 20 + i * 30, -70, 15),
 				                   minValue=sorted(self.axesRanges[i])[0],
 				                   maxValue=sorted(self.axesRanges[i])[1],
@@ -79,7 +79,7 @@ class Interpolator:
 				self.inputFieldList.append(t)
 				setattr(self.w, axis.axisTag + "input", t)
 
-			except: # Glyphs 2
+			except Exception:  # Glyphs 2
 				setattr(self.w, axis["Tag"] + "title", vanilla.TextBox((10, 20 + i * 30, -10, 14),
 				                                                       axis["Name"], sizeStyle="small"))
 				s = vanilla.Slider((60, 20 + i * 30, -70, 15),
