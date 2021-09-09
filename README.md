@@ -1,5 +1,5 @@
 # glyphs-scripts
-Scripts for Glyphs.
+Scripts for Glyphs. Beware: Most of these script currently only fork on Glyphs 2 and are experimentally being updated for Glyphs 3. Use at your own risk. Apologies for broken stuff.
 
 ## Auto-Name Instances
 Names instances based on assigned names. Useful for batch-renaming large families. Allows defining of naming exceptions for width classes.
@@ -7,14 +7,20 @@ Names instances based on assigned names. Useful for batch-renaming large familie
 ## Batch Export
 Opens a dialogue to choose multiple export formats. Sorts exported files into respective sub-directories (/Desktop/TTF, /Web/WOFF2, ...).
 
+## Delete Duplicate Nodes
+Checks for duplicate nodes (for instance after converting quadratic curves to cubic) and delete these.
+
+## Instance Kerner (WIP, one axis only)
+Adds Replace Feature custom parameter for every instance for kerning. Useful for hard-coded capital/sc spacing. Currently only works for single-axis setups, still trying to figure out how to make this work for multiple axes. Todo: more than two kerning values per axis
+
 ## Interpolate Anchors
 Same as clicking Re-Interpolate in the layers panel, but only affects anchors.
 
 ## Interpolation Preview
-Allows for visual interpolation, in order to add the interpolation as an instance or an intermediate layer. Respects multi-axis design spaces.
+Allows for visual interpolation, in order to add the interpolation as an instance or an intermediate layer. Respects multi-axis design spaces. Adding as an instance is still wobbly for Glyphs 3.
 
-## Instance Kerner (WIP, one axis only)
-Adds Replace Feature custom parameter for every instance for kerning. Useful for hard-coded capital/sc spacing. Currently only works for single-axis setups, still trying to figure out how to make this work for multiple axes. Todo: more than two kerning values per axis
+## Make Smooth Nodes
+Finds nodes that are not set to smooth that should be smooth. Useful for cleaning up client projects when they don’t know how to draw properly.
 
 ## Make Web Weights
 Converts master and instance weight values into USWeightClass values based on naming. Calculates AVAR table for correct interpolation. Takes care of intermediate layer values as well.
