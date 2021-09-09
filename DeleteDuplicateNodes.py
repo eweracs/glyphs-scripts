@@ -6,10 +6,8 @@ Deletes duplicate nodes, helpful after converting quadratic paths to cubic.
 """
 
 
-try:
-	font = Font
-except Exception:
-	print("Open a font file!")
+if Font is None:
+	Message("No font selected", "Select a font project!")
 
 for layer in Font.selectedLayers:
 	for path in layer.paths:
