@@ -44,7 +44,9 @@ class AutoNamer:
 		setattr(self.w, "autoname", vanilla.Button((10, self.ypos, -10, 20), "Auto-name instances",
 		                                           callback=self.auto_name_instances))
 
-		self.redraw(None)
+		self.redraw()
+
+		self.w.setDefaultButton(self.w.autoname)
 
 		self.w.resize(390, self.ypos + 32)
 		self.w.open()
@@ -60,7 +62,7 @@ class AutoNamer:
 		if self.exceptionName is not None:
 			self.widthExceptions[self.selectedWidthClass] = self.exceptionName
 		self.update_widths()
-		self.redraw(-1)
+		self.redraw()
 		Glyphs.defaults["com.eweracs.AutoNameInstances.exceptionprefs"] = self.widthExceptions
 
 	def clear(self, sender):
@@ -68,18 +70,16 @@ class AutoNamer:
 			if item is sender:
 				del self.widthExceptions[list(self.widthExceptions.items())[i][0]]
 		self.update_widths()
-		self.redraw(1)
+		self.redraw()
 		Glyphs.defaults["com.eweracs.AutoNameInstances.exceptionprefs"] = self.widthExceptions
 
-	def redraw(self, clear_or_add):
+	def redraw(self):
 		try:
-			for i in range(len(self.widthExceptions) + clear_or_add):
+			for i in range(len(self.buttonList)):
 				delattr(self.w, str(i) + "width")
 				delattr(self.w, str(i) + "arrow")
 				delattr(self.w, str(i) + "exception")
 				delattr(self.w, str(i) + "button")
-
-			self.update_widths()
 
 		except Exception as e:
 			print(e)
