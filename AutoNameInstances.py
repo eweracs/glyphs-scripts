@@ -1,5 +1,6 @@
-# MenuTitle: Auto-name instances
+# MenuTitle: Auto-name Instances
 # -*- coding: utf-8 -*-
+
 __doc__ = """
 Names pre-defined instances based on set weight and width classes.
 """
@@ -9,11 +10,15 @@ import vanilla
 
 class AutoNamer:
 	def __init__(self):
+
 		self.font = Font
-		self.prefs = []
 		self.widthExceptions = {}
 		self.selectedWidthClass = None
 		self.widths = []
+
+		self.exceptionName = None
+
+		self.buttonList = []
 
 		if Glyphs.defaults["com.eweracs.AutoNameInstances.exceptionprefs"]:
 			for key in Glyphs.defaults["com.eweracs.AutoNameInstances.exceptionprefs"]:
@@ -21,108 +26,102 @@ class AutoNamer:
 
 		self.update_widths()
 
-		# self.widths = [width for width in {i.width for i in self.font.instances} if width not in
-		#               [item for item in self.widthExceptions]]
-
-		self.exceptionName = None  # Exception title set by the user
-
-		self.w = vanilla.FloatingWindow((0, 0), "Instance Autonamer")
-		self.widthExTitleList = []
-		self.widthExArrowList = []
-		self.widthExEditList = []
-		self.widthExButtonList = []
+		self.w = vanilla.FloatingWindow((0, 0), "Auto-name Instances")
 
 		setattr(self.w, "widthExceptionsTitle", vanilla.TextBox((10, 10, -10, 14), "Add width name exceptions",
 		                                                        sizeStyle="small"))
 
 		self.ypos = 32
-		for i, exception in enumerate(self.widthExceptions):
-			n = vanilla.TextBox((10, self.ypos + i * 32, -10, 17), str(list(self.widthExceptions.items())[i][0]))
-			a = vanilla.TextBox((160, self.ypos + i * 32, -10, 14), u"\u2192", sizeStyle="regular")
-			e = vanilla.TextBox((190, self.ypos + i * 32, 130, 22), str(list(self.widthExceptions.items())[i][1]))
-			b = vanilla.Button((330, self.ypos + i * 32, 50, 20), "Clear", callback=self.clear_exception)
-			setattr(self.w, exception + "Selection", n)
-			self.widthExTitleList.append(n)
-			setattr(self.w, exception + "Arrow", a)
-			self.widthExArrowList.append(a)
-			setattr(self.w, exception + "Name", e)
-			self.widthExEditList.append(e)
-			setattr(self.w, exception + "Clear", b)
-			self.widthExButtonList.append(b)
 
-		try:
-			self.ypos = n.getPosSize()[1] + 32
-		except Exception:
-			self.ypos = 32
-
-		if len(self.widths) > 0:
-			self.selectedWidthClass = self.widths[0]
-			setattr(self.w, "widthExceptions", vanilla.PopUpButton((10, self.ypos, 140, 20), self.widths,
-			                                                       callback=self.list_width_exceptions))
-			setattr(self.w, "widthExceptionsArrow", vanilla.TextBox((160, self.ypos, -10, 14), u"\u2192",
-			                                                        sizeStyle="regular"))
-
-			setattr(self.w, "widthExceptionName", vanilla.EditText((190, self.ypos - 1, 130, 22),
-			                                                       callback=self.width_exception_name))
-			setattr(self.w, "addWidthException", vanilla.Button((330, self.ypos, 50, 20), "Add",
-			                                                    callback=self.add_width_exception))
-
-			self.ypos = self.w.widthExceptions.getPosSize()[1] + 32
-
-		setattr(self.w, "generate", vanilla.Button((10, self.ypos, -10, 20), "Auto-name instances",
-		                                           callback=self.auto_name_instances))
-
-		self.w.setDefaultButton(self.w.generate)
+		setattr(self.w, "addException", vanilla.PopUpButton((10, self.ypos, 140, 20), self.widths,
+		        callback=self.pick_exception_from_list))
+		setattr(self.w, "addArrow", vanilla.TextBox((160, self.ypos, -10, 14), u"\u2192", sizeStyle="regular"))
+		setattr(self.w, "addName", vanilla.EditText((190, self.ypos - 1, 130, 22), callback=self.exception_name))
+		setattr(self.w, "addButton", vanilla.Button((330, self.ypos, 50, 20), "Add", callback=self.add))
 
 		self.ypos += 32
 
-		self.w.resize(390, self.ypos)
+		setattr(self.w, "autoname", vanilla.Button((10, self.ypos, -10, 20), "Auto-name instances",
+		                                           callback=self.auto_name_instances))
+
+		self.redraw(None)
+
+		self.w.resize(390, self.ypos + 32)
 		self.w.open()
 		self.w.makeKey()
 
-	def list_width_exceptions(self, sender):
+	def pick_exception_from_list(self, sender):
 		self.selectedWidthClass = self.widths[sender.get()]
 
-	def width_exception_name(self, sender):
+	def exception_name(self, sender):
 		self.exceptionName = sender.get()
 
-	def add_width_exception(self, sender):
-		self.widthExceptions[self.selectedWidthClass] = self.exceptionName
-		n = vanilla.TextBox((10, self.ypos, -10, 17), self.selectedWidthClass)
-		a = vanilla.TextBox((160, self.ypos, -10, 14), u"\u2192", sizeStyle="regular")
-		e = vanilla.TextBox((190, self.ypos - 1, 130, 22), str(self.widthExceptions[self.selectedWidthClass]))
-		b = vanilla.Button((330, self.ypos, 50, 20), "Clear", callback=self.clear_exception)
-
-		setattr(self.w, self.selectedWidthClass + "Selection", n)
-		self.widthExTitleList.append(n)
-		setattr(self.w, self.selectedWidthClass + "Arrow", a)
-		self.widthExArrowList.append(a)
-		setattr(self.w, self.selectedWidthClass + "Name", e)
-		self.widthExEditList.append(e)
-		setattr(self.w, self.selectedWidthClass + "Clear", b)
-		self.widthExButtonList.append(b)
-
+	def add(self, sender):
+		if self.exceptionName is not None:
+			self.widthExceptions[self.selectedWidthClass] = self.exceptionName
 		self.update_widths()
-		self.redraw_items()
+		self.redraw(-1)
 		Glyphs.defaults["com.eweracs.AutoNameInstances.exceptionprefs"] = self.widthExceptions
 
-	def clear_exception(self, sender):
-
-		for i, item in enumerate(self.widthExButtonList):
+	def clear(self, sender):
+		for i, item in enumerate(self.buttonList):
 			if item is sender:
-				delattr(self.w, list(self.widthExceptions.items())[i][0] + "Selection")
-				del self.widthExTitleList[i]
-				delattr(self.w, list(self.widthExceptions.items())[i][0] + "Arrow")
-				del self.widthExArrowList[i]
-				delattr(self.w, list(self.widthExceptions.items())[i][0] + "Name")
-				del self.widthExEditList[i]
-				delattr(self.w, list(self.widthExceptions.items())[i][0] + "Clear")
-				del self.widthExButtonList[i]
 				del self.widthExceptions[list(self.widthExceptions.items())[i][0]]
-
 		self.update_widths()
-		self.redraw_items()
+		self.redraw(1)
 		Glyphs.defaults["com.eweracs.AutoNameInstances.exceptionprefs"] = self.widthExceptions
+
+	def redraw(self, clear_or_add):
+		try:
+			for i in range(len(self.widthExceptions) + clear_or_add):
+				delattr(self.w, str(i) + "width")
+				delattr(self.w, str(i) + "arrow")
+				delattr(self.w, str(i) + "exception")
+				delattr(self.w, str(i) + "button")
+
+			self.update_widths()
+
+		except Exception as e:
+			print(e)
+
+		self.ypos = 32
+
+		self.buttonList = []
+
+		for i in range(len(self.widthExceptions)):
+			width = vanilla.TextBox((10, self.ypos, -10, 17), list(self.widthExceptions)[i])
+			arrow = vanilla.TextBox((160, self.ypos, -10, 14), u"\u2192", sizeStyle="regular")
+			exception = vanilla.TextBox((190, self.ypos, 130, 22), list(self.widthExceptions.items())[i][1])
+			button = vanilla.Button((330, self.ypos, 50, 20), "Clear", callback=self.clear)
+
+			setattr(self.w, str(i) + "width", width)
+			setattr(self.w, str(i) + "arrow", arrow)
+			setattr(self.w, str(i) + "exception", exception)
+			setattr(self.w, str(i) + "button", button)
+
+			self.buttonList.append(button)
+
+			self.ypos = button.getPosSize()[1] + 32
+
+		self.w.addException.show(len(self.widths) > 0)
+		self.w.addArrow.show(len(self.widths) > 0)
+		self.w.addName.show(len(self.widths) > 0)
+		self.w.addButton.show(len(self.widths) > 0)
+
+		self.w.addException.setItems(self.widths)
+		self.w.addName.set("")
+
+		self.w.addException.setPosSize((10, self.ypos, 140, 20))
+		self.w.addArrow.setPosSize((160, self.ypos, -10, 14))
+		self.w.addName.setPosSize((190, self.ypos - 1, 130, 22))
+		self.w.addButton.setPosSize((330, self.ypos, 50, 20))
+
+		if len(self.widths) > 0:
+			self.ypos += 32
+
+		self.w.autoname.setPosSize((10, self.ypos, -10, 20))
+
+		self.w.resize(390, self.ypos + 32)
 
 	def update_widths(self):
 		self.widths = [width for width in [
@@ -140,64 +139,52 @@ class AutoNamer:
 		if len(self.widths) > 0:
 			self.selectedWidthClass = self.widths[0]
 
-	def redraw_items(self):
-		self.ypos = 32
-		for i in range(len(self.widthExceptions)):
-			self.widthExTitleList[i].setPosSize((10, self.ypos + i * 32, -10, 17))
-			self.widthExArrowList[i].setPosSize((160, self.ypos + i * 32, -10, 14))
-			self.widthExEditList[i].setPosSize((190, self.ypos + i * 32 - 1, 130, 22))
-			self.widthExButtonList[i].setPosSize((330, self.ypos + i * 32, 50, 20))
-		try:
-			self.ypos = self.widthExTitleList[i].getPosSize()[1] + 32
-		except Exception as e:
-			print(e)
-
-		if len(self.widths) == 0:
-			del self.w.widthExceptions
-			del self.w.widthExceptionsArrow
-			del self.w.widthExceptionName
-
-		self.w.widthExceptions.setItems(self.widths)
-		self.w.widthExceptions.setPosSize((10, self.ypos, 140, 20))
-		self.w.widthExceptionsArrow.setPosSize((160, self.ypos, -10, 14))
-		self.w.widthExceptionName.set("")
-		self.w.widthExceptionName.setPosSize((190, self.ypos - 1, 130, 22))
-		self.w.addWidthException.setPosSize((330, self.ypos, 50, 20))
-
-		self.ypos += 32
-
-		self.w.generate.setPosSize((10, self.ypos, -10, 20))
-
-		self.ypos += 32
-
-		self.w.resize(390, self.ypos)
-
 	def auto_name_instances(self, sender):
 		if self.font is None:
 			Message("Open a font file!", title="Error")
+
 		self.w.close()
+
 		for i in self.font.instances:
 			if i.active:
-				weight_name = i.weight
-				width_name = i.width
-				if "Medium" in i.width and "Medium" not in self.widthExceptions:
-					width_name = ""
-				if i.width in self.widthExceptions:
-					width_name = self.widthExceptions[i.width]
-				if i.weight == "Regular" or i.weight == "Normal":
-					weight_name = ""
-				if len(weight_name) > 1 and len(width_name) > 1:
-					i.name = " ".join([weight_name, width_name])
-				elif len(weight_name) > 1:
-					i.name = weight_name
-				elif len(width_name) > 1:
-					i.name = width_name
-				if i.name == "":
-					i.name = "Regular"
-				if i.isItalic:
-					i.name += " Italic"
-
-		Glyphs.defaults["com.eweracs.AutoNameInstances.exceptionprefs"] = self.widthExceptions
+				if str(Glyphs.versionNumber)[0] == "3":  # Glyphs 3
+					weight_name = i.weightClassName
+					width_name = i.widthClassName
+					if "Medium" in i.widthClassName and "Medium" not in self.widthExceptions:
+						width_name = ""
+					if i.widthClassName in self.widthExceptions:
+						width_name = self.widthExceptions[i.widthClassName]
+					if i.weightClassName == "Regular" or i.weightClassName == "Normal":
+						weight_name = ""
+					if len(weight_name) > 1 and len(width_name) > 1:
+						i.name = " ".join([weight_name, width_name])
+					elif len(weight_name) > 1:
+						i.name = weight_name
+					elif len(width_name) > 1:
+						i.name = width_name
+					if i.name == "":
+						i.name = "Regular"
+					if i.isItalic:
+						i.name += " Italic"
+				else:  # Glyphs 2
+					weight_name = i.weight
+					width_name = i.width
+					if "Medium" in i.width and "Medium" not in self.widthExceptions:
+						width_name = ""
+					if i.width in self.widthExceptions:
+						width_name = self.widthExceptions[i.width]
+					if i.weight == "Regular" or i.weight == "Normal":
+						weight_name = ""
+					if len(weight_name) > 1 and len(width_name) > 1:
+						i.name = " ".join([weight_name, width_name])
+					elif len(weight_name) > 1:
+						i.name = weight_name
+					elif len(width_name) > 1:
+						i.name = width_name
+					if i.name == "":
+						i.name = "Regular"
+					if i.isItalic:
+						i.name += " Italic"
 
 
 AutoNamer()
