@@ -8,7 +8,7 @@ Names instances based on assigned names. Useful for batch-renaming large familie
 Opens a dialogue to choose multiple export formats. Sorts exported files into respective sub-directories (/Desktop/TTF, /Web/WOFF2, ...).
 
 ## Delete Duplicate Nodes
-Checks for duplicate nodes (for instance after converting quadratic curves to cubic) and delete these.
+Checks for duplicate nodes (for instance after converting quadratic curves to cubic) and deletes these.
 
 ## Instance Kerner (WIP, one axis only)
 Adds Replace Feature custom parameter for every instance for kerning. Useful for hard-coded capital/sc spacing. Currently only works for single-axis setups, still trying to figure out how to make this work for multiple axes. Todo: more than two kerning values per axis
