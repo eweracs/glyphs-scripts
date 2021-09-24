@@ -5,8 +5,14 @@ __doc__ = """
 Writes an AVAR table based on current weight distribution
 """
 
-# create a list which indexes all instance weights
-instanceweights = sorted({instance.weightValue for instance in Font.instances})
+if str(Glyphs.versionNumber)[0] == "2":
+    instanceweights = sorted({instance.weightValue for instance in Font.instances})
+else:
+    for i, a in enumerate(Font.axes):
+        if a.axisTag == "wght":
+            axisindex = i
+    instanceweights = sorted({instance.axes[axisindex] for instance in Font.instances if instance.type == 0})
+
 
 axisMinimum = instanceweights[0]  # lightest stem weight
 axisRange = instanceweights[-1] - axisMinimum  # axis range
@@ -19,3 +25,4 @@ Font.customParameters["Axis Mappings"] = {"wght": {int(axisRange/(len(instancewe
 
 Glyphs.showNotification(title="Wrote AVAR table",
                         message="Table calculated for " + str(len(instanceweights)) + " instances")
+
