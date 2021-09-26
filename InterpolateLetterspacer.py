@@ -149,14 +149,14 @@ class InterpolateLetterspacer:
 		for i, item in enumerate(self.popUpButtonList):
 			if item is sender:
 				self.selected_targets[self.master_list[i]] = sender.get()
+				print(self.selected_targets)
 
 	def write_parameters(self, sender):
-		if self.source_one == self.source_two:
-			Message("Cannot interpolate between two identical masters.", "Select two different masters.")
-			return
-
 		for target in self.selected_targets:
 			if target.name != self.source_one.name and target.name != self.source_two.name:
+				if self.selected_targets[target] == 0 and self.source_one == self.source_two:
+					Message("Cannot interpolate between two identical masters.", "Select two different masters.")
+					return
 				for parameter in ["paramArea", "paramDepth", "paramOver"]:
 					try:
 						target.customParameters[parameter] = self.calculate_values(
