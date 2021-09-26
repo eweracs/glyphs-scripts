@@ -16,6 +16,9 @@ Adds Replace Feature custom parameter for every instance for kerning. Useful for
 ## Interpolate Anchors
 Same as clicking Re-Interpolate in the layers panel, but only affects anchors.
 
+## Interpolate Letterspacer
+Calculates paramArea, paramDepth and paramOver values for other masters based on two source masters. Currently only works for single-axis setups, please get in touch if you want to suggest a clean way of making it work for multiple axes! :)
+
 ## Interpolation Preview
 Allows for visual interpolation, in order to add the interpolation as an instance or an intermediate layer. Respects multi-axis design spaces. Adding as an instance is still wobbly for Glyphs 3.
 
