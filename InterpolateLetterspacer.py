@@ -124,9 +124,9 @@ class InterpolateLetterspacer:
 
 	def pick_first_master(self, sender):
 		self.source_one = self.master_list[sender.get()]
-		self.w.sourceOneArea.set(str(self.source_two.customParameters["paramArea"] or "0"))
-		self.w.sourceTwoDepth.set(str(self.source_two.customParameters["paramDepth"] or "0"))
-		self.w.sourceTwoOver.set(str(self.source_two.customParameters["paramOver"] or "0"))
+		self.w.sourceOneArea.set(str(self.source_one.customParameters["paramArea"] or "0"))
+		self.w.sourceOneDepth.set(str(self.source_one.customParameters["paramDepth"] or "0"))
+		self.w.sourceOneOver.set(str(self.source_one.customParameters["paramOver"] or "0"))
 
 		self.update_states()
 
