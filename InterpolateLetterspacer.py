@@ -37,12 +37,12 @@ class InterpolateLetterspacer:
 
 		self.w = vanilla.FloatingWindow((0, 0), "Interpolate Letterspacer")
 
-		self.w.sourcesTitle = vanilla.TextBox((10, 10, -10, 14), "Source masters", sizeStyle="small")
+		self.w.sourcesTitle = vanilla.TextBox((10, self.ypos, -10, 14), "Source masters", sizeStyle="small")
 
-		self.w.areaTitle = vanilla.TextBox((180, self.ypos + 3, 40, 14), "Area", alignment="center", sizeStyle="small")
-		self.w.depthTitle = vanilla.TextBox((226, self.ypos + 3, 40, 14), "Depth", alignment="center",
+		self.w.areaTitle = vanilla.TextBox((180, self.ypos, 40, 14), "Area", alignment="center", sizeStyle="small")
+		self.w.depthTitle = vanilla.TextBox((226, self.ypos, 40, 14), "Depth", alignment="center",
 		                                    sizeStyle="small")
-		self.w.overTitle = vanilla.TextBox((272, self.ypos + 3, 40, 14), "Over", alignment="center", sizeStyle="small")
+		self.w.overTitle = vanilla.TextBox((272, self.ypos, 40, 14), "Over", alignment="center", sizeStyle="small")
 
 		self.ypos += 24
 
