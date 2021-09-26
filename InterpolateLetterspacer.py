@@ -21,16 +21,11 @@ class InterpolateLetterspacer:
 
 		self.font = Font
 
-		self.letterspacer_values = {}
 		self.master_list = [master for master in self.font.masters]
 		self.selected_targets = {}
 
 		for master in self.font.masters:
 			self.selected_targets[master] = 0
-			self.letterspacer_values[master.name] = {}
-			self.letterspacer_values[master.name]["paramArea"] = str(master.customParameters["paramArea"] or "0")
-			self.letterspacer_values[master.name]["paramDepth"] = str(master.customParameters["paramDepth"] or "0")
-			self.letterspacer_values[master.name]["paramOver"] = str(master.customParameters["paramOver"] or "0")
 
 		self.source_one = self.master_list[0]
 		self.source_two = self.master_list[1]
@@ -42,7 +37,7 @@ class InterpolateLetterspacer:
 
 		self.w = vanilla.FloatingWindow((0, 0), "Interpolate Letterspacer")
 
-		self.w.sourceitle = vanilla.TextBox((10, 10, -10, 14), "Source masters", sizeStyle="small")
+		self.w.sourcesTitle = vanilla.TextBox((10, 10, -10, 14), "Source masters", sizeStyle="small")
 
 		self.w.areaTitle = vanilla.TextBox((180, self.ypos + 3, 40, 14), "Area", alignment="center", sizeStyle="small")
 		self.w.depthTitle = vanilla.TextBox((226, self.ypos + 3, 40, 14), "Depth", alignment="center",
@@ -52,32 +47,38 @@ class InterpolateLetterspacer:
 		self.ypos += 24
 
 		self.w.sourceOneTitle = vanilla.TextBox((10, self.ypos + 3, -10, 14), "1:", sizeStyle="small")
-		self.w.sourceOneSelector = vanilla.PopUpButton((32, self.ypos, 140, 20), [master.name for
-		                                                                          master in self.font.masters],
+		self.w.sourceOneSelector = vanilla.PopUpButton((32, self.ypos, 140, 20),
+		                                               [master.name for master in self.font.masters],
 		                                               callback=self.pick_first_master)
 
-		self.w.sourceOneArea = vanilla.TextBox((180, self.ypos + 3, 40, 14), self.letterspacer_values[
-			self.source_one.name]["paramArea"], alignment="center", sizeStyle="small")
-		self.w.sourceOneDepth = vanilla.TextBox((226, self.ypos + 3, 40, 14), self.letterspacer_values[
-			self.source_one.name]["paramDepth"], alignment="center", sizeStyle="small")
-		self.w.sourceOneOver = vanilla.TextBox((272, self.ypos + 3, 40, 14), self.letterspacer_values[
-			self.source_one.name]["paramOver"], alignment="center", sizeStyle="small")
+		self.w.sourceOneArea = vanilla.TextBox((180, self.ypos + 3, 40, 14),
+		                                       str(self.source_one.customParameters["paramArea"] or "0"),
+		                                       alignment="center", sizeStyle="small")
+		self.w.sourceOneDepth = vanilla.TextBox((226, self.ypos + 3, 40, 14),
+		                                        str(self.source_one.customParameters["paramDepth"] or "0"),
+		                                        alignment="center", sizeStyle="small")
+		self.w.sourceOneOver = vanilla.TextBox((272, self.ypos + 3, 40, 14),
+		                                       str(self.source_one.customParameters["paramOver"] or "0"),
+		                                       alignment="center", sizeStyle="small")
 
 		self.ypos += 32
 
 		self.w.sourceTwoTitle = vanilla.TextBox((10, self.ypos + 3, -10, 14), "2:", sizeStyle="small")
-		self.w.sourceTwoSelector = vanilla.PopUpButton((32, self.ypos, 140, 20), [master.name for
-		                                                                          master in self.font.masters],
+		self.w.sourceTwoSelector = vanilla.PopUpButton((32, self.ypos, 140, 20),
+		                                               [master.name for master in self.font.masters],
 		                                               callback=self.pick_second_master)
 
 		self.w.sourceTwoSelector.set(1)
 
-		self.w.sourceTwoArea = vanilla.TextBox((180, self.ypos + 3, 40, 14), self.letterspacer_values[
-			self.source_two.name]["paramArea"], alignment="center", sizeStyle="small")
-		self.w.sourceTwoDepth = vanilla.TextBox((226, self.ypos + 3, 40, 14), self.letterspacer_values[
-			self.source_two.name]["paramDepth"], alignment="center", sizeStyle="small")
-		self.w.sourceTwoOver = vanilla.TextBox((272, self.ypos + 3, 40, 14), self.letterspacer_values[
-			self.source_two.name]["paramOver"], alignment="center", sizeStyle="small")
+		self.w.sourceTwoArea = vanilla.TextBox((180, self.ypos + 3, 40, 14),
+		                                       str(self.source_two.customParameters["paramArea"] or "0"),
+		                                       alignment="center", sizeStyle="small")
+		self.w.sourceTwoDepth = vanilla.TextBox((226, self.ypos + 3, 40, 14),
+		                                        str(self.source_two.customParameters["paramDepth"] or "0"),
+		                                        alignment="center", sizeStyle="small")
+		self.w.sourceTwoOver = vanilla.TextBox((272, self.ypos + 3, 40, 14),
+		                                       str(self.source_two.customParameters["paramOver"] or "0"),
+		                                       alignment="center", sizeStyle="small")
 
 		self.ypos += 32
 
@@ -123,17 +124,17 @@ class InterpolateLetterspacer:
 
 	def pick_first_master(self, sender):
 		self.source_one = self.master_list[sender.get()]
-		self.w.sourceOneArea.set(self.letterspacer_values[self.source_one.name]["paramArea"])
-		self.w.sourceTwoDepth.set(self.letterspacer_values[self.source_one.name]["paramDepth"])
-		self.w.sourceTwoOver.set(self.letterspacer_values[self.source_one.name]["paramOver"])
+		self.w.sourceOneArea.set(str(self.source_two.customParameters["paramArea"] or "0"))
+		self.w.sourceTwoDepth.set(str(self.source_two.customParameters["paramDepth"] or "0"))
+		self.w.sourceTwoOver.set(str(self.source_two.customParameters["paramOver"] or "0"))
 
 		self.update_states()
 
 	def pick_second_master(self, sender):
 		self.source_two = self.master_list[sender.get()]
-		self.w.sourceTwoArea.set(self.letterspacer_values[self.source_two.name]["paramArea"])
-		self.w.sourceTwoDepth.set(self.letterspacer_values[self.source_two.name]["paramDepth"])
-		self.w.sourceTwoOver.set(self.letterspacer_values[self.source_two.name]["paramOver"])
+		self.w.sourceTwoArea.set(str(self.source_two.customParameters["paramArea"] or "0"))
+		self.w.sourceTwoDepth.set(str(self.source_two.customParameters["paramDepth"] or "0"))
+		self.w.sourceTwoOver.set(str(self.source_two.customParameters["paramOver"] or "0"))
 
 		self.update_states()
 
