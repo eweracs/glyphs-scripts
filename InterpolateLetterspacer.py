@@ -13,6 +13,7 @@ class InterpolateLetterspacer:
 
 		if Font is None:
 			Message("No font selected.", "Select a font project!")
+			return
 
 		if len(Font.axes) > 1:
 			Message("You can still use it to interpolate along the first axis of your project.",
@@ -152,6 +153,8 @@ class InterpolateLetterspacer:
 	def write_parameters(self, sender):
 		if self.source_one == self.source_two:
 			Message("Cannot interpolate between two identical masters.", "Select two different masters.")
+			return
+
 		for target in self.selected_targets:
 			if target.name != self.source_one.name and target.name != self.source_two.name:
 				for parameter in ["paramArea", "paramDepth", "paramOver"]:
