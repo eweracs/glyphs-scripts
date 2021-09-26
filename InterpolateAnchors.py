@@ -4,10 +4,13 @@ __doc__ = """
 Re-interpolates anchors for currently selected layer.
 """
 
-for thisLayer in Font.selectedLayers:
-	copyLayer = thisLayer.copy()
-	thisLayer.reinterpolate()
-	thisLayer.paths = copyLayer.paths
-	thisLayer.components = copyLayer.components
-	thisLayer.width = copyLayer.width
-	thisLayer.hints = copyLayer.hints
+for layer in Font.selectedLayers:
+	copy_layer = layer.copy()
+	layer.reinterpolate()
+	if str(Glyphs.versionNumber)[0] == "3":
+		layer.shapes = copy_layer.shapes
+	else:
+		layer.paths = copy_layer.paths
+		layer.components = copy_layer.components
+	layer.width = copy_layer.width
+	layer.hints = copy_layer.hints
