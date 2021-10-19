@@ -11,7 +11,13 @@ import vanilla
 class Interpolator:
 	def __init__(self):
 
+		if Font is None:
+			Message("No font selected", "Select a font project!")
+
 		self.font = Font
+
+		self.font.instances.append(GSInstance())
+		self.font.instances[-1].name = "Interpolator Preview"
 
 		self.w = vanilla.FloatingWindow((0, 0), "Interpolation Preview")
 
@@ -63,36 +69,26 @@ class Interpolator:
 			for axisRange in self.axesRanges:
 				del axisRange[1:-1]  # delete intermediate master coordinates
 
-			try:  # Glyphs 3
-				setattr(self.w, axis.axisTag + "title", vanilla.TextBox((10, 20 + i * 30, -10, 14), axis.name,
-				                                                        sizeStyle="small"))
-				s = vanilla.Slider((60, 20 + i * 30, -70, 15),
-				                   minValue=sorted(self.axesRanges[i])[0],
-				                   maxValue=sorted(self.axesRanges[i])[1],
-				                   value=self.currentCoords[i],
-				                   callback=self.axis_slider)
-				setattr(self.w, axis.axisTag + "slider", s)
-				self.sliderList.append(s)
+			if str(Glyphs.versionNumber)[0] == "3":
+				axis_tag = axis.axisTag
+				axis_name = axis.name
+			else:
+				axis_tag = axis["Tag"]
+				axis_name = axis["Name"]
 
-				t = vanilla.EditText((-60, 20 + i * 30 - 1, -10, 22), callback=self.axis_input,
-				                     text=self.currentCoords[i])
-				self.inputFieldList.append(t)
-				setattr(self.w, axis.axisTag + "input", t)
+			setattr(self.w, axis_tag + "title", vanilla.TextBox((10, 20 + i * 30, -10, 14),
+			                                                       axis_name, sizeStyle="small"))
+			s = vanilla.Slider((60, 20 + i * 30, -70, 15),
+			                   minValue=sorted(self.axesRanges[i])[0],
+			                   maxValue=sorted(self.axesRanges[i])[1],
+			                   value=self.currentCoords[i],
+			                   callback=self.axis_slider)
+			setattr(self.w, axis_tag + "slider", s)
+			self.sliderList.append(s)
 
-			except Exception:  # Glyphs 2
-				setattr(self.w, axis["Tag"] + "title", vanilla.TextBox((10, 20 + i * 30, -10, 14),
-				                                                       axis["Name"], sizeStyle="small"))
-				s = vanilla.Slider((60, 20 + i * 30, -70, 15),
-				                   minValue=sorted(self.axesRanges[i])[0],
-				                   maxValue=sorted(self.axesRanges[i])[1],
-				                   value=self.currentCoords[i],
-				                   callback=self.axis_slider)
-				setattr(self.w, axis["Tag"] + "slider", s)
-				self.sliderList.append(s)
-
-				t = vanilla.EditText((-60, 20 + i * 30 - 1, -10, 22), callback=self.axis_input, text=self.currentCoords[i])
-				self.inputFieldList.append(t)
-				setattr(self.w, axis["Tag"] + "input", t)
+			t = vanilla.EditText((-60, 20 + i * 30 - 1, -10, 22), callback=self.axis_input, text=self.currentCoords[i])
+			self.inputFieldList.append(t)
+			setattr(self.w, axis_tag + "input", t)
 
 		self.ypos = s.getPosSize()[1] + 36
 
@@ -168,7 +164,10 @@ class Interpolator:
 	def class_selector(self, sender):
 		for i, item in enumerate(self.popUpButtonList):
 			if item is sender:
-				self.selectedClasses[i] = list(self.styleClasses.items())[i][1].values()[sender.get()]
+				if str(Glyphs.versionNumber)[0] == "3":
+					self.selectedClasses[i] = list(self.styleClasses.items())[i][1].items()[sender.get()]
+				else:
+					self.selectedClasses[i] = list(self.styleClasses.items())[i][1].values()[sender.get()]
 		self.instance_autonamer()
 
 	def instance_autonamer(self):  # basically copied from AutoNameInstances.py
@@ -188,13 +187,6 @@ class Interpolator:
 			self.w.nameSelector.setPlaceholder(self.namePlaceholder)
 
 	def preview_instance(self):
-		if self.font.instances:
-			if self.font.instances[-1].name != "Interpolator Preview":
-				self.font.instances.append(GSInstance())
-				self.font.instances[-1].name = "Interpolator Preview"
-		else:
-			self.font.instances.append(GSInstance())
-			self.font.instances[-1].name = "Interpolator Preview"
 		self.font.instances[-1].axes = self.currentCoords
 		if not self.font.tabs:  # open up a new tab with the new instance in preview
 			string = "a"
@@ -225,8 +217,8 @@ class Interpolator:
 					break
 			delattr(self.w, "generate")
 
-		except Exception as e:
-			print(e)
+		except Exception:
+			print()
 
 		self.ypos = self.w.addIntermediate.getPosSize()[1] + 40
 
@@ -247,9 +239,14 @@ class Interpolator:
 			print(e)
 
 	def make_intermediate(self, sender):
+		print("hey")
 		for layer in self.font.selectedLayers:
 			newLayer = GSLayer()
-			newLayer.name = "{" + ", ".join([str(axis) for axis in self.currentCoords]) + "}"
+			if str(Glyphs.versionNumber)[0] == "3":
+				newLayer.attributes["coordinates"] = {self.font.axes[i].axisId: coordinate for i, coordinate in
+				                                      enumerate(self.currentCoords)}
+			else:
+				newLayer.name = "{" + ", ".join([str(axis) for axis in self.currentCoords]) + "}"
 			newLayer.associatedMasterId = self.font.masters[self.selectedParent].id
 			self.font.glyphs[layer.parent.name].layers.append(newLayer)
 			newLayer.reinterpolate()
