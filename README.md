@@ -28,13 +28,16 @@ Finds nodes that are not set to smooth that should be smooth. Useful for cleanin
 ## Make Web Weights
 Converts master and instance weight values into USWeightClass values based on naming. Calculates AVAR table for correct interpolation. Takes care of intermediate layer values as well.
 
+## Set Kern On Base Models
+Sets a pre-defined (but editable) list of kerning pairs as zero models for Kern On. Allows for capital kerning and per-master settings.
+
 ## Write AVAR
 Writes an AVAR table based on stem weights. Affects only weight, regardless of axis count.
 
 
 # License
 
-Copyright 2020 The eweracs Glyphs-Scripts Project Authors.
+Copyright 2021 The eweracs Glyphs-Scripts Project Authors.
 
 Some code samples by Georg Seifert (@schriftgestalt) and Rainer Scheichelbauer (@mekkablue).
 
