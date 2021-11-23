@@ -13,6 +13,7 @@ class Interpolator:
 
 		if Font is None:
 			Message("No font selected", "Select a font project!")
+			return
 
 		self.font = Font
 
@@ -77,7 +78,7 @@ class Interpolator:
 				axis_name = axis["Name"]
 
 			setattr(self.w, axis_tag + "title", vanilla.TextBox((10, 20 + i * 30, -10, 14),
-			                                                       axis_name, sizeStyle="small"))
+			                                                    axis_name, sizeStyle="small"))
 			s = vanilla.Slider((60, 20 + i * 30, -70, 15),
 			                   minValue=sorted(self.axesRanges[i])[0],
 			                   maxValue=sorted(self.axesRanges[i])[1],
@@ -92,9 +93,17 @@ class Interpolator:
 
 		self.ypos = s.getPosSize()[1] + 36
 
+		if self.font.instances:
+			self.w.selectInstanceTitle = vanilla.TextBox((10, self.ypos, -10, 14), "Copy from instance:",
+			                                             sizeStyle="small")
+			setattr(self.w, "instanceSelect", vanilla.PopUpButton((130, self.ypos, -10, 17),
+			                                                      [i.name for i in self.font.instances],
+			                                                      callback=self.instance_selector))
+			self.ypos += 32
+
 		setattr(self.w, "separator", vanilla.HorizontalLine((10, self.ypos, -10, 1)))
 
-		self.ypos += 25
+		self.ypos += 16
 
 		setattr(self.w, "addMenu", vanilla.Button((155, self.ypos, -10, 20), "Instance...",
 		                                          callback=self.add_instance_menu))
@@ -107,19 +116,26 @@ class Interpolator:
 		self.w.makeKey()
 		self.w.bind("close", self.remove_preview)
 
+	def instance_selector(self, sender):
+		for i, axis in enumerate(self.font.instances[sender.get()].axes):
+			self.currentCoords[i] = axis
+			self.inputFieldList[i].set(str(int(axis)))
+			self.sliderList[i].set(int(axis))
+
 	def add_instance_menu(self, sender):
 		try:
 			delattr(self.w, "intermediateTitle")
 			delattr(self.w, "parentSelector")
 			delattr(self.w, "makeIntermediate")
-		except Exception as e:
-			print(e)
+		except Exception:
+			print()
 
 		self.ypos = self.w.addMenu.getPosSize()[1] + 40
 
 		try:
 			setattr(self.w, "instanceName", vanilla.TextBox((10, self.ypos, 60, 14), "Name", sizeStyle="small"))
-			setattr(self.w, "nameSelector", vanilla.EditText((60, self.ypos, -10, 19), placeholder=self.namePlaceholder,
+			setattr(self.w, "nameSelector", vanilla.EditText((60, self.ypos, -10, 19),
+			                                                 placeholder=self.namePlaceholder, sizeStyle="small",
 			                                                 callback=self.instance_name))
 
 			self.ypos += 41
@@ -138,8 +154,8 @@ class Interpolator:
 			                                           callback=self.write_instance))
 			self.w.setDefaultButton(self.w.generate)
 			self.w.resize(300, self.w.generate.getPosSize()[1] + 30)
-		except Exception as e:
-			print(e)
+		except Exception:
+			return
 
 	def axis_slider(self, sender):
 		for i, item in enumerate(self.sliderList):
@@ -155,8 +171,7 @@ class Interpolator:
 					if sender.get().isnumeric():
 						self.currentCoords[i] = int(sender.get())
 						self.sliderList[i].set(int(sender.get()))
-				except Exception as e:
-					print(e)
+				except Exception:
 					self.currentCoords[i] = 0
 					self.sliderList[i].set(0)
 		self.preview_instance()
@@ -188,9 +203,8 @@ class Interpolator:
 
 	def preview_instance(self):
 		self.font.instances[-1].axes = self.currentCoords
-		if not self.font.tabs:  # open up a new tab with the new instance in preview
-			string = "a"
-			self.font.newTab(string)
+		if not self.font.currentTab:  # open up a new tab with the new instance in preview
+			self.font.newTab("a")
 		if self.font.currentTab.previewHeight <= 20:
 			self.font.currentTab.previewHeight = 200
 		self.font.currentTab.previewInstances = self.font.instances[-1]
@@ -203,8 +217,12 @@ class Interpolator:
 	def write_instance(self, sender):
 		self.font.instances[-1].axes = self.currentCoords
 		self.font.instances[-1].name = self.instanceName
-		self.font.instances[-1].widthClass = self.selectedClasses[0]
-		self.font.instances[-1].weightClass = self.selectedClasses[1]
+		if str(Glyphs.versionNumber)[0] == "3":
+			self.font.instances[-1].widthClass = self.selectedClasses[0]
+			self.font.instances[-1].weightClass = self.selectedClasses[1]
+		else:
+			self.font.instances[-1].widthClass = self.selectedClasses[0]
+			self.font.instances[-1].weightClass = self.selectedClasses[1]
 
 	def intermediate_menu(self, sender):
 		try:
@@ -235,21 +253,20 @@ class Interpolator:
 			self.w.setDefaultButton(self.w.makeIntermediate)
 			self.w.resize(300, self.w.makeIntermediate.getPosSize()[1] + 30)
 
-		except Exception as e:
-			print(e)
+		except Exception:
+			print()
 
 	def make_intermediate(self, sender):
-		print("hey")
 		for layer in self.font.selectedLayers:
-			newLayer = GSLayer()
+			new_layer = GSLayer()
 			if str(Glyphs.versionNumber)[0] == "3":
-				newLayer.attributes["coordinates"] = {self.font.axes[i].axisId: coordinate for i, coordinate in
+				new_layer.attributes["coordinates"] = {self.font.axes[i].axisId: coordinate for i, coordinate in
 				                                      enumerate(self.currentCoords)}
 			else:
-				newLayer.name = "{" + ", ".join([str(axis) for axis in self.currentCoords]) + "}"
-			newLayer.associatedMasterId = self.font.masters[self.selectedParent].id
-			self.font.glyphs[layer.parent.name].layers.append(newLayer)
-			newLayer.reinterpolate()
+				new_layer.name = "{" + ", ".join([str(axis) for axis in self.currentCoords]) + "}"
+			new_layer.associatedMasterId = self.font.masters[self.selectedParent].id
+			self.font.glyphs[layer.parent.name].layers.append(new_layer)
+			new_layer.reinterpolate()
 
 	def parent_selector(self, sender):
 		self.selectedParent = sender.get()
