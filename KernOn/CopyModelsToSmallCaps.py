@@ -52,6 +52,8 @@ class CopyModels:
 		                                     value=self.allMasters, callback=self.select_all_masters)
 		self.w.copyModelsButton = vanilla.Button((10, -30, -10, 20), "Copy models", callback=self.copy_models)
 
+		self.w.setDefaultButton(self.w.copyModelsButton)
+
 		self.w.resize(174, 128)
 		self.w.open()
 		self.w.makeKey()
