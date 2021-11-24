@@ -33,9 +33,15 @@ class Modeller:
 			"l n",
 			"r n",
 			"l H",  # LC/UC
+			"H o",
 			"H n",
 			"H s",
 			"H x",
+			"H H",
+			"H O",
+			"H T",
+			"H V",
+			"E H",
 			"one zero",  # numbers
 			"one one",
 			"one two",
@@ -87,7 +93,7 @@ class Modeller:
 				"modelList": self.defaults
 			}
 
-		self.master_capital_kern_values = {}
+		self.master_capital_kern_values = {master: 0 for master in self.font.masters}
 
 		self.allMasters = self.prefs["allMasters"]
 		self.capitalKerning = self.prefs["capitalKerning"]
@@ -101,18 +107,18 @@ class Modeller:
 		self.w = vanilla.FloatingWindow((0, 0), "Kern On Modeller")
 
 		self.w.modelsTitle = vanilla.TextBox((10, 10, -10, 14), "Model list", sizeStyle="small")
-		self.w.editModels = vanilla.TextEditor((10, 32, 150, -40), text="\n".join(self.prefs["modelList"]),
+		self.w.editModels = vanilla.TextEditor((10, 32, 145, -40), text="\n".join(self.prefs["modelList"]),
 		                                       callback=self.edit_models)
-		self.w.resetDefaults = vanilla.Button((10, -32, 150, 20), "Restore defaults",
+		self.w.resetDefaults = vanilla.Button((10, -32, 145, 20), "Restore defaults",
 		                                      callback=self.restore_defaults)
-		self.w.addCapitalSpacingCheckBox = vanilla.CheckBox((170, 8, -10, 20), "Add capital kerning",
+		self.w.addCapitalSpacingCheckBox = vanilla.CheckBox((165, 8, -10, 20), "Add capital kerning",
 		                                                    sizeStyle="small", value=self.prefs["capitalKerning"],
 		                                                    callback=self.toggle_capital_kerning)
 
 		self.ypos = 34
 
 		for i, master in enumerate(self.font.masters):
-			setattr(self.w, "master" + str(i), vanilla.TextBox((170, self.ypos, -60, 17), master.name,
+			setattr(self.w, "master" + str(i), vanilla.TextBox((165, self.ypos, -60, 17), master.name,
 			                                                   sizeStyle="regular"))
 			setattr(self.w, "kern" + str(i), vanilla.EditText((-50, self.ypos - 1, -10, 22), text="0",
 			                                                  callback=self.set_master_kern_value))
@@ -122,9 +128,9 @@ class Modeller:
 		if self.ypos <= 160:
 			self.ypos = 160
 
-		self.w.allMasters = vanilla.CheckBox((170, -56, -10, 18), "Apply to all masters", sizeStyle="small",
+		self.w.allMasters = vanilla.CheckBox((165, -56, -10, 18), "Apply to all masters", sizeStyle="small",
 		                                     value=self.allMasters, callback=self.select_all_masters)
-		self.w.setModelsButton = vanilla.Button((170, -32, -10, 20), "Set zero models", callback=self.set_models)
+		self.w.setModelsButton = vanilla.Button((165, -32, -10, 20), "Set zero models", callback=self.set_models)
 
 		self.toggle_master_input_fields()
 		self.toggle_default_button()
@@ -190,13 +196,18 @@ class Modeller:
 			del master.userData["KernOnModels"]
 			master.userData["KernOnModels"] = []
 			for i, model in enumerate(self.models):
+				left_glyph = model.split(" ")[0]
+				right_glyph = model.split(" ")[1]
 				kern_value = 0
 				if self.capitalKerning:
-					if self.font.glyphs[model.split(" ")[0]].case == 1 and self.font.glyphs[
-						model.split(" ")[1]].case == 1:
+					if self.font.glyphs[left_glyph].case == 1 and self.font.glyphs[right_glyph].case == 1:
 						kern_value = int(self.master_capital_kern_values[master])
 				master.userData["KernOnModels"].append(self.models[i])
 				self.font.setKerningForPair(master.id, model.split(" ")[0], model.split(" ")[1], kern_value)
+
+		Glyphs.showNotification(title="Set Kern on base models",
+		                        message="Zero models set in " + ["current master", "all masters"][self.allMasters] +
+		                                " for " + str(len(self.models)) + " models.")
 
 		self.write_prefs()
 
