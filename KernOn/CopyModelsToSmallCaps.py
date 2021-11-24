@@ -41,8 +41,8 @@ class CopyModels:
 			print(e)
 			self.master_cap_kern_values = {master: 0 for master in self.font.masters}
 
-		self.w = vanilla.FloatingWindow((0, 0), "Copy KO models", minSize=(170, len(self.font.masters)*28 + 170),
-		                                maxSize=(300, len(self.font.masters)*28 + 170))
+		self.w = vanilla.FloatingWindow((0, 0), "Copy KO models", minSize=(170, len(self.font.masters) * 28 + 170),
+		                                maxSize=(300, len(self.font.masters) * 28 + 170))
 
 		self.ypos = 10
 
@@ -74,8 +74,9 @@ class CopyModels:
 				master_cap_kern = int(self.font.kerning[master.id][self.font.glyphs["H"].id][self.font.glyphs["H"].id])
 			except:
 				master_cap_kern = 0
-			setattr(self.w, "master" + str(i), vanilla.TextBox((10, self.ypos, -80, 17), str(i+1) + ": " + master.name,
-			                                                   sizeStyle="regular"))
+			setattr(self.w, "master" + str(i),
+			        vanilla.TextBox((10, self.ypos, -80, 17), str(i + 1) + ": " + master.name,
+			                        sizeStyle="regular"))
 			setattr(self.w, "kern" + str(i), vanilla.EditText((-60, self.ypos - 1, -10, 22), text=str(
 				master_cap_kern), callback=self.set_master_cap_kern))
 
@@ -132,14 +133,14 @@ class CopyModels:
 				left_glyph = model.split(" ")[0]
 				right_glyph = model.split(" ")[1]
 
-				if self.font.glyphs[left_glyph.lower() + ".sc"]\
-						and self.font.glyphs[right_glyph.lower() + ".sc"]\
-						and	self.font.glyphs[left_glyph].case == 1\
-						and self.font.glyphs[right_glyph].case == 1\
-						and	self.font.glyphs[left_glyph].category == "Letter"\
-						and self.font.glyphs[right_glyph].category == "Letter"\
+				if self.font.glyphs[left_glyph.lower() + ".sc"] \
+						and self.font.glyphs[right_glyph.lower() + ".sc"] \
+						and self.font.glyphs[left_glyph].case == 1 \
+						and self.font.glyphs[right_glyph].case == 1 \
+						and self.font.glyphs[left_glyph].category == "Letter" \
+						and self.font.glyphs[right_glyph].category == "Letter" \
 						and self.master_cap_kern_values[master] == self.font.kerning[master.id][self.font.glyphs[
-						left_glyph].id][self.font.glyphs[right_glyph].id]:
+					left_glyph].id][self.font.glyphs[right_glyph].id]:
 
 					# if both glyphs of current pair are uppercase letters, present as smallcaps, and base models
 
@@ -147,7 +148,7 @@ class CopyModels:
 					if sc_model not in master.userData["KernOnModels"]:
 						master.userData["KernOnModels"].append(sc_model)
 						self.font.setKerningForPair(master.id, left_glyph.lower() + ".sc",
-						                               right_glyph.lower() + ".sc", 0)
+						                            right_glyph.lower() + ".sc", 0)
 						copied_models += sc_model + "\n"
 						copied_models_counter += 1
 			if copied_models_counter > 0:
