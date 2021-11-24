@@ -1,5 +1,11 @@
 # glyphs-scripts
-Scripts for Glyphs. Beware: Most of these script currently only fork on Glyphs 2 and are experimentally being updated for Glyphs 3. Use at your own risk. Apologies for broken stuff.
+Scripts for Glyphs. Beware: Some of these script currently only work on Glyphs 2 and are experimentally being updated for Glyphs 3. Use at your own risk. Apologies for broken stuff.
+
+## Kern On
+### Copy models to small caps
+Copies uppercase models to smallcaps. Support for copying number to small figures etc. in development.
+### Set Base Models
+Sets a pre-defined (but editable) list of kerning pairs as zero models for Kern On. Allows for capital kerning and per-master settings.
 
 ## Auto-Name Instances
 Names instances based on assigned names. Useful for batch-renaming large families. Allows defining of naming exceptions for width classes.
@@ -27,9 +33,6 @@ Finds nodes that are not set to smooth that should be smooth. Useful for cleanin
 
 ## Make Web Weights
 Converts master and instance weight values into USWeightClass values based on naming. Calculates AVAR table for correct interpolation. Takes care of intermediate layer values as well.
-
-## Set Kern On Base Models
-Sets a pre-defined (but editable) list of kerning pairs as zero models for Kern On. Allows for capital kerning and per-master settings.
 
 ## Write AVAR
 Writes an AVAR table based on stem weights. Affects only weight, regardless of axis count.
