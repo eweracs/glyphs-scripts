@@ -1,4 +1,4 @@
-# MenuTitle: Set Kern On base models
+# MenuTitle: Set base models
 # -*- coding: utf-8 -*-
 
 __doc__ = """
@@ -104,7 +104,7 @@ class Modeller:
 
 		self.selected_master = self.font.masters[0]
 
-		self.w = vanilla.FloatingWindow((0, 0), "Kern On Modeller")
+		self.w = vanilla.FloatingWindow((0, 0), "Set base models")
 
 		self.w.modelsTitle = vanilla.TextBox((10, 10, -10, 14), "Model list", sizeStyle="small")
 		self.w.editModels = vanilla.TextEditor((10, 32, 145, -40), text="\n".join(self.prefs["modelList"]),
@@ -187,6 +187,7 @@ class Modeller:
 
 	def select_all_masters(self, sender):
 		self.allMasters = sender.get()
+		self.write_prefs()
 
 	def set_models(self, sender):
 		self.w.close()
@@ -195,14 +196,14 @@ class Modeller:
 				continue
 			del master.userData["KernOnModels"]
 			master.userData["KernOnModels"] = []
-			for i, model in enumerate(self.models):
+			for model in self.models:
 				left_glyph = model.split(" ")[0]
 				right_glyph = model.split(" ")[1]
 				kern_value = 0
 				if self.capitalKerning:
 					if self.font.glyphs[left_glyph].case == 1 and self.font.glyphs[right_glyph].case == 1:
 						kern_value = int(self.master_capital_kern_values[master])
-				master.userData["KernOnModels"].append(self.models[i])
+				master.userData["KernOnModels"].append(model)
 				self.font.setKerningForPair(master.id, model.split(" ")[0], model.split(" ")[1], kern_value)
 
 		Glyphs.showNotification(title="Set Kern on base models",
