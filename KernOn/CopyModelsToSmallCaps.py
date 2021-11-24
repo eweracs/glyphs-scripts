@@ -122,6 +122,10 @@ class CopyModels:
 
 		global_copied_models_counter = 0
 		for master in self.font.masters:
+
+			if self.allMasters == 0 and master is not self.font.selectedFontMaster:
+				continue
+
 			if not master.userData["KernOnIsInterpolated"] and master.userData["KernOnModels"] is None:
 				Message("No models found", "Please create some models in order to copy them.")
 				return
@@ -155,8 +159,6 @@ class CopyModels:
 				print("Copied", copied_models_counter, "model(s) for master", master.name, ":\n", copied_models)
 			global_copied_models_counter += copied_models_counter
 
-			return
-
 		if global_copied_models_counter > 0:
 			Glyphs.showNotification(title="Models copied",
 			                        message="Copied " + str(global_copied_models_counter)
@@ -167,7 +169,7 @@ class CopyModels:
 
 	def write_prefs(self):
 		self.prefs["allMasters"] = self.allMasters
-		Glyphs.defaults["com.eweracs.KOmodels.prefs"] = self.prefs
+		Glyphs.defaults["com.eweracs.CopyKOtoSC.prefs"] = self.prefs
 
 
 CopyModels()
