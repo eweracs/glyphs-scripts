@@ -2,8 +2,12 @@
 # -*- coding: utf-8 -*-
 
 __doc__ = """
-Writes an AVAR table based on current weight distribution
+Writes an AVAR table based on current weight distribution.
 """
+
+if Font is None:
+    Message("No font selected.", "Select a font project!")
+    return
 
 if str(Glyphs.versionNumber)[0] == "2":
     instanceweights = sorted({instance.weightValue for instance in Font.instances})
@@ -25,4 +29,3 @@ Font.customParameters["Axis Mappings"] = {"wght": {int(axisRange/(len(instancewe
 
 Glyphs.showNotification(title="Wrote AVAR table",
                         message="Table calculated for " + str(len(instanceweights)) + " instances")
-
