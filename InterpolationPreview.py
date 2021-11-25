@@ -62,11 +62,14 @@ class Interpolator:
 
 		for coord in self.font.selectedFontMaster.axes:
 			self.currentCoords.append(int(coord))
-		_axesRanges = self.font.variationAxesRanges_(self.font.masters[0]) # this checks masters and "Virtual Masters"
 		for i, axis in enumerate(self.font.axes):  # for each axis in the font, create a new slider
-			axesRange = _axesRanges[axis.axisTag]
-			self.axesRanges.append((axesRange[0], axesRange[2]))
-			
+			self.axesRanges.append(set())  # for each axis in the font, create an empty tuple to store the axis range
+			for master in self.font.masters:  # first, build a list of the axis ranges
+				self.axesRanges[i].add(master.axes[i])
+			self.axesRanges = [sorted(list(a)) for a in self.axesRanges]
+			for axisRange in self.axesRanges:
+				del axisRange[1:-1]  # delete intermediate master coordinates
+
 			if str(Glyphs.versionNumber)[0] == "3":
 				axis_tag = axis.axisTag
 				axis_name = axis.name
