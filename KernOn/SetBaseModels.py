@@ -83,9 +83,9 @@ class Modeller:
 			"one.sc comma"
 		]
 
-		if Glyphs.defaults["com.eweracs.KOmodels.prefs"]:
-			for key in Glyphs.defaults["com.eweracs.KOmodels.prefs"]:
-				self.prefs[key] = Glyphs.defaults["com.eweracs.KOmodels.prefs"][key]
+		if Glyphs.defaults["com.eweracs.setKOmodels.prefs"]:
+			for key in Glyphs.defaults["com.eweracs.setKOmodels.prefs"]:
+				self.prefs[key] = Glyphs.defaults["com.eweracs.setKOmodels.prefs"][key]
 		else:
 			self.prefs = {
 				"allMasters": 1,
@@ -123,6 +123,8 @@ class Modeller:
 			setattr(self.w, "kern" + str(i), vanilla.EditText((-50, self.ypos - 1, -10, 22), text="0",
 			                                                  callback=self.set_master_kern_value))
 			self.ypos += 28
+
+		self.w.kern0.selectAll()
 
 		self.ypos += 70
 		if self.ypos <= 160:
@@ -215,7 +217,7 @@ class Modeller:
 	def write_prefs(self):
 		self.prefs["allMasters"] = self.allMasters
 		self.prefs["capitalKerning"] = self.capitalKerning
-		Glyphs.defaults["com.eweracs.KOmodels.prefs"] = self.prefs
+		Glyphs.defaults["com.eweracs.setKOmodels.prefs"] = self.prefs
 
 
 Modeller()
