@@ -121,6 +121,7 @@ class Interpolator:
 			self.currentCoords[i] = axis
 			self.inputFieldList[i].set(str(int(axis)))
 			self.sliderList[i].set(int(axis))
+		self.preview_instance()
 
 	def add_instance_menu(self, sender):
 		try:
@@ -261,7 +262,7 @@ class Interpolator:
 			new_layer = GSLayer()
 			if str(Glyphs.versionNumber)[0] == "3":
 				new_layer.attributes["coordinates"] = {self.font.axes[i].axisId: coordinate for i, coordinate in
-				                                      enumerate(self.currentCoords)}
+				                                       enumerate(self.currentCoords)}
 			else:
 				new_layer.name = "{" + ", ".join([str(axis) for axis in self.currentCoords]) + "}"
 			new_layer.associatedMasterId = self.font.masters[self.selectedParent].id
