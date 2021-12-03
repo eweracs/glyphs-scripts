@@ -28,6 +28,9 @@ Calculates paramArea, paramDepth and paramOver values for other masters based on
 ## Interpolation Preview
 Allows for visual interpolation, in order to add the interpolation as an instance or an intermediate layer. Respects multi-axis design spaces. Adding as an instance is still wobbly for Glyphs 3.
 
+## Kern Slider
+A simple tool to kern with a slider instead of using keyboard shortcuts.
+
 ## Make Smooth Nodes
 Finds nodes that are not set to smooth that should be smooth. Useful for cleaning up client projects when they don’t know how to draw properly.
 
