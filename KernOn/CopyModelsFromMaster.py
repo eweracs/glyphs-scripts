@@ -97,6 +97,9 @@ class CopyMasterModels:
 					right_glyph = model.split(" ")[1]
 					model_kerning = self.font.kerningForPair(self.sourceMaster.id, left_glyph, right_glyph)
 
+					if self.w.onlyZeroModels and model_kerning != 0:
+						continue
+
 					self.font.setKerningForPair(master.id, left_glyph, right_glyph, model_kerning)
 
 		print("Copied models from master", self.font.masters[self.w.sourceSelector.get()].name, "to", ", ".join([
