@@ -3,13 +3,15 @@ Scripts for Glyphs. Beware: Some of these script currently only work on Glyphs 2
 
 ## Kern On
 ### Clean kerning groups
-Removes all occurences of "KO_" in kerning groups.
+Removes all occurrences of "KO_" in kerning groups.
 ### Copy models to small caps
 Copies uppercase models to smallcaps. Support for copying number to small figures etc. in development.
 ### Print Master Models
 Prints a tab with the models for each master. Useful for proofing without having to open Kern On.
 ### Set Base Models
 Sets a pre-defined (but editable) list of kerning pairs as zero models for Kern On. Allows for capital kerning and per-master settings.
+### Set Special Spacing
+Sets a standardised list of glyphs to No Kerning (side-sensitive) and makes a small nums group for .dnom, .numr, inferior and superior figures. Kern On can be running while this script is executed.
 
 ## Auto-Name Instances
 Names instances based on assigned names. Useful for batch-renaming large families. Allows defining of naming exceptions for width classes.
