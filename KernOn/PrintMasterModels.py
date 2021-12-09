@@ -5,7 +5,7 @@ __doc__ = """
 Prints a tab with all Kern On models for each master.
 """
 
-for i, master in enumerate(Font.masters):
+for master in Font.masters:
 
 	negativeModels = []
 	zeroModels = []
