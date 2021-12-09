@@ -2,6 +2,8 @@
 Scripts for Glyphs. Beware: Some of these script currently only work on Glyphs 2 and are experimentally being updated for Glyphs 3. Use at your own risk. Apologies for broken stuff.
 
 ## Kern On
+### Clean kerning groups
+Removes all occurences of "KO_" in kerning groups.
 ### Copy models to small caps
 Copies uppercase models to smallcaps. Support for copying number to small figures etc. in development.
 ### Print Master Models
