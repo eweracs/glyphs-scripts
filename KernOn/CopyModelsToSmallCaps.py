@@ -41,7 +41,7 @@ class CopyModels:
 			print(e)
 			self.master_cap_kern_values = {master: 0 for master in self.font.masters}
 
-		self.w = vanilla.FloatingWindow((0, 0), "Copy KO models", minSize=(170, len(self.font.masters) * 28 + 170),
+		self.w = vanilla.FloatingWindow((0, 0), "Copy zero models", minSize=(170, len(self.font.masters) * 28 + 170),
 		                                maxSize=(300, len(self.font.masters) * 28 + 170))
 
 		self.ypos = 10
