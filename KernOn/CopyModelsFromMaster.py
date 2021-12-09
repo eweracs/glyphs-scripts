@@ -16,11 +16,11 @@ class CopyMasterModels:
 
 		self.font = Font
 
-		self.KOmasters = [master for master in Font.masters if master.userData["KernOnModels"]]
-
-		if len(self.KOmasters) == 0:
+		if len([master for master in Font.masters if master.userData["KernOnModels"]]) == 0:
 			Message("Please set some models first.", "No Kern On models found")
 			return
+
+		self.sourceMaster = self.font.masters[0]
 
 		self.w = vanilla.FloatingWindow((0, 0), "Copy models from Master")
 
