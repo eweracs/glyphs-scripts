@@ -4,6 +4,8 @@ Scripts for Glyphs. Beware: Some of these script currently only work on Glyphs 2
 ## Kern On
 ### Copy models to small caps
 Copies uppercase models to smallcaps. Support for copying number to small figures etc. in development.
+### Print Master Models
+Prints a tab with the models for each master. Useful for proofing without having to open Kern On.
 ### Set Base Models
 Sets a pre-defined (but editable) list of kerning pairs as zero models for Kern On. Allows for capital kerning and per-master settings.
 
