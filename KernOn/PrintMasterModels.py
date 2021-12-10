@@ -5,7 +5,9 @@ __doc__ = """
 Prints a tab with all Kern On models for each master.
 """
 
-for master in Font.masters:
+for i, master in enumerate(Font.masters):
+	if master.userData["KernOnIsInterpolated"]:
+		continue
 
 	negativeModels = []
 	zeroModels = []
@@ -15,7 +17,8 @@ for master in Font.masters:
 		Lglyph = Font.glyphs[model.split(" ")[0]]
 		Rglyph = Font.glyphs[model.split(" ")[1]]
 		newModel = Lglyph.string + Rglyph.string
-		model_kerning = Font.kerningForPair(master.id, Lglyph.name, Rglyph.name)
+		model_kerning = Rglyph.layers[i].previousKerningForLayer_direction_(Lglyph.layers[i], LTR)
+		print(newModel, model_kerning)
 		if model_kerning == 0:
 			zeroModels.append(newModel)
 		elif model_kerning > 0:
