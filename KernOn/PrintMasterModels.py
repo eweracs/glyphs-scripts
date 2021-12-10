@@ -18,7 +18,6 @@ for i, master in enumerate(Font.masters):
 		Rglyph = Font.glyphs[model.split(" ")[1]]
 		newModel = Lglyph.string + Rglyph.string
 		model_kerning = Rglyph.layers[i].previousKerningForLayer_direction_(Lglyph.layers[i], LTR)
-		print(newModel, model_kerning)
 		if model_kerning == 0:
 			zeroModels.append(newModel)
 		elif model_kerning > 0:
