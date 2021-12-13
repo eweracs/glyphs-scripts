@@ -70,6 +70,11 @@ class Interpolator:
 			for axisRange in self.axesRanges:
 				del axisRange[1:-1]  # delete intermediate master coordinates
 
+			if len(self.axesRanges[i]) == 1:
+				Message("Please add more than one axis coordinate in your masters.", "Invalid axis coordinates for "
+				        + axis.name + " axis")
+				return
+
 			if str(Glyphs.versionNumber)[0] == "3":
 				axis_tag = axis.axisTag
 				axis_name = axis.name
