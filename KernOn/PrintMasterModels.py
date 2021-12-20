@@ -16,17 +16,18 @@ for i, master in enumerate(Font.masters):
 	for model in master.userData["KernOnModels"]:
 		Lglyph = Font.glyphs[model.split(" ")[0]]
 		Rglyph = Font.glyphs[model.split(" ")[1]]
-		newModel = Lglyph.string + Rglyph.string
+		newModel = "/" + Lglyph.name + "/" + Rglyph.name
 		model_kerning = Rglyph.layers[i].previousKerningForLayer_direction_(Lglyph.layers[i], LTR)
-		if model_kerning == 0:
+		if model_kerning == 0 or model_kerning is None:
 			zeroModels.append(newModel)
 		elif model_kerning > 0:
 			positiveModels.append(newModel)
 		elif model_kerning < 0:
 			negativeModels.append(newModel)
 
-	text = "Zero models:\n" + " ".join(zeroModels) + "\n\nPositive models:\n" \
-	       + " ".join(positiveModels) + "\n\nNegative models:\n" + " ".join(negativeModels)
+	text = master.name + "(" + str(len(master.userData["KernOnModels"])) + ")\n\nZero models:\n" + "/space".join(
+		zeroModels) + "\n\nPositive models:\n" \
+	    + "/space".join(positiveModels) + "\n\nNegative models:\n" + "/space".join(negativeModels)
 
 	Font.newTab(text)
 	Font.currentTab.masterIndex = i
