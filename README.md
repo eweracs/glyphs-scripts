@@ -12,7 +12,7 @@ Copies uppercase models to smallcaps and number models to small figures.
 Prints a tab with the models for each master. Useful for proofing without having to open Kern On.
 ### Set Base Models
 Sets a pre-defined (but editable) list of kerning pairs as zero models for Kern On. Allows for capital kerning and per-master settings.
-###Set Fraction Autopairs
+### Set Fraction Autopairs
 Sets .numr–fraction and fraction–.dnom autopairs.
 ### Set Special Spacing
 Sets a standardised list of glyphs to No Kerning (side-sensitive) and makes a small nums group for .dnom, .numr, inferior and superior figures. Kern On can be running while this script is executed.
@@ -26,7 +26,7 @@ Opens a dialogue to choose multiple export formats. Sorts exported files into re
 ## Delete Duplicate Nodes
 Checks for duplicate nodes (for instance after converting quadratic curves to cubic) and deletes these.
 
-##Delete Nodes in All Masters
+## Delete Nodes in All Masters
 Deletes the selected node(s) in all masters (G3 only).
 
 ## Instance Kerner (WIP, one axis only)
