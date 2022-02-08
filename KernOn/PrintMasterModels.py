@@ -25,9 +25,10 @@ for i, master in enumerate(Font.masters):
 		elif model_kerning < 0:
 			negativeModels.append(newModel)
 
-	text = master.name + "(" + str(len(master.userData["KernOnModels"])) + ")\n\nZero models:\n" + "/space".join(
-		zeroModels) + "\n\nPositive models:\n" \
-	    + "/space".join(positiveModels) + "\n\nNegative models:\n" + "/space".join(negativeModels)
+	text = master.name + " (" + str(len(master.userData["KernOnModels"])) + " models)\n\nZero:\n" + \
+	       "/space".join(
+		zeroModels) + "\n\nPositive:\n" \
+	    + "/space".join(positiveModels) + "\n\nNegative:\n" + "/space".join(negativeModels)
 
 	Font.newTab(text)
 	Font.currentTab.masterIndex = i
