@@ -4,7 +4,7 @@ Scripts for Glyphs. Beware: Some of these script currently only work on Glyphs 2
 ## Kern On
 ### Clean kerning groups
 Removes all occurrences of "KO_" in kerning groups.
-###Copy Models from Master
+### Copy Models from Master
 Copies models (or just zero models) between masters.
 ### Copy Models to Derivatives
 Copies uppercase models to smallcaps and number models to small figures.
