@@ -4,12 +4,16 @@ Scripts for Glyphs. Beware: Some of these script currently only work on Glyphs 2
 ## Kern On
 ### Clean kerning groups
 Removes all occurrences of "KO_" in kerning groups.
-### Copy models to small caps
-Copies uppercase models to smallcaps. Support for copying number to small figures etc. in development.
+###Copy Models from Master
+Copies models (or just zero models) between masters.
+### Copy Models to Derivatives
+Copies uppercase models to smallcaps and number models to small figures.
 ### Print Master Models
 Prints a tab with the models for each master. Useful for proofing without having to open Kern On.
 ### Set Base Models
 Sets a pre-defined (but editable) list of kerning pairs as zero models for Kern On. Allows for capital kerning and per-master settings.
+###Set Fraction Autopairs
+Sets .numr–fraction and fraction–.dnom autopairs.
 ### Set Special Spacing
 Sets a standardised list of glyphs to No Kerning (side-sensitive) and makes a small nums group for .dnom, .numr, inferior and superior figures. Kern On can be running while this script is executed.
 
@@ -21,6 +25,9 @@ Opens a dialogue to choose multiple export formats. Sorts exported files into re
 
 ## Delete Duplicate Nodes
 Checks for duplicate nodes (for instance after converting quadratic curves to cubic) and deletes these.
+
+##Delete Nodes in All Masters
+Deletes the selected node(s) in all masters (G3 only).
 
 ## Instance Kerner (WIP, one axis only)
 Adds Replace Feature custom parameter for every instance for kerning. Useful for hard-coded capital/sc spacing. Currently only works for single-axis setups, still trying to figure out how to make this work for multiple axes. Todo: more than two kerning values per axis
