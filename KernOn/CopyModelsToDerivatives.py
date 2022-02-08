@@ -74,7 +74,7 @@ class CopyModels:
 
 		for i, master in enumerate(self.font.masters):
 			try:
-				master_cap_kern = int(self.font.kerning[master.id][self.font.glyphs["H"].id][self.font.glyphs["H"].id])
+				master_cap_kern = int(self.font.kerningForPair(master.id, "H", "H"))
 			except:
 				master_cap_kern = 0
 			setattr(self.w, "master" + str(i),
