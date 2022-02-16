@@ -6,7 +6,11 @@ Visually adjust HT Letterspacer parameters.
 """
 
 import vanilla
-import HT_LetterSpacer_script
+
+try:
+	import HT_LetterSpacer_script
+except:
+	Message("Please run HT Letterspacer once before starting the script.", "External import required")
 
 try:
 	from importlib import reload
