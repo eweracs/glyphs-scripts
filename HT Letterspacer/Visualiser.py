@@ -1,4 +1,4 @@
-# MenuTitle: HT Letterspacer Visualiser
+# MenuTitle: Visualiser
 # -*- coding: utf-8 -*-
 
 __doc__ = """

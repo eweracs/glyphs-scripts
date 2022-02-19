@@ -1,4 +1,4 @@
-# MenuTitle: Interpolate Letterspacer
+# MenuTitle: Parameter Interpolator
 # -*- coding: utf-8 -*-
 
 __doc__ = """
