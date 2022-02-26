@@ -6,6 +6,7 @@ Visually adjust HT Letterspacer parameters.
 """
 
 import vanilla
+import preview as preview
 
 try:
 	import HT_LetterSpacer_script
@@ -27,8 +28,11 @@ class HTLSVisualiser:
 
 		self.font = Font
 
+		self.glyphList = [glyph.name for glyph in self.font.glyphs]
+
 		self.currentMasterId = self.font.selectedFontMaster.id
 		self.originalParams = []
+		self.originalSidebearings = []
 		self.force_update = False
 
 		for i, master in enumerate(Font.masters):
@@ -39,10 +43,17 @@ class HTLSVisualiser:
 				master.customParameters["paramDepth"] = 10
 			self.originalParams.append([master.customParameters["paramArea"], master.customParameters["paramDepth"]])
 
+			master_sidebearings = {glyph.name: [self.font.glyphs[glyph.name].layers[master.id].LSB, self.font.glyphs[
+				glyph.name].layers[master.id].RSB] for glyph in self.font.glyphs
+			}
+
+			self.originalSidebearings.append(master_sidebearings)
+
 		self.areaValueForMaster = int(self.font.selectedFontMaster.customParameters["paramArea"])
 		self.depthValueForMaster = int(self.font.selectedFontMaster.customParameters["paramDepth"])
 
-		self.font.newTab("nnnnonononooo")
+		if not self.font.currentTab:
+			self.font.newTab("nnnnonononooo")
 
 		self.font.currentTab.textCursor = 0
 		self.font.currentTab.textRange = len(Font.currentTab.text)
@@ -83,6 +94,68 @@ class HTLSVisualiser:
 		self.ypos += 30
 
 		self.w.resetButton = vanilla.Button((10, self.ypos, 100, 20), "Reset", callback=self.reset_values)
+
+		self.ypos += 32
+
+		self.w.divider = vanilla.HorizontalLine((10, self.ypos, -10, 1))
+
+		self.ypos += 16
+
+		self.w.leftOriginalLSB = vanilla.TextBox((30, self.ypos, 110, 14),
+		                                      "(" + str(self.originalSidebearings[self.font.masterIndex]["n"][0]) + ")",
+		                                      sizeStyle="small", alignment="left")
+		self.w.leftOriginalRSB = vanilla.TextBox((30, self.ypos, 110, 14),
+		                                      "(" + str(self.originalSidebearings[self.font.masterIndex]["n"][1]) + ")",
+		                                      sizeStyle="small", alignment="right")
+
+		self.w.rightOriginalLSB = vanilla.TextBox((160, self.ypos, -30, 14),
+		                                      self.originalSidebearings[self.font.masterIndex]["o"][0],
+		                                      sizeStyle="small", alignment="left")
+		self.w.rightOriginalRSB = vanilla.TextBox((160, self.ypos, -30, 14),
+		                                      self.originalSidebearings[self.font.masterIndex]["o"][1],
+		                                      sizeStyle="small", alignment="right")
+
+		self.ypos += 25
+
+		self.w.leftView = preview.GlyphView((20, self.ypos, 130, 100),
+		                                    layer=self.font.glyphs["n"].layers[self.font.selectedFontMaster.id])
+		self.w.leftView._nsObject.setNeedsDisplay_(True)
+		self.w.leftView._nsObject._upm = self.font.upm
+		self.w.leftView._nsObject._scaleFactor = 1 / (self.font.upm / (100))
+		self.w.leftView._nsObject._margin = 20
+
+		self.w.rightView = preview.GlyphView((150, self.ypos, 130, 100),
+		                                     layer=self.font.glyphs["o"].layers[self.font.selectedFontMaster.id])
+		self.w.rightView._nsObject.setNeedsDisplay_(True)
+		self.w.rightView._nsObject._upm = self.font.upm
+		self.w.rightView._nsObject._scaleFactor = 1 / (self.font.upm / (100))
+		self.w.rightView._nsObject._margin = 20
+
+		self.ypos += 40
+
+		self.w.leftNewLSB = vanilla.TextBox((30, self.ypos, 110, 14),
+		                                 self.font.glyphs["n"].layers[self.font.masterIndex].LSB,
+		                                 sizeStyle="small", alignment="left")
+		self.w.leftNewRSB = vanilla.TextBox((30, self.ypos, 110, 14),
+		                                 self.font.glyphs["n"].layers[self.font.masterIndex].RSB,
+		                                 sizeStyle="small", alignment="right")
+
+		self.w.rightNewLSB = vanilla.TextBox((160, self.ypos, -30, 14),
+		                                 self.font.glyphs["o"].layers[self.font.masterIndex].LSB,
+		                                 sizeStyle="small", alignment="left")
+		self.w.rightNewRSB = vanilla.TextBox((160, self.ypos, -30, 14),
+		                                 self.font.glyphs["o"].layers[self.font.masterIndex].RSB,
+		                                 sizeStyle="small", alignment="right")
+
+		self.ypos += 66
+
+		self.w.leftGlyphSelector = vanilla.ComboBox((20, self.ypos, 120, 19), self.glyphList, sizeStyle="small",
+		                                            callback=self.ui_update)
+		self.w.rightGlyphSelector = vanilla.ComboBox((160, self.ypos, -20, 19), self.glyphList, sizeStyle="small",
+		                                             callback=self.ui_update)
+
+		self.w.leftGlyphSelector.set("n")
+		self.w.rightGlyphSelector.set("o")
 
 		self.ypos += 30
 
@@ -142,9 +215,36 @@ class HTLSVisualiser:
 			layer.syncMetrics()
 
 	def ui_update(self, info):
+		self.w.leftNewLSB.set(self.font.glyphs[self.w.leftGlyphSelector.get()].layers[self.font.masterIndex].LSB)
+		self.w.leftNewRSB.set(self.font.glyphs[self.w.leftGlyphSelector.get()].layers[self.font.masterIndex].RSB)
+		self.w.rightNewLSB.set(self.font.glyphs[self.w.rightGlyphSelector.get()].layers[self.font.masterIndex].LSB)
+		self.w.rightNewRSB.set(self.font.glyphs[self.w.rightGlyphSelector.get()].layers[self.font.masterIndex].RSB)
+
+		if self.w.leftGlyphSelector.get() in self.glyphList:
+			self.w.leftView.layer = self.font.glyphs[self.w.leftGlyphSelector.get()].layers[
+				self.font.selectedFontMaster.id
+			]
+			if self.font.glyphs[self.w.leftGlyphSelector.get()].string not in self.font.currentTab.text:
+				self.font.currentTab.text += "/" + self.w.leftGlyphSelector.get()
+		if self.w.rightGlyphSelector.get() in self.glyphList:
+			self.w.rightView.layer = self.font.glyphs[self.w.rightGlyphSelector.get()].layers[
+				self.font.selectedFontMaster.id
+			]
+			if self.font.glyphs[self.w.rightGlyphSelector.get()].string not in self.font.currentTab.text:
+				self.font.currentTab.text += "/" + self.w.rightGlyphSelector.get()
+			
+		self.w.leftOriginalLSB.set("(" + str(self.originalSidebearings[self.font.masterIndex][
+			                                  self.w.leftGlyphSelector.get()][0]) + ")")
+		self.w.leftOriginalRSB.set("(" + str(self.originalSidebearings[self.font.masterIndex][
+			                                  self.w.leftGlyphSelector.get()][1]) + ")")
+		self.w.rightOriginalLSB.set("(" + str(self.originalSidebearings[self.font.masterIndex][
+			                                  self.w.rightGlyphSelector.get()][0]) + ")")
+		self.w.rightOriginalRSB.set("(" + str(self.originalSidebearings[self.font.masterIndex][
+			                                  self.w.rightGlyphSelector.get()][1]) + ")")
+
 		if self.currentMasterId == self.font.selectedFontMaster.id and self.force_update is False:
 			return
-		print("h")
+
 		self.w.areaTtitle.set("Area (" + str(self.originalParams[self.font.masterIndex][0]) + ")")
 		self.areaValueForMaster = int(self.font.selectedFontMaster.customParameters["paramArea"])
 		self.w.areaEntry.set(self.areaValueForMaster)
