@@ -6,10 +6,9 @@ Visually adjust HT Letterspacer parameters.
 """
 
 import vanilla
-import preview as preview
 
 try:
-	import HT_LetterSpacer_script
+	from HT_LetterSpacer_script import *
 except:
 	Message("Please run HT Letterspacer once before starting the script.", "External import required")
 
@@ -18,6 +17,90 @@ try:
 except:
 	pass
 reload(HT_LetterSpacer_script)
+
+#################################################################
+#                                                               #
+#   Code for glyph preview module adapted from Mark Frömberg    #
+#                                                               #
+#################################################################
+
+from AppKit import NSView, NSColor, NSAffineTransform, NSMutableParagraphStyle, NSAttributedString, NSFont, \
+	NSFontAttributeName, NSForegroundColorAttributeName, NSParagraphStyleAttributeName, \
+	NSRectFill
+
+from vanilla.vanillaBase import VanillaBaseObject
+
+
+try:
+	class BaseGlyphView(NSView):
+
+		def drawRect_(self, rect):
+			bounds = self.bounds()
+			NSColor.textBackgroundColor().set()
+			NSRectFill(bounds)
+			scale_factor = self._scaleFactor
+
+			layer_width = self._layer.width * scale_factor
+			descender = self._layer.master.descender * scale_factor
+			ascender = self._layer.master.ascender * scale_factor
+
+			bezier_path_only = self._layer.bezierPath  # Path Only
+			if bezier_path_only is not None:
+				bezier_path_only = bezier_path_only.copy()
+			bezier_path_with_components = self._layer.completeBezierPath  # Path & Components
+			bezier_path_open_with_components = self._layer.completeOpenBezierPath  # Path & Components
+
+			scale = NSAffineTransform.transform()
+			scale.translateXBy_yBy_((bounds.size.width - layer_width) / 2,
+			                        (bounds.size.height - ascender + descender) / 2 - descender)
+			scale.scaleBy_(scale_factor)
+
+			# Draw only path in black, components in inactive state
+			path_color = NSColor.textColor()
+			component_color = NSColor.secondaryLabelColor()
+
+			if bezier_path_with_components:
+				bezier_path_with_components.transformUsingAffineTransform_(scale)
+				component_color.set()  # Draw components in gray
+				bezier_path_with_components.fill()
+			if bezier_path_only:
+				path_color.set()
+				bezier_path_only.transformUsingAffineTransform_(scale)
+				bezier_path_only.fill()
+			if bezier_path_open_with_components:
+				path_color.set()
+				bezier_path_open_with_components.transformUsingAffineTransform_(scale)
+				bezier_path_open_with_components.stroke()
+
+			# Draw non-exported glyphs in orange
+			else:
+				NSColor.orangeColor().set()
+				bezier_path_with_components.transformUsingAffineTransform_(scale)
+				bezier_path_with_components.fill()
+
+			# Auto-width label
+			if self._layer.hasAlignedWidth():
+				string = NSAttributedString.alloc().initWithString_attributes_("Auto-width")
+				string.drawAtPoint_alignment_((bounds.size.width / 2, 5), 1)
+
+except:
+	pass
+
+class GlyphView(VanillaBaseObject):
+	nsGlyphPreviewClass = BaseGlyphView
+
+	def __init__(self, posSize, layer=None):
+		self._setupView(self.nsGlyphPreviewClass, posSize)
+		self.layer = layer
+
+	@property
+	def layer(self):
+		return self._nsObject._layer
+
+	@layer.setter
+	def layer(self, value):
+		self._nsObject._layer = value
+		self._nsObject.setNeedsDisplay_(True)
 
 
 class HTLSVisualiser:
@@ -117,14 +200,14 @@ class HTLSVisualiser:
 
 		self.ypos += 25
 
-		self.w.leftView = preview.GlyphView((20, self.ypos, 130, 100),
+		self.w.leftView = GlyphView((20, self.ypos, 130, 100),
 		                                    layer=self.font.glyphs["n"].layers[self.font.selectedFontMaster.id])
 		self.w.leftView._nsObject.setNeedsDisplay_(True)
 		self.w.leftView._nsObject._upm = self.font.upm
 		self.w.leftView._nsObject._scaleFactor = 1 / (self.font.upm / (100))
 		self.w.leftView._nsObject._margin = 20
 
-		self.w.rightView = preview.GlyphView((150, self.ypos, 130, 100),
+		self.w.rightView = GlyphView((150, self.ypos, 130, 100),
 		                                     layer=self.font.glyphs["o"].layers[self.font.selectedFontMaster.id])
 		self.w.rightView._nsObject.setNeedsDisplay_(True)
 		self.w.rightView._nsObject._upm = self.font.upm
