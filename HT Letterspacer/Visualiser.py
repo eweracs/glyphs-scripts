@@ -109,10 +109,10 @@ class HTLSVisualiser:
 		                                      sizeStyle="small", alignment="right")
 
 		self.w.rightOriginalLSB = vanilla.TextBox((160, self.ypos, -30, 14),
-		                                      self.originalSidebearings[self.font.masterIndex]["o"][0],
+		                                      "(" + str(self.originalSidebearings[self.font.masterIndex]["o"][0]) + ")",
 		                                      sizeStyle="small", alignment="left")
 		self.w.rightOriginalRSB = vanilla.TextBox((160, self.ypos, -30, 14),
-		                                      self.originalSidebearings[self.font.masterIndex]["o"][1],
+		                                      "(" + str(self.originalSidebearings[self.font.masterIndex]["o"][1]) + ")",
 		                                      sizeStyle="small", alignment="right")
 
 		self.ypos += 25
