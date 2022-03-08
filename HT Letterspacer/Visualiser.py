@@ -7,6 +7,7 @@ Visually adjust HT Letterspacer parameters.
 
 import vanilla
 from AppKit import NSColor
+from GlyphsApp.UI import *
 
 try:
 	from HT_LetterSpacer_script import *
