@@ -17,6 +17,10 @@ class BuildFigures:
 			Message("No font selected", "Select a font project!")
 			return
 
+		self.currentMaster = self.font.selectedFontMaster
+
+		self.base_suffixes = [".dnom", "inferior", ".numr", "superior"]
+
 		self.w = vanilla.FloatingWindow((0, 0), "Build Small Figures RMX")
 
 		self.w.descriptionText = vanilla.TextBox("auto",
@@ -31,10 +35,17 @@ class BuildFigures:
 		                                             sizeStyle="small")
 
 		self.w.default = vanilla.Group("auto")
-		self.w.default.title = vanilla.TextBox("auto", "Base small figures:", sizeStyle="small")
-		self.w.default.selector = vanilla.PopUpButton("auto", [".dnom", "inferior", ".numr", "superior"],
+		self.w.default.title = vanilla.TextBox("auto", "Target figures:", sizeStyle="small")
+		self.w.default.selector = vanilla.PopUpButton("auto", self.base_suffixes,
 		                                              sizeStyle="small",
 		                                              callback=self.selection_change)
+
+		self.w.divider1 = vanilla.HorizontalLine("auto")
+
+		self.w.master = vanilla.Group("auto")
+		self.w.master.title = vanilla.TextBox("auto", "Master: " + self.font.selectedFontMaster.name, sizeStyle="small")
+		self.w.master.selector = vanilla.SegmentedButton("auto", [dict(title="←"), dict(title="→")],
+            callback=self.master_switcher)
 
 		self.w.paramTitles = vanilla.Group("auto")
 		self.w.paramTitles.width = vanilla.TextBox("auto", "Width", sizeStyle="small")
@@ -42,11 +53,11 @@ class BuildFigures:
 		self.w.paramTitles.weight = vanilla.TextBox("auto", "Weight", sizeStyle="small")
 
 		self.w.paramEntries = vanilla.Group("auto")
-		self.w.paramEntries.width = vanilla.EditText("auto", sizeStyle="small", text="0")
-		self.w.paramEntries.height = vanilla.EditText("auto", sizeStyle="small", text="0")
-		self.w.paramEntries.weight = vanilla.EditText("auto", sizeStyle="small", text="0")
+		self.w.paramEntries.width = vanilla.EditText("auto", sizeStyle="small", text="0", callback=self.param_input)
+		self.w.paramEntries.height = vanilla.EditText("auto", sizeStyle="small", text="0", callback=self.param_input)
+		self.w.paramEntries.weight = vanilla.EditText("auto", sizeStyle="small", text="0", callback=self.param_input)
 
-		self.w.divider1 = vanilla.HorizontalLine("auto")
+		self.w.divider2 = vanilla.HorizontalLine("auto")
 
 		self.w.componentTitles = vanilla.Group("auto")
 		self.w.componentTitles.figures = vanilla.TextBox("auto", "Build components:",
@@ -71,32 +82,41 @@ class BuildFigures:
 		self.w.superior.select = vanilla.CheckBox("auto", "superior", sizeStyle="small")
 		self.w.superior.shift = vanilla.EditText("auto", text="350", sizeStyle="small")
 
-		self.w.divider2 = vanilla.HorizontalLine("auto")
+		self.w.divider3 = vanilla.HorizontalLine("auto")
 
-		self.w.allMasters = vanilla.Group("auto")
-		self.w.allMasters.select = vanilla.CheckBox("auto", "Apply to all masters", sizeStyle="small")
-		self.w.allMasters.shift = vanilla.TextBox("auto", "")
+		# self.w.allMasters = vanilla.Group("auto")
+		# self.w.allMasters.select = vanilla.CheckBox("auto", "Apply to all masters", sizeStyle="small")
+		# self.w.allMasters.shift = vanilla.TextBox("auto", "")
 
 
 		self.w.writeButton = vanilla.Button("auto", "Make figures", callback=self.make_figures)
 
-
 		self.load_preferences()
+
+		self.masterParams = {master.id: {
+			"width": self.w.paramEntries.width.get(),
+			"height": self.w.paramEntries.height.get(),
+			"weight": self.w.paramEntries.weight.get()
+		} for master in self.font.masters}
+
 		self.selection_change(None)
+		self.param_input(None)
 
 		rules = [
 			"H:|-border-[" + item + "]-border-|" for item in [
-				"descriptionText", "source", "default", "paramTitles", "paramEntries", "divider1", "componentTitles",
-				"dnom", "inferior", "numr", "superior", "divider2", "allMasters", "writeButton"
+				"descriptionText", "source", "default", "divider1", "master", "paramTitles", "paramEntries",
+				"divider2", "componentTitles", "dnom", "inferior", "numr", "superior", "divider3",
+				"writeButton"
 			]
 		]
 
-		rules.append("V:|-border-[descriptionText]-space-[source]-margin-[default(==source)]-space-[paramTitles]-"
-		             "margin-[paramEntries]-margin-[divider1]-margin-[componentTitles]-margin-[dnom]-thin-[inferior]-"
-		             "thin-[numr]-thin-[superior]-margin-[divider2]-margin-[allMasters]-margin-[writeButton]-border-|")
+		rules.append("V:|-border-[descriptionText]-space-[source]-margin-[default(==source)]-margin-[divider1]-margin-"
+		             "[master]-margin-[paramTitles]-margin-[paramEntries]-margin-[divider2]-margin-"
+		             "[componentTitles]-margin-[dnom]-thin-[inferior]-thin-[numr]-thin-[superior]-margin-[divider3]"
+		             "-margin-[writeButton]-border-|")
 
 		metrics = {
-			"width": 70,
+			"buttonWidth": 70,
 			"border": 10,
 			"margin": 10,
 			"thin": 5,
@@ -104,32 +124,33 @@ class BuildFigures:
 		}
 
 		popup_rules = [
-			"H:|[title]-[selector(width)]|",
+			"H:|[title]-[selector(buttonWidth)]|",
 			"V:|[title]|",
 			"V:|[selector]|"
 		]
 
 		param_rules = [
-			"H:|[width(width)]-[height(==width)]-[weight(==width)]|",
+			"H:|[width(buttonWidth)]-[height(==buttonWidth)]-[weight(==buttonWidth)]|",
 			"V:|[width]|",
 			"V:|[height]|",
 			"V:|[weight]|"
 		]
 
 		component_rules = [
-			"H:|[figures]-[yShift(width)]|",
+			"H:|[figures]-[yShift(buttonWidth)]|",
 			"V:|[figures]|",
 			"V:|[yShift]|"
 		]
 
 		select_nums_rules = [
-			"H:|[select]-[shift(width)]|",
+			"H:|[select]-[shift(buttonWidth)]|",
 			"V:|[select]|",
 			"V:|[shift]|"
 		]
 
 		self.w.source.addAutoPosSizeRules(popup_rules, metrics)
 		self.w.default.addAutoPosSizeRules(popup_rules, metrics)
+		self.w.master.addAutoPosSizeRules(popup_rules, metrics)
 		self.w.paramTitles.addAutoPosSizeRules(param_rules, metrics)
 		self.w.paramEntries.addAutoPosSizeRules(param_rules, metrics)
 		self.w.componentTitles.addAutoPosSizeRules(component_rules, metrics)
@@ -137,21 +158,31 @@ class BuildFigures:
 		self.w.inferior.addAutoPosSizeRules(select_nums_rules, metrics)
 		self.w.numr.addAutoPosSizeRules(select_nums_rules, metrics)
 		self.w.superior.addAutoPosSizeRules(select_nums_rules, metrics)
-		self.w.allMasters.addAutoPosSizeRules(select_nums_rules, metrics)
+		# self.w.allMasters.addAutoPosSizeRules(select_nums_rules, metrics)
 
 		self.w.addAutoPosSizeRules(rules, metrics)
 		self.w.setDefaultButton(self.w.writeButton)
 
 		self.w.open()
 		self.w.makeKey()
+		self.w.bind("close", self.window_close)
+
+		Glyphs.addCallback(self.ui_update, UPDATEINTERFACE)
 
 	def filter_for_name(self, name):
 		for filter in Glyphs.filters:
 			if filter.__class__.__name__ == name:
 				return filter
 
+	def param_input(self, sender):
+		self.masterParams[self.font.selectedFontMaster.id] = {
+			"width": self.w.paramEntries.width.get(),
+			"height": self.w.paramEntries.height.get(),
+			"weight": self.w.paramEntries.weight.get()
+		}
+
 	def selection_change(self, sender):
-		selection = [".dnom", "inferior", ".numr", "superior"][self.w.default.selector.get()]
+		selection = self.base_suffixes[self.w.default.selector.get()]
 		self.w.dnom.select.enable(self.w.dnom.select.getTitle() != selection)
 		self.w.inferior.select.enable(self.w.inferior.select.getTitle() != selection)
 		self.w.numr.select.enable(self.w.numr.select.getTitle() != selection)
@@ -167,7 +198,7 @@ class BuildFigures:
 		self.write_preferences()
 
 		RMX_layers = []
-		base_suffix = [".dnom", "inferior", ".numr", "superior"][self.w.default.selector.get()]
+		base_suffix = self.base_suffixes[self.w.default.selector.get()]
 		source_suffix = ["", ".lf", ".tf"][self.w.source.selector.get()]
 		for glyph in self.font.glyphs:
 			if base_suffix in glyph.name:
@@ -176,7 +207,7 @@ class BuildFigures:
 				glyph.userData["RMXScaler"]["source"] = glyph.name.replace(base_suffix, source_suffix)
 
 				for layer in glyph.layers:
-					if self.w.allMasters.select.get() == 0 and layer is not glyph.layers[
+					if layer is not glyph.layers[
 						self.font.selectedFontMaster.id]:
 						continue
 					layer.userData["RMXScaler"] = {}
@@ -207,22 +238,39 @@ class BuildFigures:
 		]
 		                     ]
 
+		print("Building components:\n")
 		for glyph in component_targets:
 			glyph_name = glyph.replace("/", "")
 			component_shift = int(Glyphs.defaults[
 				                      "com.eweracs.BuildSmallFiguresRMX." + glyph.split("/")[1].replace(".",
 				                                                                                        "") + "Shift"
 				                      ])
-			print(glyph.replace("/", ""), glyph.split("/")[0] + base_suffix, component_shift)
+			print(glyph.replace("/", ""), "from",
+			      glyph.split("/")[0] + base_suffix, "with y shift", component_shift)
 			if glyph_name not in self.font.glyphs:
 				self.font.glyphs.append(GSGlyph(glyph_name))
 			for layer in self.font[glyph_name].layers:
-				if self.w.allMasters.select.get() == 0 and layer is not self.font.glyphs[
-					glyph_name].layers[self.font.selectedFontMaster.id]:
-					print("h")
+				if layer is not self.font.glyphs[glyph_name].layers[self.font.selectedFontMaster.id]:
 					continue
 				layer.clear()
 				layer.shapes.append(GSComponent(glyph.split("/")[0] + base_suffix, NSPoint(0, component_shift)))
+		print("\nDone.")
+
+	def master_switcher(self, sender):
+		if sender.get() == 1:
+			self.font.masterIndex += 1
+		else:
+			self.font.masterIndex -= 1
+
+	def ui_update(self, info):
+		if self.currentMaster != self.font.selectedFontMaster:
+			self.w.master.title.set("Master: " + self.font.selectedFontMaster.name)
+			for name in self.masterParams[self.font.selectedFontMaster.id]:
+				getattr(self.w.paramEntries, name).set(self.masterParams[self.font.selectedFontMaster.id][name])
+		self.currentMaster = self.font.selectedFontMaster
+
+	def window_close(self, sender):
+		Glyphs.removeCallback(self.ui_update, UPDATEINTERFACE)
 
 	def write_preferences(self):
 		Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX.source"] = self.w.source.selector.get()
@@ -231,17 +279,13 @@ class BuildFigures:
 		Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX.height"] = int(self.w.paramEntries.height.get())
 		Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX.weight"] = int(self.w.paramEntries.weight.get())
 
-		Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX.dnom"] = self.w.dnom.select.get()
-		Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX.inferior"] = self.w.inferior.select.get()
-		Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX.numr"] = self.w.numr.select.get()
-		Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX.superior"] = self.w.superior.select.get()
+		for suffix in self.base_suffixes:
+			suffix = suffix.replace(".", "")
+			Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX." + suffix] = getattr(self.w, suffix).select.get()
+			Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX." + suffix + "Shift"] = getattr(self.w,
+			                                                                                  suffix).shift.get()
 
-		Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX.dnomShift"] = self.w.dnom.shift.get()
-		Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX.inferiorShift"] = self.w.inferior.shift.get()
-		Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX.numrShift"] = self.w.numr.shift.get()
-		Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX.superiorShift"] = self.w.superior.shift.get()
-
-		Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX.allMasters"] = self.w.allMasters.select.get()
+		# Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX.allMasters"] = self.w.allMasters.select.get()
 
 	def load_preferences(self):
 		self.w.source.selector.set(Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX.source"] or 0)
@@ -250,17 +294,13 @@ class BuildFigures:
 		self.w.paramEntries.height.set(Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX.height"] or 0)
 		self.w.paramEntries.weight.set(Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX.weight"] or 0)
 
-		self.w.dnom.select.set(Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX.dnom"] or 0)
-		self.w.inferior.select.set(Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX.inferior"] or 0)
-		self.w.numr.select.set(Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX.numr"] or 0)
-		self.w.superior.select.set(Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX.superior"] or 0)
+		for i, suffix in enumerate(self.base_suffixes):
+			suffix = suffix.replace(".", "")
+			getattr(self.w, suffix).select.set(Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX." + suffix] or 0)
+			getattr(self.w, suffix).shift.set(Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX." + suffix + "Shift"]
+			                                  or [0, -150, 280, 320][i])
 
-		self.w.dnom.shift.set(Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX.dnomShift"] or 0)
-		self.w.inferior.shift.set(Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX.inferiorShift"] or 0)
-		self.w.numr.shift.set(Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX.numrShift"] or 0)
-		self.w.superior.shift.set(Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX.superiorShift"] or 0)
-
-		self.w.allMasters.select.set(Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX.allMasters"] or 0)
+		# self.w.allMasters.select.set(Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX.allMasters"] or 1)
 
 
 BuildFigures()
