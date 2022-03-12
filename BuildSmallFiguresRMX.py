@@ -196,9 +196,11 @@ class BuildFigures:
 					layer.userData["RMXScaler"]["weight"] = int(self.w.paramEntries.weight.get())
 					RMX_layers.append(layer)
 
-		RMXScaler = self.filter_for_name('RMXScaler')
-
-		RMXScaler.runFilterWithLayers_error_(RMX_layers, None)
+		try:
+			RMXScaler = self.filter_for_name("RMXScaler")
+			RMXScaler.runFilterWithLayers_error_(RMX_layers, None)
+		except:
+			Message("Please run the RMX scaler manually for all %s figures." %base_suffix, "Couldn’t run RMX Scaler")
 
 		selected_targets = []
 		if self.w.dnom.select:
