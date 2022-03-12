@@ -85,26 +85,15 @@ class BuildFigures:
 		self.selection_change(None)
 
 		rules = [
-			"H:|-border-[descriptionText]-border-|",
-			"H:|-border-[source]-border-|",
-			"H:|-border-[default]-border-|",
-			"H:|-border-[paramTitles]-border-|",
-			"H:|-border-[paramEntries]-border-|",
-			"H:|-border-[divider1]-border-|",
-			"H:|-border-[componentTitles]-border-|",
-			"H:|-border-[dnom]-border-|",
-			"H:|-border-[inferior]-border-|",
-			"H:|-border-[numr]-border-|",
-			"H:|-border-[superior]-border-|",
-			"H:|-border-[divider2]-border-|",
-			"H:|-border-[allMasters]-border-|",
-			"H:|-border-[writeButton]-border-|",
-
-			"V:|-border-[descriptionText]-space-[source]-margin-[default(==source)]-space-[paramTitles]-margin-"
-			"[paramEntries]-margin-[divider1]-margin-[componentTitles]-margin-[dnom]-thin-[inferior]-thin-[numr]"
-			"-thin-[superior]-margin-[divider2]-margin-[allMasters]-margin-[writeButton]-border-|"
-
+			"H:|-border-[" + item + "]-border-|" for item in [
+				"descriptionText", "source", "default", "paramTitles", "paramEntries", "divider1", "componentTitles",
+				"dnom", "inferior", "numr", "superior", "divider2", "allMasters", "writeButton"
+			]
 		]
+
+		rules.append("V:|-border-[descriptionText]-space-[source]-margin-[default(==source)]-space-[paramTitles]-"
+		             "margin-[paramEntries]-margin-[divider1]-margin-[componentTitles]-margin-[dnom]-thin-[inferior]-"
+		             "thin-[numr]-thin-[superior]-margin-[divider2]-margin-[allMasters]-margin-[writeButton]-border-|")
 
 		metrics = {
 			"width": 70,
