@@ -65,9 +65,10 @@ class Modeller:
 			"quoteleft h",
 			"guilsinglleft h",
 			"d parenleft",  # parens
-			"pareneleft h",
+			"parenleft h",
 			"bracketleft h",
-			"h.sc h.sc",  # SC
+			"H h.sc",  # SC
+			"h.sc h.sc",
 			"e.sc h.sc",
 			"h.sc o.sc",
 			"o.sc h.sc",
