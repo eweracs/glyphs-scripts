@@ -220,13 +220,9 @@ class BuildFigures:
 				glyph.userData["RMXScaler"]["source"] = glyph.name.replace(base_suffix, source_suffix)
 
 				for layer in glyph.layers:
-					if layer is not glyph.layers[
-						self.font.selectedFontMaster.id]:
-						continue
 					layer.userData["RMXScaler"] = {}
-					layer.userData["RMXScaler"]["width"] = int(self.w.paramEntries.width.get())
-					layer.userData["RMXScaler"]["height"] = int(self.w.paramEntries.height.get())
-					layer.userData["RMXScaler"]["weight"] = int(self.w.paramEntries.weight.get())
+					for name in self.masterParams[layer.master.id]:
+							layer.userData["RMXScaler"][name] = self.masterParams[layer.master.id][name]
 					RMX_layers.append(layer)
 
 		try:
@@ -267,7 +263,7 @@ class BuildFigures:
 					continue
 				layer.clear()
 				layer.shapes.append(GSComponent(glyph.split("/")[0] + base_suffix, NSPoint(0, component_shift)))
-		print("\nDone.")
+		print("\n...Done.")
 
 	def master_switcher(self, sender):
 		if sender.get() == 1:
