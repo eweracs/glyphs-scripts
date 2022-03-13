@@ -32,13 +32,13 @@ class BuildFigures:
 		self.w.source = vanilla.Group("auto")
 		self.w.source.title = vanilla.TextBox("auto", "Source figures:", sizeStyle="small")
 		self.w.source.selector = vanilla.PopUpButton("auto", ["Default", "Proportional .lf", "Tabular .tf"],
-		                                             sizeStyle="small")
+		                                             sizeStyle="small", callback=self.select_source)
 
 		self.w.default = vanilla.Group("auto")
 		self.w.default.title = vanilla.TextBox("auto", "Target figures:", sizeStyle="small")
 		self.w.default.selector = vanilla.PopUpButton("auto", self.base_suffixes,
 		                                              sizeStyle="small",
-		                                              callback=self.selection_change)
+		                                              callback=self.select_default)
 
 		self.w.divider1 = vanilla.HorizontalLine("auto")
 
@@ -48,8 +48,8 @@ class BuildFigures:
             callback=self.master_switcher)
 
 		self.w.paramTitles = vanilla.Group("auto")
-		self.w.paramTitles.width = vanilla.TextBox("auto", "Width", sizeStyle="small")
-		self.w.paramTitles.height = vanilla.TextBox("auto", "Height", sizeStyle="small")
+		self.w.paramTitles.width = vanilla.TextBox("auto", "Width %", sizeStyle="small")
+		self.w.paramTitles.height = vanilla.TextBox("auto", "Height %", sizeStyle="small")
 		self.w.paramTitles.weight = vanilla.TextBox("auto", "Weight", sizeStyle="small")
 
 		self.w.paramEntries = vanilla.Group("auto")
@@ -99,7 +99,7 @@ class BuildFigures:
 			"weight": self.w.paramEntries.weight.get()
 		} for master in self.font.masters}
 
-		self.selection_change(None)
+		self.select_default(None)
 		self.param_input(None)
 
 		rules = [
@@ -181,7 +181,17 @@ class BuildFigures:
 			"weight": self.w.paramEntries.weight.get()
 		}
 
-	def selection_change(self, sender):
+	def select_source(self, sender):
+		missing_numbers = []
+		for number in ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]:
+			suffix = ["", ".lf", ".tf"][self.w.source.selector.get()]
+			if number + suffix not in self.font.glyphs:
+				missing_numbers.append(number + suffix)
+		if len(missing_numbers) > 0:
+			Message("Please add " + ", ".join(missing_numbers) + " to glyph set.", "Missing source glyphs for scaling")
+			return False
+
+	def select_default(self, sender):
 		selection = self.base_suffixes[self.w.default.selector.get()]
 		self.w.dnom.select.enable(self.w.dnom.select.getTitle() != selection)
 		self.w.inferior.select.enable(self.w.inferior.select.getTitle() != selection)
@@ -196,6 +206,9 @@ class BuildFigures:
 	def make_figures(self, sender):
 
 		self.write_preferences()
+		self.select_source(None)
+		if self.select_source(None) == False:
+			return
 
 		RMX_layers = []
 		base_suffix = self.base_suffixes[self.w.default.selector.get()]
