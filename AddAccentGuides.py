@@ -103,9 +103,10 @@ class AddGuides:
 
 	def measure_reference(self, glyph):
 		reference = self.font.glyphs[glyph]
-		return {master.id: NSPoint(reference.layers[master.id].width / 2,
-		                           reference.layers[master.id].bounds.origin.y)
-		        for master in self.font.masters}
+		return {master.id: NSPoint(
+			reference.layers[master.id].width / 2,
+			reference.layers[master.id].bounds.size.height / 2 + reference.layers[master.id].bounds.origin.y)
+			for master in self.font.masters}
 
 	def add_guides(self, sender):
 		if self.w.LCAccents.title.get():
