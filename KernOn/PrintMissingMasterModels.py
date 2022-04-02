@@ -5,10 +5,8 @@ __doc__ = """
 Prints a tab for each master with missing models from all other masters.
 """
 
-# with the GlyphsApp lib, create a list of all Kern On models across all masters of the current font
+# create a list of all Kern On models across all masters of the current font
 # for each master, check which models are missing and open a new tab with the missing models
-
-import GlyphsApp
 
 if Font is None:
 	Message("Please open a font project!", "No font selected")
