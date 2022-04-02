@@ -1,4 +1,4 @@
-# MenuTitle: Copy zero models to derivatives
+# MenuTitle: Copy Zero Models to Derivatives
 # -*- coding: utf-8 -*-
 
 __doc__ = """

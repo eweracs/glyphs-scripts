@@ -1,4 +1,4 @@
-# MenuTitle: Set special spacing groups
+# MenuTitle: Set Special Spacing Groups
 # -*- coding: utf-8 -*-
 
 __doc__ = """

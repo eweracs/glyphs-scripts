@@ -1,4 +1,4 @@
-# MenuTitle: Clean kerning groups
+# MenuTitle: Clean Kerning Groups
 # -*- coding: utf-8 -*-
 
 __doc__ = """

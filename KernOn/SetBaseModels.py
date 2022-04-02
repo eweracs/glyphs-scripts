@@ -1,4 +1,4 @@
-# MenuTitle: Set base models
+# MenuTitle: Set Base Models
 # -*- coding: utf-8 -*-
 
 __doc__ = """

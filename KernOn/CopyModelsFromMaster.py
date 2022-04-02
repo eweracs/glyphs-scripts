@@ -1,4 +1,4 @@
-# MenuTitle: Copy models from Master
+# MenuTitle: Copy Models from Master
 # -*- coding: utf-8 -*-
 
 __doc__ = """

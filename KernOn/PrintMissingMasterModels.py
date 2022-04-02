@@ -1,4 +1,4 @@
-# MenuTitle: Print master models
+# MenuTitle: Print Missing Master Models
 # -*- coding: utf-8 -*-
 
 __doc__ = """
