@@ -13,6 +13,8 @@ from vanilla import *
 # make sure that all entered glyphs exist in the target font
 # add a check box for overwriting existing glyphs
 # add a button which copies the selected glyphs
+# import preferences at the beginning of the script
+# write preferences when the copy button is pressed
 
 class CopyGlyphs:
 	def __init__(self):
@@ -49,6 +51,8 @@ class CopyGlyphs:
 		self.w.overwrite = CheckBox("auto", "Overwrite existing glyphs")
 		self.w.divider = HorizontalLine("auto")
 		self.w.copyGlyphs = Button("auto", "Copy glyphs", callback=self.copy_glyphs)
+
+		self.load_preferences()
 
 		self.check_glyphs(self.w.glyphs.text)
 
@@ -114,7 +118,6 @@ class CopyGlyphs:
 
 		self.w.copyGlyphs.enable(len(missing) == 0)
 
-
 	# show the macro window
 	# copy the selected glyphs from the source font to the target font
 	# print a log in the macro window of the process
@@ -138,5 +141,18 @@ class CopyGlyphs:
 					print(glyph)
 		print("...Done.")
 
+		self.save_preferences()
+
+
+	def load_preferences(self):
+		try:
+			self.w.glyphs.text.set(Glyphs.defaults["com.eweracs.CopyGlyphs.glyphs"])
+			self.w.overwrite.set(Glyphs.defaults["com.eweracs.CopyGlyphs.overwrite"])
+		except:
+			pass
+
+	def save_preferences(self):
+		Glyphs.defaults["com.eweracs.CopyGlyphs.glyphs"] = self.w.glyphs.text.get()
+		Glyphs.defaults["com.eweracs.CopyGlyphs.overwrite"] = self.w.overwrite.get()
 
 CopyGlyphs()
