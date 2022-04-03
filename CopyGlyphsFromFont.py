@@ -143,7 +143,6 @@ class CopyGlyphs:
 
 		self.save_preferences()
 
-
 	def load_preferences(self):
 		try:
 			self.w.glyphs.text.set(Glyphs.defaults["com.eweracs.CopyGlyphs.glyphs"])
