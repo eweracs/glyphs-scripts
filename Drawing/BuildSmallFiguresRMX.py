@@ -222,7 +222,7 @@ class BuildFigures:
 				for layer in glyph.layers:
 					layer.userData["RMXScaler"] = {}
 					for name in self.masterParams[layer.master.id]:
-							layer.userData["RMXScaler"][name] = self.masterParams[layer.master.id][name]
+							layer.userData["RMXScaler"][name] = int(self.masterParams[layer.master.id][name])
 					RMX_layers.append(layer)
 
 		try:
@@ -251,8 +251,8 @@ class BuildFigures:
 		for glyph in component_targets:
 			glyph_name = glyph.replace("/", "")
 			component_shift = int(Glyphs.defaults[
-				                      "com.eweracs.BuildSmallFiguresRMX." + glyph.split("/")[1].replace(".",
-				                                                                                        "") + "Shift"
+				                      "com.eweracs.BuildSmallFiguresRMX." +
+				                      glyph.split("/")[1].replace(".", "") + "Shift"
 				                      ])
 			print(glyph.replace("/", ""), "from",
 			      glyph.split("/")[0] + base_suffix, "with y shift", component_shift)

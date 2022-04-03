@@ -87,8 +87,9 @@ class InstanceKerner:
 		number = 0
 		for instance in Font.instances:
 			if instance.active:
-				kern = float((self.master_2_kern - self.master_1_kern)/self.axis_1_range*(instance.axes[0] - self.master1))\
-				       + self.master_1_kern  # calculate the kern value for current instance
+				kern = float((self.master_2_kern - self.master_1_kern) / self.axis_1_range
+				             * (instance.axes[0] - self.master1)) + self.master_1_kern
+				# calculate the kern value for current instance
 
 				# if Replace Feature already exists, append kern text
 				if instance.customParameters["Replace Feature"]:
@@ -116,7 +117,7 @@ class InstanceKerner:
 				instance.customParameters["Replace Feature"] = kern_text
 				number += 1
 
-		Glyphs.showNotification(title="Replace Feature parameter added", message="Values calculated for " + str(number) + " instances.")
+		Glyphs.showNotification(title="Replace Feature parameter added", message="Values calculated for " + str(number) + "instances.")
 
 
 InstanceKerner()

@@ -17,7 +17,12 @@ class KernSlider:
 			Message("No font selected", "Select a font project!")
 			return
 
+		if not self.font.currentTab:
+			self.font.newTab("AV")
+			self.font.currentTab.textCursor = 1
+
 		self.currentPair = ""
+		self.currentText = str(self.font.currentTab.text)
 
 		self.update_current_pair()
 
@@ -28,10 +33,6 @@ class KernSlider:
 		self.oldKerningValue = int(self.currentKerningValue)
 
 		Glyphs.addCallback(self.ui_update, UPDATEINTERFACE)
-
-		if not self.font.currentTab:
-			self.font.newTab("AV")
-			self.font.currentTab.textCursor = 1
 
 		self.w = vanilla.FloatingWindow((0, 0), "Kerning slider")
 
@@ -61,7 +62,9 @@ class KernSlider:
 		self.currentKerningValue = int(sender.get())
 
 		self.left_key = self.font.glyphs[self.currentPair[0]].leftKerningKey or self.currentPair[0]
-		self.right_key = self.font.glyphs[self.currentPair[1]].leftKerningKey or self.currentPair[1]
+		self.right_key = self.font.glyphs[self.currentPair[1]].rightKerningKey or self.currentPair[1]
+
+		print(self.left_key)
 
 		self.font.setKerningForPair(self.font.selectedFontMaster.id, self.left_key, self.right_key,
 		                            self.currentKerningValue)
@@ -86,7 +89,7 @@ class KernSlider:
 		                   ]
 
 		self.left_key = self.font.glyphs[self.currentPair[0]].leftKerningKey or self.currentPair[0]
-		self.right_key = self.font.glyphs[self.currentPair[1]].leftKerningKey or self.currentPair[1]
+		self.right_key = self.font.glyphs[self.currentPair[1]].rightKerningKey or self.currentPair[1]
 
 		if len(self.currentPair) < 2:
 			self.currentPair = "  "
@@ -102,13 +105,9 @@ class KernSlider:
 			self.currentKerningValue = 0
 
 	def ui_update(self, info):
-		try:
-			if self.font.currentTab.text[self.font.currentTab.textCursor] != self.currentPair[1]:
-				self.update_current_pair()
-				self.w.kernSlider.set(self.currentKerningValue)
-				self.update_slider_values(self.currentKerningValue, True)
-		except:
-			self.w.pairTitle.set("–")
+		if self.currentPair != self.font.currentTab.text[
+		                       self.font.currentTab.textCursor - 1:self.font.currentTab.textCursor + 1]:
+			self.update_current_pair()
 
 	def window_close(self, sender):
 		Glyphs.removeCallback(self.ui_update, UPDATEINTERFACE)

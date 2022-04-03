@@ -7,15 +7,19 @@ Writes an AVAR table based on current weight distribution.
 
 if Font is None:
     Message("No font selected.", "Select a font project!")
-    return
 
 if str(Glyphs.versionNumber)[0] == "2":
     instanceweights = sorted({instance.weightValue for instance in Font.instances})
+    instancewidths = sorted({instance.widthValue for instance in Font.instances})
 else:
     for i, a in enumerate(Font.axes):
         if a.axisTag == "wght":
-            axisindex = i
-    instanceweights = sorted({instance.axes[axisindex] for instance in Font.instances if instance.type == 0})
+            weightindex = i
+    instanceweights = sorted({instance.axes[weightindex] for instance in Font.instances if instance.type == 0})
+    for j, a in enumerate(Font.axes):
+        if a.axisTag =="wdth":
+            widthindex = j
+    instancewidths = sorted({instance.axes[widthindex] for instance in Font.instances if instance.type == 0})
 
 
 axisMinimum = instanceweights[0]  # lightest stem weight
@@ -24,6 +28,9 @@ axisRange = instanceweights[-1] - axisMinimum  # axis range
 # calculate and write AVAR table to custom parameters
 Font.customParameters["Axis Mappings"] = {"wght": {int(axisRange/(len(instanceweights) - 1)*instance + axisMinimum):
                                                    instanceweights[instance] for instance in range(len(instanceweights))
+                                                   },
+                                          "wdth": {int(axisRange/(len(instancewidths) - 1)*instance + axisMinimum):
+                                                   instancewidths[instance] for instance in range(len(instancewidths))
                                                    }
                                           }
 
