@@ -11,7 +11,7 @@ from vanilla import *
 # Build a vanilla UI that has a selector for the source font and a selector for the target font
 # Add a scrolling text field where you can enter the glyphs you want to copy
 # make sure that all entered glyphs exist in the target font
-# add a check box for overwrtiting existing glyphs
+# add a check box for overwriting existing glyphs
 # add a button which copies the selected glyphs
 
 class CopyGlyphs:
@@ -43,6 +43,9 @@ class CopyGlyphs:
 		self.w.glyphs.title = TextBox("auto", "Glyphs to copy (space separated):")
 		self.w.glyphs.text = TextEditor("auto", "", callback=self.check_glyphs)
 
+		# add a text box listing the glyphs missing in the source font
+		self.w.missing = TextBox("auto", "", sizeStyle="small")
+
 		self.w.overwrite = CheckBox("auto", "Overwrite existing glyphs")
 		self.w.divider = HorizontalLine("auto")
 		self.w.copyGlyphs = Button("auto", "Copy glyphs", callback=self.copy_glyphs)
@@ -67,10 +70,12 @@ class CopyGlyphs:
 			"H:|-border-[sourceFont]-border-|",
 			"H:|-border-[targetFont]-border-|",
 			"H:|-border-[glyphs]-border-|",
+			"H:|-border-[missing(200)]",
 			"H:|-border-[overwrite]-border-|",
 			"H:|-border-[divider]-border-|",
 			"H:|-border-[copyGlyphs]-border-|",
-			"V:|-border-[sourceFont]-margin-[targetFont]-margin-[glyphs]-margin-[overwrite]-margin-[divider]-margin"
+			"V:|-border-[sourceFont]-margin-[targetFont]-margin-[glyphs]-[missing]-margin-[overwrite]-margin-["
+			"divider]-margin"
 			"-[copyGlyphs]-border-|",
 		]
 
@@ -96,11 +101,19 @@ class CopyGlyphs:
 	# deactivate the copy button if any of the entered glyphs do not exist in the source font
 
 	def check_glyphs(self, sender):
+		# make a list of the missing glyphs and write it in the text box
+		# show the text box only if there are missing glyphs
+		missing = []
 		for glyph in sender.get().split(" "):
-			if glyph not in Glyphs.fonts[self.w.sourceFont.selector.get()].glyphs:
-				self.w.copyGlyphs.enable(False)
-				return
-		self.w.copyGlyphs.enable(True)
+			if glyph not in Glyphs.fonts[self.w.targetFont.selector.get()].glyphs:
+				if glyph != "":
+					missing.append(glyph)
+
+		self.w.missing.set("Missing in source font: " + ", ".join(missing))
+		self.w.missing.show(len(missing) > 0)
+
+		self.w.copyGlyphs.enable(len(missing) == 0)
+
 
 	# show the macro window
 	# copy the selected glyphs from the source font to the target font
