@@ -1,4 +1,4 @@
-# MenuTitle: Copy HTLS Parameters Between Masters
+# MenuTitle: Copy Parameters Between Masters
 # -*- coding: utf-8 -*-
 
 __doc__ = """
