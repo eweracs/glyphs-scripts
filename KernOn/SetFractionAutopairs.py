@@ -41,7 +41,7 @@ for master in Font.masters:
 
 	auto_fraction_models = tuple(model for model in fraction_models if model not in master.userData["KernOnModels"])
 
-	if master.userData["KernOnUserSetAitopairs"]:
+	if master.userData["KernOnUserSetAutopairs"]:
 		master.userData["KernOnUserSetAutopairs"] = master.userData["KernOnUserSetAutopairs"] + auto_fraction_models
 	else:
 		master.userData["KernOnUserSetAutopairs"] = auto_fraction_models
