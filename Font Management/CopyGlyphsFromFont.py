@@ -29,15 +29,17 @@ class CopyGlyphs:
 			Message("Please open another font and try again.", "Two fonts required")
 			return
 
+		file_list = [font.parent.fileName().split("/")[-1] for font in Glyphs.fonts]
+
 		self.w = FloatingWindow((1, 1), "")
 		self.w.sourceFont = Group("auto")
 		self.w.sourceFont.title = TextBox("auto", "Source font:")
-		self.w.sourceFont.selector = PopUpButton("auto", [font.familyName for font in Glyphs.fonts],
+		self.w.sourceFont.selector = PopUpButton("auto", [str(i + 1) + ": " + font for i, font in enumerate(file_list)],
 		                                         callback=self.check_source_target)
 
 		self.w.targetFont = Group("auto")
 		self.w.targetFont.title = TextBox("auto", "Target font:")
-		self.w.targetFont.selector = PopUpButton("auto", [font.familyName for font in Glyphs.fonts],
+		self.w.targetFont.selector = PopUpButton("auto", [str(i + 1) + ": " + font for i, font in enumerate(file_list)],
 		                                         callback=self.check_source_target)
 		self.w.targetFont.selector.set(1)
 
@@ -153,5 +155,6 @@ class CopyGlyphs:
 	def save_preferences(self):
 		Glyphs.defaults["com.eweracs.CopyGlyphs.glyphs"] = self.w.glyphs.text.get()
 		Glyphs.defaults["com.eweracs.CopyGlyphs.overwrite"] = self.w.overwrite.get()
+
 
 CopyGlyphs()
