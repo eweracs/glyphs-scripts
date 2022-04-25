@@ -49,7 +49,8 @@ class ReportMissingGlyphs():
 		self.w.divider2 = HorizontalLine("auto")
 
 		# add a checkbox to open a tab with the generated glyphs
-		self.w.openTab = CheckBox("auto", "Open tab with generated glyphs", sizeStyle="small")
+		self.w.openTab = CheckBox("auto", "Open tab with generated glyphs", sizeStyle="small",
+		                          callback=self.save_preferences)
 
 		# add a button to generate the missing glyphs
 		self.w.generate = Button("auto", "Generate missing glyphs", callback=self.generate_missing_glyphs)
@@ -87,6 +88,8 @@ class ReportMissingGlyphs():
 		self.w.open()
 		self.w.makeKey()
 
+		self.read_preferences()
+
 	def select_compare_font(self, sender):
 		self.compare_font = Glyphs.fonts[sender.get() + 1]
 		self.update_missing_glyphs()
@@ -98,10 +101,13 @@ class ReportMissingGlyphs():
 				self.missing_glyphs.append(glyph.name)
 		self.missing.text.set("\n".join(self.missing_glyphs))
 		if len(self.missing_glyphs) == 0:
-			self.missing.text.set("No missing glyphs")
+			self.missing.text.set("No missing glyphs found.")
 
-		# count the number of lines in the text box
+		# count the number of lines in the text box and scale the scroll view accordingly
 		self.missing.resize(self.w.missing.getNSScrollView().frame().size.width, len(self.missing_glyphs) * 15)
+
+		# enable the generate button only if there are missing glyphs
+		self.w.generate.enable(len(self.missing_glyphs) > 0)
 
 	def generate_missing_glyphs(self, sender):
 		self.font.disableUpdateInterface()
@@ -124,6 +130,16 @@ class ReportMissingGlyphs():
 			self.font.newTab("/" + "/".join(self.missing_glyphs))
 
 		self.update_missing_glyphs()
+
+	# read and write preferences
+	def read_preferences(self):
+		try:
+			self.w.openTab.set(Glyphs.defaults["com.eweracs.MissingGlyphs.openTab"])
+		except:
+			self.w.openTab.set(True)
+
+	def save_preferences(self, sender):
+		Glyphs.defaults["com.eweracs.MissingGlyphs.openTab"] = self.w.openTab.get()
 
 
 ReportMissingGlyphs()
