@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 __doc__ = """
-Creates glyphs files to export a subset variable font.
+Creates a file to export a subset variable font.
 """
 
 import vanilla
@@ -162,7 +162,7 @@ class CreateSubset:
 		self.w.setDefaultButton(self.w.makeButton)
 		self.w.open()
 		self.w.makeKey()
-		self.w.bind("close", self.write_prefences)
+		self.w.bind("close", self.write_preferences)
 
 	def add_recipe(self, sender):
 		recipe_text = self.w.newName.entry.get() + "\n"
@@ -192,7 +192,7 @@ class CreateSubset:
 			"V:|-border-[description]-border-|"
 		]
 
-		metrics = {
+		metrics= {
 			"border": 10
 		}
 
@@ -233,16 +233,15 @@ class CreateSubset:
 			self.preferred_directory = self.font.filepath.replace("/" + self.font.filepath.split("/")[-1], "")
 			print(self.preferred_directory)
 
-		self.write_prefences(None)
+		self.write_preferences(None)
 
-	def master_manager(self, subset_values):
-		current_font = Glyphs.currentDocument.font
-		current_font.disableUpdateInterface()
+	def master_manager(self, subset_values, family_name):
+		self.current_font.disableUpdateInterface()
 
 		# Calculate necessary extremes and intermediates
 		axes_ranges = [[subset_values[axis][0], subset_values[axis][1]] for axis in subset_values]
 		for i, axis in enumerate(axes_ranges):
-			for master in current_font.masters:
+			for master in self.current_font.masters:
 				if axes_ranges[i][0] < master.axes[i] < axes_ranges[i][1]:
 					if master.axes[i] in axes_ranges[i]:
 						continue
@@ -251,7 +250,7 @@ class CreateSubset:
 		necessary_extremes = list(itertools.product(*axes_ranges))
 		missing_extremes = []
 		for extreme in necessary_extremes:
-			if extreme not in [master.axes for master in current_font.masters]:
+			if extreme not in [master.axes for master in self.current_font.masters]:
 				if extreme not in missing_extremes:
 					missing_extremes.append(extreme)
 					print("Adding missing extreme master:", extreme)
@@ -260,45 +259,45 @@ class CreateSubset:
 		for extreme in missing_extremes:
 			extreme_instance = GSInstance()
 			extreme_instance.name = "Extreme " + str(extreme)
-			current_font.instances.append(extreme_instance)
-			current_font.instances[-1].axes = extreme
-			current_font.instances[-1].addAsMaster()
-			current_font.masters[-1].axes = extreme
+			self.current_font.instances.append(extreme_instance)
+			self.current_font.instances[-1].axes = extreme
+			self.current_font.instances[-1].addAsMaster()
+			self.current_font.masters[-1].axes = extreme
 
 		# Find/add missing origin master
 		try:
-			for master in current_font.masters:
+			for master in self.current_font.masters:
 				match_count = 0
 				for i, axis in enumerate(subset_values):
 					if master.axes[i] == subset_values[axis][2]:
 						match_count += 1
-				if match_count == len(current_font.axes):
+				if match_count == len(self.current_font.axes):
 					origin_master = master
 			print("Origin exists:", origin_master)
-			current_font.customParameters["Variable Font Origin"] = origin_master.id
+			self.current_font.customParameters["Variable Font Origin"] = origin_master.id
 
 		except:
 			origin_instance = GSInstance()
 			origin_instance.name = "Variable Font Origin"
-			current_font.instances.append(origin_instance)
-			current_font.instances[-1].axes = [subset_values[axis][2] for axis in subset_values]
-			current_font.instances[-1].addAsMaster()
-			current_font.masters[-1].axes = [subset_values[axis][2] for axis in subset_values]
-			current_font.customParameters["Variable Font Origin"] = current_font.masters[-1].id
-			print("New origin master:", current_font.masters[-1])
+			self.current_font.instances.append(origin_instance)
+			self.current_font.instances[-1].axes = [subset_values[axis][2] for axis in subset_values]
+			self.current_font.instances[-1].addAsMaster()
+			self.current_font.masters[-1].axes = [subset_values[axis][2] for axis in subset_values]
+			self.current_font.customParameters["Variable Font Origin"] = self.current_font.masters[-1].id
+			print("New origin master:", self.current_font.masters[-1])
 
 		# Remove unused instances
 		remove_list = []
-		for instance in current_font.instances:
+		for instance in self.current_font.instances:
 			if instance.type == 1:
 				continue
-			for i, axis in enumerate(current_font.axes):
+			for i, axis in enumerate(self.current_font.axes):
 				if instance.axes[i] < subset_values[axis.name][0] or instance.axes[i] > subset_values[axis.name][1]:
 					remove_list.append(instance)
 		for instance in remove_list:
-			current_font.instances.remove(instance)
+			self.current_font.instances.remove(instance)
 
-		for instance in current_font.instances:
+		for instance in self.current_font.instances:
 			if instance.type:
 				for fontInfo in instance.properties:
 					if fontInfo.key == "familyNames":
@@ -316,20 +315,19 @@ class CreateSubset:
 				except:
 					pass
 
-		current_font.enableUpdateInterface()
+		self.current_font.enableUpdateInterface()
 
 	def fix_special_layers(self):
-		current_font = Glyphs.currentDocument.font
-		current_font.disableUpdateInterface()
+		self.current_font.disableUpdateInterface()
 		Glyphs.showMacroWindow()
 
-		for glyph in current_font.glyphs:
+		for glyph in self.current_font.glyphs:
 			if glyph.mastersCompatible:
 				continue
 			print("Fixing layers:", glyph.name + "...")
 			duplicate = glyph.duplicate(name=glyph.name + "specialLayers")
 
-			master_layers = [master.id for master in current_font.masters]
+			master_layers = [master.id for master in self.current_font.masters]
 			for layer in duplicate.layers:
 				if not layer.isSpecialLayer:
 					continue
@@ -342,12 +340,12 @@ class CreateSubset:
 				append_layer.attributes["axisRules"] = axis_rules
 				glyph.layers.append(append_layer)
 
-			del current_font.glyphs[glyph.name + "specialLayers"]
+			del self.current_font.glyphs[glyph.name + "specialLayers"]
 
-		current_font.enableUpdateInterface()
+		self.current_font.enableUpdateInterface()
 
 	def check_empty_glyphs(self):
-		for glyph in Glyphs.currentDocument.font.glyphs:
+		for glyph in self.current_font.glyphs:
 			if glyph.mastersCompatible:
 				continue
 			remove_layers = []
@@ -360,20 +358,24 @@ class CreateSubset:
 		self.fix_special_layers()
 
 	def order_special_layers(self, subset_values):
-		if "Collection" in Glyphs.font.familyName:
-			return
-		for glyph in Glyphs.currentDocument.font.glyphs:
+		for glyph in self.current_font.glyphs:
 			make_master_layers = False
 			delete_special_layers = False
 			for layer in glyph.layers:
 				if not layer.isSpecialLayer:
 					continue
-				for i, axis in enumerate(Glyphs.currentDocument.font.axes):
+				for i, axis in enumerate(self.current_font.axes):
 					try:
-						if layer.attributes["axisRules"]["a0" + str(i + 1)]["max"] > subset_values[axis.name][0]:
+						axis_max = subset_values[axis.name][1]
+						axis_min = subset_values[axis.name][0]
+						layer_attributes_max = layer.attributes["axisRules"]["a0" + str(i + 1)]["max"]
+						if axis_min < layer_attributes_max < axis_max:
+							continue
+						if layer_attributes_max > axis_min:
 							make_master_layers = True
-						if layer.attributes["axisRules"]["a0" + str(i + 1)]["max"] < subset_values[axis.name][0]:
+						if layer_attributes_max < axis_min:
 							delete_special_layers = True
+
 					except:
 						pass
 
@@ -389,38 +391,36 @@ class CreateSubset:
 	def remove_unused_masters(self, subset_values):
 
 		# Remove unnecessary masters
-		current_font = Glyphs.currentDocument.font
 		remove_list = []
-		for master in current_font.masters:
-			for i, axis in enumerate(current_font.axes):
+		for master in self.current_font.masters:
+			for i, axis in enumerate(self.current_font.axes):
 				if master.axes[i] < subset_values[axis.name][0] or master.axes[i] > subset_values[axis.name][1]:
 					remove_list.append(master)
 
 		for master in remove_list:
-			current_font.masters.remove(master)
+			self.current_font.masters.remove(master)
 
-	def remove_axes(self, family_name):
+	def remove_axes(self):
 
 		# Remove unused axes
-		current_font = Glyphs.currentDocument.font
-		axisranges = [[] for axis in current_font.axes]
-		for i, axis in enumerate(current_font.axes):
-			for master in current_font.masters:
+		axisranges = [[] for axis in self.current_font.axes]
+		for i, axis in enumerate(self.current_font.axes):
+			for master in self.current_font.masters:
 				if master.axes[i] in axisranges[i]:
 					continue
 				axisranges[i].append(master.axes[i])
 
 		remove_axes = []
-		remove_master_parameters = {master: [] for master in current_font.masters}
+		remove_master_parameters = {master: [] for master in self.current_font.masters}
 		for i, axis in enumerate(axisranges):
 			if len(axisranges[i]) == 1:
-				for master in current_font.masters:
+				for master in self.current_font.masters:
 					remove_master_parameters[master].append(master.customParameters["Axis Location"][i])
-				remove_axes.append(current_font.axes[i])
+				remove_axes.append(self.current_font.axes[i])
 
 		for axis in remove_axes:
 			print("Removing unused axis:", axis)
-			current_font.axes.remove(axis)
+			self.current_font.axes.remove(axis)
 
 		for master in remove_master_parameters:
 			print("Master:", master.name)
@@ -430,19 +430,19 @@ class CreateSubset:
 
 	def remove_unused_instances(self):
 		remove_instances = []
-		for instance in Glyphs.currentDocument.font.instances:
+		for instance in self.current_font.instances:
 			if instance.type:
 				continue
 			if "Extreme" in instance.name or "Origin" in instance.name:
 				remove_instances.append(instance)
 
 		for instance in remove_instances:
-			Glyphs.currentDocument.font.instances.remove(instance)
+			self.current_font.instances.remove(instance)
 
 	def remove_in_instance_names(self, name):
 		if name == "-":
 			name = ""
-		for instance in Glyphs.currentDocument.font.instances:
+		for instance in self.current_font.instances:
 			if instance.type:
 				continue
 			instance.name = instance.name.replace(name, "")
@@ -455,42 +455,43 @@ class CreateSubset:
 		original_font_file_path = self.font.filepath
 
 		for recipe in self.w.enterRecipe.get().split("\n\n"):
+			self.current_font = Glyphs.currentDocument.font
 			if recipe == "":
 				continue
 			family_name = recipe.split("\n")[0]
 			replace_name = recipe.split("\n")[len(recipe.split("\n")) - 1]
 			subset_values = {}
 			for i, line in enumerate(recipe.split("\n")[1:len(recipe.split("\n")) - 1]):
-				subset_values[Glyphs.currentDocument.font.axes[i].name] = [int(line.split(":")[0]),
+				subset_values[self.current_font.axes[i].name] = [int(line.split(":")[0]),
 				                                                           int(line.split(":")[1].split("[")[0]),
 				                                                           int(line.split("[")[1].replace("]", ""))]
 
 			print("\nNew family name:", family_name)
 
-			self.master_manager(subset_values)
+			self.master_manager(subset_values, family_name)
 
 			filename = self.preferred_directory + "/" + family_name + ".glyphs"
 			print("Writing file to:", filename)
-			Glyphs.currentDocument.font.save(path=filename)
-			Glyphs.currentDocument.font.save()
+			self.current_font.save(path=filename)
+			self.current_font.save()
 
 			self.fix_special_layers()
 			self.remove_unused_masters(subset_values)
-			Glyphs.currentDocument.font.save()
+			self.current_font.save()
 			self.check_empty_glyphs()
 			self.order_special_layers(subset_values)
-			self.remove_axes(family_name)
+			self.remove_axes()
 			self.remove_unused_instances()
 			self.remove_in_instance_names(replace_name)
 
-			Glyphs.currentDocument.font.save()
-			Glyphs.currentDocument.font.close()
+			self.current_font.save()
+			self.current_font.close()
 			Glyphs.open(original_font_file_path)
-			Glyphs.currentDocument.font.save()
+			self.current_font.save()
 
 		self.w.close()
 
-	def write_prefences(self, sender):
+	def write_preferences(self, sender):
 		# save text field to prefs
 		Glyphs.defaults["com.eweracs.subsetVariableFont.recipes"] = self.w.enterRecipe.get()
 		Glyphs.defaults["com.eweracs.subsetVariableFont.saveLocation"] = self.preferred_directory
