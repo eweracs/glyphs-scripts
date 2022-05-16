@@ -27,5 +27,6 @@ def toggle_special_layer(layer):
 			layer.attributes[key] = layer.userData["attributes"][key]
 		del layer.userData["attributes"]
 
+
 for layer in Font.selectedLayers:
 	toggle_special_layer(layer)
