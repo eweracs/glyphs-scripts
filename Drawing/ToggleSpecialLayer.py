@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 __doc__ = """
-Toggles the activation state of special layers.
+Toggles the activation state of special layers (intermediate or alternate).
 """
 
 
@@ -23,6 +23,9 @@ def toggle_special_layer(layer):
 			del layer.attributes["coordinates"]
 		layer.name = "(Deactivated)"
 	else:
+		if not layer.userData["attributes"]:
+			Message("No restorable attributes were found for the selected layer.", "No attributes to restore")
+			return
 		for key in layer.userData["attributes"]:
 			layer.attributes[key] = layer.userData["attributes"][key]
 		del layer.userData["attributes"]
