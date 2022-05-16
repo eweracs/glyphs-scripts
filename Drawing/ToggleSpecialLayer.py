@@ -1,4 +1,4 @@
-# MenuTitle: Toggle Special layer
+# MenuTitle: Toggle Special Layer
 # -*- coding: utf-8 -*-
 
 __doc__ = """
