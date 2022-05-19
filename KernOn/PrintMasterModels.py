@@ -1,34 +1,53 @@
-# MenuTitle: Print Master Models
+# MenuTitle: Print Models
 # -*- coding: utf-8 -*-
 
 __doc__ = """
 Prints a tab with all Kern On models for each master.
 """
 
-for i, master in enumerate(Font.masters):
-	if master.userData["KernOnIsInterpolated"]:
-		continue
 
-	negativeModels = []
-	zeroModels = []
-	positiveModels = []
+class ModelsForGlyph:
+	def __init__(self):
+		if Font is None:
+			return
 
-	for model in master.userData["KernOnModels"]:
-		Lglyph = Font.glyphs[model.split(" ")[0]]
-		Rglyph = Font.glyphs[model.split(" ")[1]]
-		newModel = "/" + Lglyph.name + "/" + Rglyph.name
-		model_kerning = Rglyph.layers[i].previousKerningForLayer_direction_(Lglyph.layers[i], LTR)
-		if model_kerning == 0 or model_kerning is None:
-			zeroModels.append(newModel)
-		elif model_kerning > 0:
-			positiveModels.append(newModel)
-		elif model_kerning < 0:
-			negativeModels.append(newModel)
+		self.font = Font
 
-	text = master.name + " (" + str(len(master.userData["KernOnModels"])) + " models)\n\nZero:\n" + \
-	       "/space".join(
-		zeroModels) + "\n\nPositive:\n" \
-	    + "/space".join(positiveModels) + "\n\nNegative:\n" + "/space".join(negativeModels)
+		did_something = False
 
-	Font.newTab(text)
-	Font.currentTab.masterIndex = i
+		for i, master in enumerate(self.font.masters):
+			if master.userData["KernOnIsInterpolated"]\
+					or not master.userData["KernOnModels"]\
+					or len(master.userData["KernOnModels"]) == 0:
+				continue
+
+			negative_models = []
+			zero_models = []
+			positive_models = []
+
+			for model in master.userData["KernOnModels"]:
+				lglyph = self.font.glyphs[model.split(" ")[0]]
+				rglyph = self.font.glyphs[model.split(" ")[1]]
+				new_model = "/" + lglyph.name + "/" + rglyph.name
+				model_kerning = rglyph.layers[i].previousKerningForLayer_direction_(lglyph.layers[i], LTR)
+				if model_kerning == 0 or model_kerning is None:
+					zero_models.append(new_model)
+				elif model_kerning > 0:
+					positive_models.append(new_model)
+				elif model_kerning < 0:
+					negative_models.append(new_model)
+
+			text = master.name + " (" + str(len(master.userData["KernOnModels"])) + " models)\n\nZero:\n" + \
+			       "/space".join(zero_models) + "\n\nPositive:\n" + "/space".join(positive_models) + \
+			       "\n\nNegative:\n" + "/space".join(negative_models)
+
+			self.font.newTab(text)
+			self.font.currentTab.masterIndex = i
+
+			did_something = True
+
+		if not did_something:
+			Message("This project does not appear to contain any Kern On models.", "No models found"))
+
+
+ModelsForGlyph()
