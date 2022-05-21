@@ -1,4 +1,4 @@
-# MenuTitle: Toggle Automatic Alignment for All Masters
+# MenuTitle: Toggle Automatic Alignment in All Masters
 # -*- coding: utf-8 -*-
 
 __doc__ = """
