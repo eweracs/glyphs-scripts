@@ -62,8 +62,6 @@ class ReportMissingGlyphs():
 
 		# add a button to generate the missing glyphs
 		self.w.generate = Button("auto", "Generate missing glyphs", callback=self.generate_missing_glyphs)
-
-		self.update_missing_glyphs()
 		
 		group_rules = [
 			"H:|[title]-margin-[select]|",
@@ -100,6 +98,8 @@ class ReportMissingGlyphs():
 		self.w.makeKey()
 
 		self.read_preferences()
+
+		self.update_missing_glyphs()
 
 		self.w.bind("close", self.save_preferences)
 
