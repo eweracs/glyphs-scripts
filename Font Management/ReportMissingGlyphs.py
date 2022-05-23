@@ -18,7 +18,7 @@ class ReportMissingGlyphs():
 		self.font = Glyphs.fonts[0]
 		self.compare_font = Glyphs.fonts[1]
 
-		self.w = FloatingWindow((1, 1), "Report Missing Glyphs")
+		self.w = FloatingWindow((1, 1), "Report Missing Glyphs", maxSize=(300, 800))
 
 		# add a title to display the name of the currently open font, without the extension
 		self.w.source = Group("auto")
@@ -45,6 +45,14 @@ class ReportMissingGlyphs():
 		self.w.missingTitle = TextBox("auto", "Missing glyphs:", sizeStyle="small")
 		self.w.missing = ScrollView("auto", self.missing.getNSView())
 
+		# check only exporting glyphs?
+		self.w.onlyExportingGlyphs = CheckBox("auto", "Only check exporting glyphs", sizeStyle="small",
+		                                      callback=self.update_missing_glyphs)
+
+		# ignore stylistic sets?
+		self.w.ignoreStylisticSets = CheckBox("auto", "Ignore stylistic set glyphs", sizeStyle="small",
+		                                      callback=self.update_missing_glyphs)
+
 		# add a divider
 		self.w.divider2 = HorizontalLine("auto")
 
@@ -66,14 +74,17 @@ class ReportMissingGlyphs():
 		rules = [
 			"H:|-margin-[source]-margin-|",
 			"H:|-margin-[compare]-margin-|",
+			"H:|-margin-[onlyExportingGlyphs]-margin-|",
+			"H:|-margin-[ignoreStylisticSets]-margin-|",
 			"H:|-margin-[divider1]-margin-|",
 			"H:|-margin-[missingTitle]-margin-|",
 			"H:|-margin-[missing]-margin-|",
 			"H:|-margin-[divider2]-margin-|",
 			"H:|-margin-[generate]-margin-|",
 			"H:|-margin-[openTab]-margin-|",
-			"V:|-margin-[source]-margin-[compare]-margin-[divider1]-margin-[missingTitle]-margin-"
-			"[missing(100)]-margin-[divider2]-margin-[openTab]-margin-[generate]-margin-|",
+			"V:|-margin-[source]-margin-[compare]-margin-[onlyExportingGlyphs]-margin-[ignoreStylisticSets]-margin-"
+			"[divider1]-margin-[missingTitle]-margin-[missing(>=100)]-margin-[divider2]-margin-[generate]-margin-"
+			"[openTab]-margin-|",
 		]
 
 		metrics = {
@@ -94,10 +105,14 @@ class ReportMissingGlyphs():
 		self.compare_font = Glyphs.fonts[sender.get() + 1]
 		self.update_missing_glyphs()
 
-	def update_missing_glyphs(self):
+	def update_missing_glyphs(self, sender=None):
 		self.missing_glyphs = []
 		for glyph in self.compare_font.glyphs:
 			if glyph.name not in self.font.glyphs:
+				if self.w.onlyExportingGlyphs.get() and not glyph.export:
+					continue
+				if self.w.ignoreStylisticSets.get() and ".ss" in glyph.name:
+					continue
 				self.missing_glyphs.append(glyph.name)
 		self.missing.text.set("\n".join(self.missing_glyphs))
 		if len(self.missing_glyphs) == 0:
@@ -137,9 +152,19 @@ class ReportMissingGlyphs():
 			self.w.openTab.set(Glyphs.defaults["com.eweracs.MissingGlyphs.openTab"])
 		except:
 			self.w.openTab.set(True)
+		try:
+			self.w.onlyExportingGlyphs.set(Glyphs.defaults["com.eweracs.MissingGlyphs.onlyExportingGlyphs"])
+		except:
+			self.w.onlyExportingGlyphs.set(False)
+		try:
+			self.w.ignoreStylisticSets.set(Glyphs.defaults["com.eweracs.MissingGlyphs.ignoreStylisticSets"])
+		except:
+			self.w.ignoreStylisticSets.set(False)
 
 	def save_preferences(self, sender):
 		Glyphs.defaults["com.eweracs.MissingGlyphs.openTab"] = self.w.openTab.get()
+		Glyphs.defaults["com.eweracs.MissingGlyphs.onlyExportingGlyphs"] = self.w.onlyExportingGlyphs.get()
+		Glyphs.defaults["com.eweracs.MissingGlyphs.ignoreStylisticSets"] = self.w.ignoreStylisticSets.get()
 
 
 ReportMissingGlyphs()
