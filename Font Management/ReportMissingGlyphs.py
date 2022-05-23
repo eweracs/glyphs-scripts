@@ -101,6 +101,8 @@ class ReportMissingGlyphs():
 
 		self.read_preferences()
 
+		self.w.bind("close", self.save_preferences)
+
 	def select_compare_font(self, sender):
 		self.compare_font = Glyphs.fonts[sender.get() + 1]
 		self.update_missing_glyphs()
