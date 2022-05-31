@@ -1,4 +1,4 @@
-# MenuTitle: Print Models
+# MenuTitle: Print Models in All Masters
 # -*- coding: utf-8 -*-
 
 __doc__ = """
@@ -47,7 +47,7 @@ class ModelsForGlyph:
 			did_something = True
 
 		if not did_something:
-			Message("This project does not appear to contain any Kern On models.", "No models found"))
+			Message("This project does not appear to contain any Kern On models.", "No models found")
 
 
 ModelsForGlyph()
