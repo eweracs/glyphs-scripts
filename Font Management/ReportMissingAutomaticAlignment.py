@@ -22,6 +22,8 @@ class ReportMissingAutomaticAlignment:
 			for layer in glyph.layers:
 				if not layer.components:
 					continue
+				if not layer.isMasterLayer or not layer.isSpacingLayer:
+					continue
 
 				# check for mixed paths/components
 				if layer.paths and layer.components:
