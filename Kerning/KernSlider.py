@@ -106,7 +106,10 @@ class KernSlider:
 			self.oldKerningValue = self.currentKerningValue
 		self.currentSliderValue = sender.get()
 
-		self.set_kerning_value(self.oldKerningValue + self.currentSliderValue)
+		try:
+			self.set_kerning_value(self.oldKerningValue + self.currentSliderValue)
+		except:
+			pass
 
 	def set_kerning_value(self, value):
 		try:
@@ -138,6 +141,9 @@ class KernSlider:
 
 	def ui_update(self, sender=None):
 		if not self.font.currentTab:
+			self.w.slider.enable(False)
+			self.w.currentPair.set("–")
+			self.w.currentValue.set("")
 			return
 
 		if self.font.currentTab.textCursor == 0 or self.font.currentTab.textCursor == len(self.font.currentTab.text):
@@ -153,6 +159,14 @@ class KernSlider:
 				self.rightGlyph = self.font.currentTab.text[self.font.currentTab.textCursor]
 			except:
 				self.rightGlyph = ""
+
+		# if line break, reset
+		if self.leftGlyph == "\n" or self.rightGlyph == "\n":
+			self.leftGlyph = ""
+			self.rightGlyph = ""
+
+		# only enable slider if leftGlyph and rightGlyph are not empty
+		self.w.slider.enable(len(self.leftGlyph + self.rightGlyph) > 0)
 
 		self.currentPair = self.leftGlyph + " – " + self.rightGlyph
 
