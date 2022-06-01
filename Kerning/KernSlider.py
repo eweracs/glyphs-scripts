@@ -1,16 +1,26 @@
-# MenuTitle: Kerning slider
+# MenuTitle: Kern Slider
 # -*- coding: utf-8 -*-
 
 __doc__ = """
-Kerns glyphs by slider input.
+Kern glyphs by slider input.
 """
 
-import vanilla
+import sys
+
+from vanilla import *
+
+
+# title at the top with the current glyph pair
+# slider with the current kerning value
+# change the kerning value by dragging the slider
+# save the kerning value when the slider is released
+# update the slider value when the kerning value is changed
+# update the slider value when the glyph pair is changed
+# write the kerning value below the slider
 
 
 class KernSlider:
 	def __init__(self):
-
 		self.font = Font
 
 		if self.font is None:
@@ -21,95 +31,142 @@ class KernSlider:
 			self.font.newTab("AV")
 			self.font.currentTab.textCursor = 1
 
+		self.minValue = -20
+		self.maxValue = 20
+
+		self.currentSliderValue = 0
+
+		self.currentKerningValue = 0
+		self.oldKerningValue = 0
+
+		self.leftGlyph = ""
+		self.rightGlyph = ""
 		self.currentPair = ""
-		self.currentText = str(self.font.currentTab.text)
 
-		self.update_current_pair()
+		self.w = FloatingWindow((1, 1), "Kern Slider")
 
-		self.currentKerningValue = self.font.kerningForPair(self.font.selectedFontMaster.id, self.currentPair[0],
-		                                                    self.currentPair[1])
-		if self.currentKerningValue is None:
-			self.currentKerningValue = 0
-		self.oldKerningValue = int(self.currentKerningValue)
+		self.w.negativeRange = Group("auto")
+		self.w.negativeRange.prefix = TextBox("auto", "−")
+		self.w.negativeRange.entry = EditText("auto", text=str(abs(self.minValue)), continuous=False,
+		                                      callback=self.update_ranges)
+
+		self.w.positiveRange = Group("auto")
+		self.w.positiveRange.prefix = TextBox("auto", "+")
+		self.w.positiveRange.entry = EditText("auto", text=str(self.maxValue), continuous=False,
+		                                      callback=self.update_ranges)
+
+		self.w.currentPair = TextBox("auto", self.currentPair, alignment="center")
+
+		self.w.slider = Slider("auto",
+		                       tickMarkCount=self.maxValue - self.minValue + 1,
+		                       stopOnTickMarks=True,
+		                       minValue=self.minValue,
+		                       maxValue=self.maxValue,
+		                       value=0,
+		                       callback=self.enter_kern_value)
+
+		self.w.currentValue = TextBox("auto", "", alignment="center")
+		try:
+			self.w.currentValue.set(str(int(self.currentKerningValue)))
+		except:
+			self.w.currentValue.set("")
+
+		range_rules = [
+			"H:|[prefix(8)]-margin-[entry(50)]|",
+			"V:|[entry]|",
+			"V:|[prefix]",
+		]
+
+		rules = [
+			"H:|-margin-[negativeRange]-[currentPair]-[positiveRange]-margin-|",
+			"H:|-margin-[slider(>=300)]-margin-|",
+			"H:|-margin-[currentValue]-margin-|",
+			"V:|-margin-[currentPair]-margin-[slider]-margin-[currentValue]-margin-|",
+			"V:|-margin-[negativeRange]",
+			"V:|-margin-[positiveRange]",
+		]
+
+		metrics = {
+			"margin": 10
+		}
+
+		self.w.negativeRange.addAutoPosSizeRules(range_rules, metrics)
+		self.w.positiveRange.addAutoPosSizeRules(range_rules, metrics)
+		self.w.addAutoPosSizeRules(rules, metrics)
+		self.w.open()
+		self.w.bind("close", self.close)
+
+		self.ui_update()
 
 		Glyphs.addCallback(self.ui_update, UPDATEINTERFACE)
 
-		self.w = vanilla.FloatingWindow((0, 0), "Kerning slider")
-
-		self.ypos = 10
-
-		self.w.pairTitle = vanilla.TextBox((10, self.ypos, -10, 17), self.currentPair[0] + " – " + self.currentPair[
-			1], alignment="center")
-
-		self.ypos += 20
-
-		self.w.kernSlider = vanilla.Slider((10, self.ypos, -10, 23), minValue=-20,
-		                                   maxValue=20, tickMarkCount=41,
-		                                   value=self.currentKerningValue, stopOnTickMarks=True,
-		                                   callback=self.enter_kern_value)
-
-		self.ypos += 30
-
-		self.update_slider_values(self.currentKerningValue, True)
-
-		self.w.bind("close", self.window_close)
-		self.w.resize(300, self.ypos)
-		self.w.open()
-
 	def enter_kern_value(self, sender):
-		if sender.get() == self.currentKerningValue and self.oldKerningValue != sender.get():
-			self.update_slider_values(sender.get(), True)
-		self.currentKerningValue = int(sender.get())
+		if sender.get() == self.currentSliderValue:
+			sender.set(0)
+			self.oldKerningValue = self.currentKerningValue
+		self.currentSliderValue = sender.get()
 
-		self.left_key = self.font.glyphs[self.currentPair[0]].leftKerningKey or self.currentPair[0]
-		self.right_key = self.font.glyphs[self.currentPair[1]].rightKerningKey or self.currentPair[1]
+		self.set_kerning_value(self.oldKerningValue + self.currentSliderValue)
 
-		print(self.left_key)
-
-		self.font.setKerningForPair(self.font.selectedFontMaster.id, self.left_key, self.right_key,
-		                            self.currentKerningValue)
-
-	def update_slider_values(self, value, redraw_axis):
-		if redraw_axis:
-			if abs(value * 2) < 20:
-				new_max = 20
-				new_min = -20
-			else:
-				new_max = abs(value) * 2
-				new_min = abs(value) * -2
-			self.w.kernSlider.setMaxValue(new_max)
-			self.w.kernSlider.setMinValue(new_min)
-			self.w.kernSlider.setTickMarkCount(new_max * 2 + 1)
-		self.w.kernSlider.set(value)
-		self.oldKerningValue = value
-
-	def update_current_pair(self):
-		self.currentPair = self.font.currentTab.text[
-		                   self.font.currentTab.textCursor - 1:self.font.currentTab.textCursor + 1
-		                   ]
-
-		self.left_key = self.font.glyphs[self.currentPair[0]].leftKerningKey or self.currentPair[0]
-		self.right_key = self.font.glyphs[self.currentPair[1]].rightKerningKey or self.currentPair[1]
-
-		if len(self.currentPair) < 2:
-			self.currentPair = "  "
+	def set_kerning_value(self, value):
 		try:
-			self.w.pairTitle.set(self.currentPair[0] + " – " + self.currentPair[
-			1])
+			right_layer = self.font.glyphs[self.rightGlyph].layers[self.font.selectedFontMaster.id]
+			left_layer = self.font.glyphs[self.leftGlyph].layers[self.font.selectedFontMaster.id]
+			right_layer.setPreviousKerning_forLayer_direction_(value, left_layer, LTR)
 		except:
+			pass
+
+	def update_ranges(self, sender):
+		if not sender.get().isnumeric():
+			return
+		self.minValue = -int(self.w.negativeRange.entry.get())
+		self.maxValue = int(self.w.positiveRange.entry.get())
+		self.w.slider.set(0)
+		self.w.slider.setMinValue(self.minValue)
+		self.w.slider.setMaxValue(self.maxValue)
+		self.w.slider.setTickMarkCount(self.maxValue - self.minValue + 1)
+
+	def update_kerning_value(self):
+		try:
+			right_layer = self.font.glyphs[self.rightGlyph].layers[self.font.selectedFontMaster.id]
+			left_layer = self.font.glyphs[self.leftGlyph].layers[self.font.selectedFontMaster.id]
+			self.currentKerningValue = right_layer.previousKerningForLayer_direction_(left_layer, LTR)
+			if self.currentKerningValue - 1 == float(sys.maxsize):
+				self.currentKerningValue = 0
+		except:
+			self.currentKerningValue = None
+
+	def ui_update(self, sender=None):
+		if not self.font.currentTab:
 			return
 
-		self.currentKerningValue = self.font.kerningForPair(self.font.selectedFontMaster.id, self.left_key,
-		                                                    self.right_key)
-		if self.currentKerningValue is None:
-			self.currentKerningValue = 0
+		if self.font.currentTab.textCursor == 0 or self.font.currentTab.textCursor == len(self.font.currentTab.text):
+			self.leftGlyph = ""
+			self.rightGlyph = ""
 
-	def ui_update(self, info):
-		if self.currentPair != self.font.currentTab.text[
-		                       self.font.currentTab.textCursor - 1:self.font.currentTab.textCursor + 1]:
-			self.update_current_pair()
+		else:
+			try:
+				self.leftGlyph = self.font.currentTab.text[self.font.currentTab.textCursor - 1]
+			except:
+				self.leftGlyph = ""
+			try:
+				self.rightGlyph = self.font.currentTab.text[self.font.currentTab.textCursor]
+			except:
+				self.rightGlyph = ""
 
-	def window_close(self, sender):
+		self.currentPair = self.leftGlyph + " – " + self.rightGlyph
+
+		self.update_kerning_value()
+
+		self.w.currentPair.set(self.currentPair)
+
+		try:
+			self.w.currentValue.set(str(int(self.currentKerningValue)))
+		except:
+			self.w.currentValue.set("")
+
+	def close(self, sender):
 		Glyphs.removeCallback(self.ui_update, UPDATEINTERFACE)
+
 
 KernSlider()
