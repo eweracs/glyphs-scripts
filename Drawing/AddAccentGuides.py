@@ -29,7 +29,8 @@ class AddGuides:
 			"ringcomb",
 			"tildecomb",
 			"macroncomb",
-			"commaturnedabovecomb"
+			"commaturnedabovecomb",
+			"brevecomb-cy"
 		] if accent in self.font.glyphs]
 
 		self.UCBaseAccents = [accent for accent in [
@@ -43,7 +44,8 @@ class AddGuides:
 			"brevecomb.case",
 			"ringcomb.case",
 			"tildecomb.case",
-			"macroncomb.case"
+			"macroncomb.case",
+			"brevecomb-cy.case"
 		] if accent in self.font.glyphs]
 
 		self.w = FloatingWindow((1, 1), "Add guides for accents")
