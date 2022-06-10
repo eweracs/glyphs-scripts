@@ -125,7 +125,7 @@ else:
 		"six.sups": {"L": "small nums", "R": "small nums"},
 		"seven.sups": {"L": "small nums", "R": "small nums"},
 		"eight.sups": {"L": "small nums", "R": "small nums"},
-		"nine.sups": {"L": "small nums", "R": "small nums"}
+		"nine.sups": {"L": "small nums", "R": "small nums"},
 		"zerosuperior": {"L": "small nums", "R": "small nums"},
 		"onesuperior": {"L": "small nums", "R": "small nums"},
 		"twosuperior": {"L": "small nums", "R": "small nums"},
