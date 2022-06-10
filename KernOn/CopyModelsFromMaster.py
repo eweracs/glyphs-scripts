@@ -5,6 +5,8 @@ __doc__ = """
 Copies Kern On models with values between masters.
 """
 
+import sys
+
 import vanilla
 
 
@@ -22,7 +24,7 @@ class CopyMasterModels:
 
 		self.sourceMaster = self.font.masters[0]
 
-		self.w = vanilla.FloatingWindow((0, 0), "Copy models from Master")
+		self.w = vanilla.FloatingWindow((0, 0), "Copy Models from Master")
 
 		self.ypos = 10
 
@@ -93,14 +95,17 @@ class CopyMasterModels:
 				master.userData["KernOnModels"] = self.sourceMaster.userData["KernOnModels"]
 				for model in self.sourceMaster.userData["KernOnModels"]:
 
-					left_glyph = model.split(" ")[0]
-					right_glyph = model.split(" ")[1]
-					model_kerning = self.font.kerningForPair(self.sourceMaster.id, left_glyph, right_glyph)
+					left_glyph = self.font.glyphs[model.split(" ")[0]].layers[master.id]
+					right_glyph = self.font.glyphs[model.split(" ")[1]].layers[master.id]
+					model_kerning = right_glyph.previousKerningForLayer_direction_(left_glyph, LTR)
+
+					if model_kerning - 1 == float(sys.maxsize):
+						model_kerning = 0
 
 					if self.w.onlyZeroModels and model_kerning != 0:
 						continue
 
-					self.font.setKerningForPair(master.id, left_glyph, right_glyph, model_kerning)
+					right_glyph.setPreviousKerning_forLayer_direction_(model_kerning, left_glyph, LTR)
 
 		print("Copied models from master", self.font.masters[self.w.sourceSelector.get()].name, "to", ", ".join([
 			master.name for i, master in enumerate(self.font.masters) if getattr(self.w, master.name + str(i)).get()]))
