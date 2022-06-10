@@ -5,26 +5,28 @@ __doc__ = """
 Sets .numr–fraction and fraction–.dnom autopairs for Kern On.
 """
 
-fraction_models = ["one.numr fraction",
-                   "two.numr fraction",
-                   "three.numr fraction",
-                   "four.numr fraction",
-                   "five.numr fraction",
-                   "six.numr fraction",
-                   "seven.numr fraction",
-                   "eight.numr fraction",
-                   "nine.numr fraction",
-                   "zero.numr fraction",
-                   "fraction one.dnom",
-                   "fraction two.dnom",
-                   "fraction three.dnom",
-                   "fraction four.dnom",
-                   "fraction five.dnom",
-                   "fraction six.dnom",
-                   "fraction seven.dnom",
-                   "fraction eight.dnom",
-                   "fraction nine.dnom",
-                   "fraction zero.dnom"]
+fraction_models = [
+	"one.numr fraction",
+	"two.numr fraction",
+	"three.numr fraction",
+	"four.numr fraction",
+	"five.numr fraction",
+	"six.numr fraction",
+	"seven.numr fraction",
+	"eight.numr fraction",
+	"nine.numr fraction",
+	"zero.numr fraction",
+	"fraction one.dnom",
+	"fraction two.dnom",
+	"fraction three.dnom",
+	"fraction four.dnom",
+	"fraction five.dnom",
+	"fraction six.dnom",
+	"fraction seven.dnom",
+	"fraction eight.dnom",
+	"fraction nine.dnom",
+	"fraction zero.dnom"
+]
 
 required_glyphs = []
 for glyph in fraction_models:
@@ -46,5 +48,4 @@ for master in Font.masters:
 	else:
 		master.userData["KernOnUserSetAutopairs"] = auto_fraction_models
 
-Glyphs.showNotification(title="Fraction autopairs set",
-			                        message="Restart Kern On for changes to take effect.")
+Glyphs.showNotification(title="Fraction autopairs set", message="Restart Kern On for changes to take effect.")
