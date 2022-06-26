@@ -1,15 +1,15 @@
-# MenuTitle: Create Variable Subset File
+# MenuTitle: Create Variable Subset Files
 # -*- coding: utf-8 -*-
 
 __doc__ = """
-Creates a file to export a subset variable font.
+Create glyphs files to export subset variable fonts.
 """
 
 import vanilla
 import itertools
 
 
-class CreateSubset:
+class CreateSubsets:
 	def __init__(self):
 
 		Message("This script is still heavily experimental, especially for managing special layers. Use at your own "
@@ -415,7 +415,10 @@ class CreateSubset:
 		for i, axis in enumerate(axisranges):
 			if len(axisranges[i]) == 1:
 				for master in self.current_font.masters:
-					remove_master_parameters[master].append(master.customParameters["Axis Location"][i])
+					try:
+						remove_master_parameters[master].append(master.customParameters["Axis Location"][i])
+					except:
+						pass
 				remove_axes.append(self.current_font.axes[i])
 
 		for axis in remove_axes:
@@ -455,7 +458,7 @@ class CreateSubset:
 		original_font_file_path = self.font.filepath
 
 		for recipe in self.w.enterRecipe.get().split("\n\n"):
-			self.current_font = Glyphs.currentDocument.font
+			self.current_font = Glyphs.openDocumentWithContentsOfFile_display_(original_font_file_path, False).font
 			if recipe == "":
 				continue
 			family_name = recipe.split("\n")[0]
@@ -486,8 +489,6 @@ class CreateSubset:
 
 			self.current_font.save()
 			self.current_font.close()
-			Glyphs.open(original_font_file_path)
-			self.current_font.save()
 
 		self.w.close()
 
@@ -497,4 +498,4 @@ class CreateSubset:
 		Glyphs.defaults["com.eweracs.subsetVariableFont.saveLocation"] = self.preferred_directory
 
 
-CreateSubset()
+CreateSubsets()
