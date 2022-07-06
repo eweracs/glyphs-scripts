@@ -63,15 +63,15 @@ class BuildPeriodComposites:
 		if self.w.colon.get():
 			glyphs_to_build["colon"] = ["period", "period"]
 			required_glyphs.add("period")
-			required_anchors["period"].add("colon")
-			required_anchors["period"].add("_colon")
+			required_anchors["period"].add("#exit")
+			required_anchors["period"].add("#entry")
 		if self.w.semicolon.get():
 			glyphs_to_build["semicolon"] = ["comma", "period"]
 			required_glyphs.add("comma")
 			required_glyphs.add("period")
-			required_anchors["period"].add("colon")
-			required_anchors["period"].add("_colon")
-			required_anchors["comma"].add("colon")
+			required_anchors["period"].add("#exit")
+			required_anchors["period"].add("#entry")
+			required_anchors["comma"].add("#exit")
 		if self.w.ellipsis.get():
 			glyphs_to_build["ellipsis"] = ["period", "period", "period"]
 			required_glyphs.add("period")
@@ -92,9 +92,9 @@ class BuildPeriodComposites:
 			# set anchors: use dict to find coordinates, then use calculate_italic_shift to shift coordinates for italic
 			for layer in working_glyph.layers:
 				period_layer = period.layers[layer.associatedMasterId]
-				coordinates = {"_colon": (layer.bounds.origin.x + layer.bounds.size.width / 2,
+				coordinates = {"#entry": (layer.bounds.origin.x + layer.bounds.size.width / 2,
 				                          layer.bounds.origin.y + layer.bounds.size.height),
-				               "colon": (layer.bounds.origin.x + layer.bounds.size.width / 2,
+				               "#exit": (layer.bounds.origin.x + layer.bounds.size.width / 2,
 				                         period_layer.master.xHeight - period_layer.bounds.origin.y),
 				               "_ellipsis": (0, 0),
 				               "ellipsis": (layer.bounds.origin.x + layer.bounds.size.width, 0)}
@@ -127,7 +127,7 @@ class BuildPeriodComposites:
 					new_component = GSComponent(component)
 
 					if glyph.endswith("colon"):
-						new_component.anchor = "colon"
+						new_component.anchor = "#exit"
 					if glyph == "ellipsis":
 						new_component.anchor = "ellipsis"
 					layer.components.append(new_component)
