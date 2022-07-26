@@ -32,6 +32,7 @@ class HTLSAllMasters:
 				if (not layer_lsb or not layer_rsb) and (layer_lsb != 0 or layer_rsb != 0):
 					continue
 				layer.LSB, layer.RSB = layer_lsb, layer_rsb
+				layer.syncMetrics()
 
 				print(self.engine.output)
 
