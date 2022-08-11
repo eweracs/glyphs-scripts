@@ -5,7 +5,6 @@ __doc__ = """
 Builds colon, semicolon and ellipsis from glyphs period and comma.
 """
 
-from vanilla import *
 from Foundation import NSPoint
 from math import *
 
