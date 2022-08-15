@@ -41,7 +41,10 @@ if len(required_glyphs) > 0:
 
 for master in Font.masters:
 
-	auto_fraction_models = tuple(model for model in fraction_models if model not in master.userData["KernOnModels"])
+	if master.userData["KernOnModels"]:
+		auto_fraction_models = tuple(model for model in fraction_models if model not in master.userData["KernOnModels"])
+	else:
+		auto_fraction_models = fraction_models
 
 	if master.userData["KernOnUserSetAutopairs"]:
 		master.userData["KernOnUserSetAutopairs"] = master.userData["KernOnUserSetAutopairs"] + auto_fraction_models
