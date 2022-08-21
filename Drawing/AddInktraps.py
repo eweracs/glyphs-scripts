@@ -139,7 +139,7 @@ class AddInktraps:
 			path.insertNode_atIndex_(GSNode(intersection_c), node.index + 1)
 
 			# open a corner at the node
-			layer.openCornerAtNode_offset_(node, distance_to_intersections / 2)
+			layer.openCornerAtNode_offset_(node, distance_to_intersections * self.depth)
 			# find the middle between the two new nodes
 			node_1_position = path.nodes[node.index].position
 			node_2_position = path.nodes[node.index - 1].position
