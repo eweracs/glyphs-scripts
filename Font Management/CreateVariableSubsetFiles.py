@@ -236,8 +236,6 @@ class CreateSubsets:
 		self.write_preferences(None)
 
 	def master_manager(self, subset_values, family_name):
-		self.current_font.disableUpdateInterface()
-
 		# Calculate necessary extremes and intermediates
 		axes_ranges = [[subset_values[axis][0], subset_values[axis][1]] for axis in subset_values]
 		for i, axis in enumerate(axes_ranges):
@@ -315,34 +313,44 @@ class CreateSubsets:
 				except:
 					pass
 
-		self.current_font.enableUpdateInterface()
-
 	def fix_special_layers(self):
-		self.current_font.disableUpdateInterface()
 		Glyphs.showMacroWindow()
 
 		for glyph in self.current_font.glyphs:
 			if glyph.mastersCompatible:
 				continue
 			print("Fixing layers:", glyph.name + "...")
-			duplicate = glyph.duplicate(name=glyph.name + "specialLayers")
+			# check if glyph includes smart components by checking, for each layer, its components and their smart
+			# component values
+			smart_components = False
+			for layer in glyph.layers:
+				for component in layer.components:
+					if component.smartComponentValues:
+						smart_components = True
+						break
+				if smart_components:
+					break
+			# if smart components are found, decompose all components in all layers
+			if smart_components:
+				for layer in glyph.layers:
+					layer.decomposeComponents()
+			else:
+				duplicate = glyph.duplicate(name=glyph.name + "specialLayers")
 
-			master_layers = [master.id for master in self.current_font.masters]
-			for layer in duplicate.layers:
-				if not layer.isSpecialLayer:
-					continue
-				axis_rules = layer.attributes["axisRules"]
-				duplicate.layers[layer.associatedMasterId] = layer.copy()
-				master_layers.remove(layer.associatedMasterId)
-			for id in master_layers:
-				duplicate.layers[id].reinterpolate()
-				append_layer = duplicate.layers[id]
-				append_layer.attributes["axisRules"] = axis_rules
-				glyph.layers.append(append_layer)
+				master_layers = [master.id for master in self.current_font.masters]
+				for layer in duplicate.layers:
+					if not layer.isSpecialLayer:
+						continue
+					axis_rules = layer.attributes["axisRules"]
+					duplicate.layers[layer.associatedMasterId] = layer.copy()
+					master_layers.remove(layer.associatedMasterId)
+				for id in master_layers:
+					duplicate.layers[id].reinterpolate()
+					append_layer = duplicate.layers[id]
+					append_layer.attributes["axisRules"] = axis_rules
+					glyph.layers.append(append_layer)
 
-			del self.current_font.glyphs[glyph.name + "specialLayers"]
-
-		self.current_font.enableUpdateInterface()
+				del self.current_font.glyphs[glyph.name + "specialLayers"]
 
 	def check_empty_glyphs(self):
 		for glyph in self.current_font.glyphs:
