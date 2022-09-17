@@ -5,7 +5,6 @@ __doc__ = """
 Swaps two selected on-curve nodes, moving their handles accordingly.
 """
 
-
 from Foundation import NSPoint
 
 
