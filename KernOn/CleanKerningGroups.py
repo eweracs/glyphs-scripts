@@ -5,7 +5,7 @@ __doc__ = """
 Cleans up the kerning file to remove all occurences of "KO_".
 """
 
-import vanilla
+import vanilla, os
 
 
 class CleanGroups:
@@ -47,19 +47,32 @@ class CleanGroups:
 
 		self.font.save()
 
-		f = open(self.font.filepath, "r")
-		filedata = f.read()
-		f.close()
+		kernfiles = []
+		if os.path.isdir(self.font.filepath): # Glyphs package
+			kernfiles.append(self.font.filepath+"/fontinfo.plist")
+			for subdir, dirs, files in os.walk(self.font.filepath+"/glyphs"):
+				for file in files:
+					kernfiles.append(self.font.filepath + "/glyphs/" + file)
+		else: # .glyphs file
+			kernfiles.append(self.font.filepath)
 
-		newdata = filedata.replace("KO_", "")
-
-		f = open(self.font.filepath, "w")
-		f.write(newdata)
-		f.close()
-
-		self.font.close()
-		if self.w.reopen.get():
-			Glyphs.open(self.filePath)
+		if len(kernfiles) > 0:
+			for kernfile in kernfiles:
+				f = open(kernfile)
+				filedata = f.read()
+				f.close()
+        		
+				newdata = filedata.replace("KO_", "")
+        		
+				f = open(kernfile, "w")
+				f.write(newdata)
+				f.close()
+	
+			self.font.close()
+			if self.w.reopen.get():
+				Glyphs.open(self.filePath)
+		else:
+			print("Error opening file.")
 
 
 CleanGroups()
