@@ -88,6 +88,7 @@ class Interpolator:
 			                   minValue=sorted(self.axesRanges[i])[0],
 			                   maxValue=sorted(self.axesRanges[i])[1],
 			                   value=self.currentCoords[i],
+			                   sizeStyle="small",
 			                   callback=self.axis_slider)
 			setattr(self.w, axis_tag + "slider", s)
 			self.sliderList.append(s)
