@@ -38,6 +38,10 @@ class ReportMissingAutomaticAlignment:
 				if count < len(layer.components) - 1:
 					missing_alignment.append(layer)
 
+				# check for missing automatic alignment if only one component is present
+				if len(layer.components) == 1 and not layer.components[0].automaticAlignment:
+					missing_alignment.append(layer)
+
 		if len(missing_alignment) > 0:
 			self.font.newTab(missing_alignment)
 		else:
