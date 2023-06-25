@@ -35,8 +35,14 @@ class ReportMissingAutomaticAlignment:
 				for component in layer.components:
 					if component.automaticAlignment:
 						count += 1
-				if count < len(layer.components) - 1:
-					missing_alignment.append(layer)
+				if count < len(layer.components):
+					if len(layer.components) > 1:
+						count_2 = 0
+						for component in list(layer.components)[1:]:
+							if component.automaticAlignment:
+								count_2 += 1
+						if count_2 < len(layer.components) - 1:
+							missing_alignment.append(layer)
 
 				# check for missing automatic alignment if only one component is present
 				if len(layer.components) == 1 and not layer.components[0].automaticAlignment:
