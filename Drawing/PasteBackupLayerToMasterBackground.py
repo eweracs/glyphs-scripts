@@ -11,4 +11,4 @@ if not Layer.isMasterLayer and not Layer.isSpecialLayer:
 	master_layer.background.hints = Layer.hints.copy()
 	master_layer.background.anchors = Layer.anchors.copy()
 else:
-	Message(title="Not a backup layer", message="Please select a backhup layer from which to copy the contents.")
+	Message(title="Not a backup layer", message="Please select a backup layer from which to copy the contents.")
