@@ -63,20 +63,20 @@ class BuildPeriodComposites:
 		if self.w.colon.get():
 			glyphs_to_build["colon"] = ["period", "period"]
 			required_glyphs.add("period")
-			required_anchors["period"].add("colon_exit")
-			required_anchors["period"].add("colon_entry")
+			required_anchors["period"].add("top")
+			required_anchors["period"].add("_top")
 		if self.w.semicolon.get():
 			glyphs_to_build["semicolon"] = ["comma", "period"]
 			required_glyphs.add("comma")
 			required_glyphs.add("period")
-			required_anchors["period"].add("colon_exit")
-			required_anchors["period"].add("colon_entry")
-			required_anchors["comma"].add("colon_exit")
+			required_anchors["period"].add("top")
+			required_anchors["period"].add("_top")
+			required_anchors["comma"].add("top")
 		if self.w.ellipsis.get():
 			glyphs_to_build["ellipsis"] = ["period", "period", "period"]
 			required_glyphs.add("period")
-			required_anchors["period"].add("_ellipsis")
-			required_anchors["period"].add("ellipsis")
+			required_anchors["period"].add("#entry")
+			required_anchors["period"].add("#exit")
 
 		missing = [glyph for glyph in required_glyphs if glyph not in self.font.glyphs]
 
@@ -92,16 +92,16 @@ class BuildPeriodComposites:
 			# set anchors: use dict to find coordinates, then use calculate_italic_shift to shift coordinates for italic
 			for layer in working_glyph.layers:
 				period_layer = period.layers[layer.associatedMasterId]
-				coordinates = {"colon_entry": (layer.bounds.origin.x + layer.bounds.size.width / 2,
+				coordinates = {"_top": (layer.bounds.origin.x + layer.bounds.size.width / 2,
 				                          layer.bounds.origin.y + layer.bounds.size.height),
-				               "colon_exit": (layer.bounds.origin.x + layer.bounds.size.width / 2,
+				               "top": (layer.bounds.origin.x + layer.bounds.size.width / 2,
 				                         period_layer.master.xHeight - period_layer.bounds.origin.y),
-				               "_ellipsis": (0, 0),
-				               "ellipsis": (layer.bounds.origin.x + layer.bounds.size.width, 0)}
+				               "#entry": (0, 0),
+				               "#exit": (layer.bounds.origin.x + layer.bounds.size.width, 0)}
 
 				for anchor in required_anchors[glyph]:
 					center = layer.bounds.size.height / 2
-					if anchor == "_ellipsis":
+					if anchor == "#entry":
 						center = layer.master.xHeight / 2
 					layer.anchors[anchor] = GSAnchor(name=anchor,
 					                                 pt=self.calculate_italic_shift(coordinates[anchor],
@@ -127,9 +127,10 @@ class BuildPeriodComposites:
 					new_component = GSComponent(component)
 
 					if glyph.endswith("colon"):
-						new_component.anchor = "colon_exit"
+						new_component.anchor = "top"
 					if glyph == "ellipsis":
-						new_component.anchor = "ellipsis"
+						new_component.anchor = "#exit"
+						new_component.automaticAlignment = True
 					layer.components.append(new_component)
 
 		print("\n...Done!")
