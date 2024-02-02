@@ -15,6 +15,8 @@ if Font is None:
 all_models = []
 
 for master in Font.masters:
+	if master.userData["KernOnAutoKernedFrom"] or master.userData["KernOnIsInterpolated"]:
+		continue
 	for model in master.userData["KernOnModels"]:
 		if model not in all_models:
 			all_models.append(model)
