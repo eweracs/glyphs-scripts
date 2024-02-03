@@ -7,19 +7,12 @@ Toggles automatic alignment for the selected component in all masters.
 
 
 def toggle_automatic_alignment_all_masters():
-	for layer in Font.selectedLayers:
-		if layer is None:
-			return
+	selected_components = [component for component in Layer.components if component.selected]
 
-		for i, reference in enumerate(layer.components):
-			if reference.selected or len(layer.selection) == 0:
-				reference.automaticAlignment = not reference.automaticAlignment
-
-			for layer in layer.parent.layers:
-				if layer is layer:
-					continue
-
-				layer.components[i].automaticAlignment = reference.automaticAlignment
+	for layer in Layer.parent.layers:
+		for component in layer.components:
+			if component.name in [selected_component.name for selected_component in selected_components]:
+				component.automaticAlignment = not component.automaticAlignment
 
 
 toggle_automatic_alignment_all_masters()
