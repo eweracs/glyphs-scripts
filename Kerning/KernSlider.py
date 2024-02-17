@@ -7,8 +7,8 @@ Kern glyphs by slider input.
 
 import sys
 
-from vanilla import *
-
+from vanilla import FloatingWindow, Group, TextBox, EditText, Slider
+from GlyphsApp import Glyphs, Message, UPDATEINTERFACE, LTR
 
 # title at the top with the current glyph pair
 # slider with the current kerning value
@@ -21,7 +21,7 @@ from vanilla import *
 
 class KernSlider:
 	def __init__(self):
-		self.font = Font
+		self.font = Glyphs.font
 
 		if self.font is None:
 			Message("No font selected", "Select a font project!")
@@ -47,23 +47,33 @@ class KernSlider:
 
 		self.w.negativeRange = Group("auto")
 		self.w.negativeRange.prefix = TextBox("auto", "−")
-		self.w.negativeRange.entry = EditText("auto", text=str(abs(self.minValue)), continuous=False,
-		                                      callback=self.update_ranges)
+		self.w.negativeRange.entry = EditText(
+			"auto",
+			text=str(abs(self.minValue)),
+			continuous=False,
+			callback=self.update_ranges
+		)
 
 		self.w.positiveRange = Group("auto")
 		self.w.positiveRange.prefix = TextBox("auto", "+")
-		self.w.positiveRange.entry = EditText("auto", text=str(self.maxValue), continuous=False,
-		                                      callback=self.update_ranges)
+		self.w.positiveRange.entry = EditText(
+			"auto",
+			text=str(self.maxValue),
+			continuous=False,
+			callback=self.update_ranges
+		)
 
 		self.w.currentPair = TextBox("auto", self.currentPair, alignment="center")
 
-		self.w.slider = Slider("auto",
-		                       tickMarkCount=self.maxValue - self.minValue + 1,
-		                       stopOnTickMarks=True,
-		                       minValue=self.minValue,
-		                       maxValue=self.maxValue,
-		                       value=0,
-		                       callback=self.enter_kern_value)
+		self.w.slider = Slider(
+			"auto",
+			tickMarkCount=self.maxValue - self.minValue + 1,
+			stopOnTickMarks=True,
+			minValue=self.minValue,
+			maxValue=self.maxValue,
+			value=0,
+			callback=self.enter_kern_value
+		)
 
 		self.w.currentValue = TextBox("auto", "", alignment="center")
 		try:

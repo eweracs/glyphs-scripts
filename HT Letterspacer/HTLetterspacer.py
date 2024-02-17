@@ -6,10 +6,11 @@ Runs HT Letterspacer for the current selection. Hold Option to run for all maste
 """
 
 from Foundation import NSEvent
+from GlyphsApp import Message
 
 import_success = False
 try:
-	from HTLSLibrary import *
+	from HTLSLibrary import HTLSScript
 	import_success = True
 except:
 	Message("Please install HTLS Manager from the plugin manager and restart Glyphs.", "HTLS Manager required")

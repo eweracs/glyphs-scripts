@@ -5,10 +5,12 @@ __doc__ = """
 Copies shapes from the first half of the masters to the second half. Includes special layers.
 """
 
+from GlyphsApp import Glyphs, Message
+
 
 class CopyShapesFromFirstHalf:
 	def __init__(self):
-		self.font = Font
+		self.font = Glyphs.font
 
 		# check that the font has an even amount of masters
 		if len(self.font.masters) % 2 != 0:
@@ -27,9 +29,11 @@ class CopyShapesFromFirstHalf:
 
 			for i, layer in enumerate(special_layers):
 				if layer.associatedMasterId != master_layers[i].associatedMasterId:
-					print("%s: Special layers not copied. An amount of exactly one special layer per master is "
-					      "required." %
-					      glyph.parent.name)
+					print(
+						"%s: Special layers not copied. An amount of exactly one special layer per master is "
+						"required." %
+						glyph.parent.name
+					)
 					copy_special_layers = False
 					break
 

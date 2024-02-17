@@ -5,13 +5,14 @@ __doc__ = """
 Adjust the amount of base kerning between capitals.
 """
 
-from vanilla import *
+from vanilla import FloatingWindow, Group, TextBox, SegmentedButton, EditText, HorizontalLine, Button
+from GlyphsApp import Glyphs, Message, UPDATEINTERFACE
 
 
 class AdjustCapKern:
 	def __init__(self):
 
-		self.font = Font
+		self.font = Glyphs.font
 		if self.font is None:
 			Message("No font selected", "Select a font project!")
 			return
@@ -19,8 +20,10 @@ class AdjustCapKern:
 		# check whether font has class kerning
 		try:
 			if "@MMK" in self.font.kerning[self.font.masters[0].id].items()[0][0]:
-				Message("This script only works on projects before kerning has been generated.",
-				        "Font has class kerning")
+				Message(
+					"This script only works on projects before kerning has been generated.",
+					"Font has class kerning"
+				)
 				return
 		except:
 			pass
@@ -31,20 +34,32 @@ class AdjustCapKern:
 
 		self.w.master = Group("auto")
 		self.w.master.title = TextBox("auto", "Master: " + self.font.selectedFontMaster.name, sizeStyle="small")
-		self.w.master.selector = SegmentedButton("auto", [dict(title="←"), dict(title="→")],
-		                                                 callback=self.master_switcher, sizeStyle="small")
+		self.w.master.selector = SegmentedButton(
+			"auto",
+			[dict(title="←"), dict(title="→")],
+			callback=self.master_switcher,
+			sizeStyle="small"
+		)
 
 		self.w.capKern = Group("auto")
 		self.w.capKern.title = TextBox("auto", "Adjust capital models by:", sizeStyle="small")
 
-		self.w.capKern.selector = EditText("auto", text=self.masterParams[self.font.selectedFontMaster.id],
-		                                           sizeStyle="small", callback=self.set_cap_kern)
+		self.w.capKern.selector = EditText(
+			"auto",
+			text=self.masterParams[self.font.selectedFontMaster.id],
+			callback=self.set_cap_kern,
+			sizeStyle="small"
+		)
 		self.w.capKern.selector.selectAll()
 
 		self.w.divider = HorizontalLine("auto")
 
-		self.w.adjustButton = Button("auto", "Adjust models", callback=self.adjust_capital_models,
-		                                     sizeStyle="small")
+		self.w.adjustButton = Button(
+			"auto",
+			"Adjust models",
+			callback=self.adjust_capital_models,
+			sizeStyle="small"
+		)
 
 		rules = [
 			"H:|-border-[master]-border-|",
@@ -94,9 +109,12 @@ class AdjustCapKern:
 			right = self.font.glyphs[model.split(" ")[1]]
 			current_kerning = self.font.kerningForPair(self.font.selectedFontMaster.id, left.name, right.name)
 			if left.case == 1 and left.category == "Letter" and right.case == 1 and right.category == "Letter":
-				self.font.setKerningForPair(self.font.selectedFontMaster.id,
-				                            left.name, right.name,
-				                            current_kerning + self.masterParams[self.font.selectedFontMaster.id])
+				self.font.setKerningForPair(
+					self.font.selectedFontMaster.id,
+					left.name,
+					right.name,
+					current_kerning + self.masterParams[self.font.selectedFontMaster.id]
+				)
 
 	def ui_update(self, info):
 		self.w.master.title.set("Master: " + self.font.selectedFontMaster.name)

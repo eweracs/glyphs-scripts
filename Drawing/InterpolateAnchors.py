@@ -4,7 +4,9 @@ __doc__ = """
 Re-interpolates anchors for currently selected layer.
 """
 
-for layer in Font.selectedLayers:
+from GlyphsApp import Glyphs
+
+for layer in Glyphs.font.selectedLayers:
 	copy_layer = layer.copy()
 	layer.reinterpolate()
 	if str(Glyphs.versionNumber)[0] == "3":

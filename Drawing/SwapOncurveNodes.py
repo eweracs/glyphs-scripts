@@ -10,8 +10,10 @@ from Foundation import NSPoint
 
 def swap_oncurve_node_positions_keep_offcurves():
 	# get selected on-curve nodes
-	selected_nodes = [selected for selected in Layer.selection if
-	                  type(selected) == GSNode and selected.type != "offcurve"]
+	selected_nodes = [
+		selected for selected in Layer.selection if
+		isinstance(selected, GSNode) and selected.type != "offcurve"
+	]
 
 	# check that exactly two nodes are selected
 	if len(selected_nodes) != 2:

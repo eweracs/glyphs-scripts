@@ -8,10 +8,12 @@ Prints a tab with all layers with mirrored components.
 # go through all glyphs and their layers, excluding backup layers and layers with no components
 # print a tab with all layers with mirrored components
 
+from GlyphsApp import Glyphs, Message
+
 
 class FindMirroredComponents:
 	def __init__(self):
-		self.font = Font
+		self.font = Glyphs.font
 
 		if self.font is None:
 			Message("No font selected", "Select a font project!")

@@ -7,13 +7,14 @@ Exports font in specified formats, nicely sorted into folders.
 
 import os
 import vanilla
+from GlyphsApp import Glyphs, OTF, TTF, VARIABLE, WOFF, WOFF2, EOT, GetFolder
 
 
 class ExportWindow:
 
 	def __init__(self):
 
-		self.font = Font
+		self.font = Glyphs.font
 		self.parent_path = None
 		self.export_path = None
 
@@ -26,15 +27,35 @@ class ExportWindow:
 				self.selected_formats[key] = dict(self.prefs[key])
 				self.selected_formats[key]["Containers"] = list(self.selected_formats[key]["Containers"])
 		else:  # build dictionary to store preferences
-			self.selected_formats = {"OTF": {"Export": False, "Type": "Desktop", "Output": "OTF",
-			                                 "Autohint": False, "Containers": []},
-			                         "TTF": {"Export": False, "Type": "Desktop", "Output": "TTF",
-			                                 "Autohint": False, "Containers": []},
-			                         "VAR": {"Export": False, "Type": "Desktop", "Output": VARIABLE,
-			                                 "Autohint": False, "Containers": []},
-			                         "Web": {"Export": False, "Type": "Web", "Output": "OTF",
-			                                 "Autohint": False, "Containers": []}
-			                         }
+			self.selected_formats = {
+				"OTF": {
+					"Export": False,
+					"Type": "Desktop",
+					"Output": OTF,
+					"Autohint": False, "Containers": []
+				},
+				"TTF": {
+					"Export": False,
+					"Type": "Desktop",
+					"Output": TTF,
+					"Autohint": False,
+					"Containers": []
+				},
+				"VAR": {
+					"Export": False,
+					"Type": "Desktop",
+					"Output": VARIABLE,
+					"Autohint": False,
+					"Containers": []
+				},
+				"Web": {
+					"Export": False,
+					"Type": "Web",
+					"Output": OTF,
+					"Autohint": False,
+					"Containers": []
+				}
+			}
 
 		# UI elements indent init
 		x = 10
@@ -45,29 +66,46 @@ class ExportWindow:
 		self.w.desktop_title = vanilla.TextBox((x, y, 200, 20), "Desktop")
 		y += 24
 
-		self.w.otf_checkbox = vanilla.CheckBox((x, y, 200, 22), "OTF",
-		                                       callback=self.format_selection, value=int(self.selected_formats["OTF"]["Export"]))
+		self.w.otf_checkbox = vanilla.CheckBox(
+			(x, y, 200, 22),
+			"OTF",
+			callback=self.format_selection,
+			value=int(self.selected_formats["OTF"]["Export"])
+		)
 		x += 16
 		y += 26
-		self.w.otf_autohint = vanilla.CheckBox((x, y, 200, 18), "Autohint",
-		                                       sizeStyle="small", callback=self.format_selection,
-		                                       value=int(self.selected_formats["OTF"]["Autohint"]))
+		self.w.otf_autohint = vanilla.CheckBox(
+			(x, y, 200, 18), "Autohint",
+			sizeStyle="small",
+			callback=self.format_selection,
+			value=int(self.selected_formats["OTF"]["Autohint"])
+		)
 		x -= 16
 		y += 26
 
-		self.w.ttf_checkbox = vanilla.CheckBox((x, y, 200, 22), "TTF",
-		                                       callback=self.format_selection, value=int(self.selected_formats["TTF"]["Export"]))
+		self.w.ttf_checkbox = vanilla.CheckBox(
+			(x, y, 200, 22),
+			"TTF",
+			callback=self.format_selection,
+			value=int(self.selected_formats["TTF"]["Export"])
+		)
 		x += 16
 		y += 26
-		self.w.ttf_autohint = vanilla.CheckBox((x, y, 200, 18), "Autohint",
-		                                       sizeStyle="small", callback=self.format_selection,
-		                                       value=int(self.selected_formats["TTF"]["Autohint"]))
+		self.w.ttf_autohint = vanilla.CheckBox(
+			(x, y, 200, 18), "Autohint",
+			sizeStyle="small",
+			callback=self.format_selection,
+			value=int(self.selected_formats["TTF"]["Autohint"])
+		)
 		x -= 16
 		y += 26
 
-		self.w.var_checkbox = vanilla.CheckBox((x, y, 200, 22), "VAR",
-		                                            callback=self.format_selection,
-		                                            value=int(self.selected_formats["VAR"]["Export"]))
+		self.w.var_checkbox = vanilla.CheckBox(
+			(x, y, 200, 22),
+			"VAR",
+			callback=self.format_selection,
+			value=int(self.selected_formats["VAR"]["Export"])
+		)
 		y = 10
 
 		x += 150
@@ -78,20 +116,35 @@ class ExportWindow:
 		self.w.web_source.set(self.selected_formats["Web"]["Output"] != "OTF")
 		y += 26
 		x += 16
-		self.w.web_autohint = vanilla.CheckBox((x, y, 200, 18), "Autohint",
-		                                       sizeStyle="small", callback=self.format_selection,
-		                                       value=int(self.selected_formats["Web"]["Autohint"]))
+		self.w.web_autohint = vanilla.CheckBox(
+			(x, y, 200, 18), "Autohint",
+			sizeStyle="small",
+			callback=self.format_selection,
+			value=int(self.selected_formats["Web"]["Autohint"])
+		)
 		x -= 16
 		y += 26
 
-		self.w.woff_checkbox = vanilla.CheckBox((x, y, 200, 20), "WOFF", callback=self.format_selection,
-		                                        value=WOFF in self.selected_formats["Web"]["Containers"])
+		self.w.woff_checkbox = vanilla.CheckBox(
+			(x, y, 200, 20),
+			"WOFF",
+			callback=self.format_selection,
+			value=WOFF in self.selected_formats["Web"]["Containers"]
+		)
 		y += 26
-		self.w.woff2_checkbox = vanilla.CheckBox((x, y, 200, 20), "WOFF2", callback=self.format_selection,
-		                                         value=WOFF2 in self.selected_formats["Web"]["Containers"])
+		self.w.woff2_checkbox = vanilla.CheckBox(
+			(x, y, 200, 20),
+			"WOFF2",
+			callback=self.format_selection,
+			value=WOFF2 in self.selected_formats["Web"]["Containers"]
+		)
 		y += 26
-		self.w.eot_checkbox = vanilla.CheckBox((x, y, 200, 20), "EOT", callback=self.format_selection,
-		                                       value=EOT in self.selected_formats["Web"]["Containers"])
+		self.w.eot_checkbox = vanilla.CheckBox(
+			(x, y, 200, 20),
+			"EOT",
+			callback=self.format_selection,
+			value=EOT in self.selected_formats["Web"]["Containers"]
+		)
 		y += 30
 
 		self.w.export_button = vanilla.Button((10, y, -10, 20), "Export...", callback=self.export_selection)
@@ -106,8 +159,10 @@ class ExportWindow:
 		self.w.makeKey()
 
 	def export_button_toggle(self):
-		self.w.export_button.enable(self.w.otf_checkbox.get() + self.w.ttf_checkbox.get() + self.w.var_checkbox.get() +
-		                            self.w.woff_checkbox.get() + self.w.woff2_checkbox.get() + self.w.eot_checkbox.get() > 0)
+		self.w.export_button.enable(
+			self.w.otf_checkbox.get() + self.w.ttf_checkbox.get() + self.w.var_checkbox.get() +
+			self.w.woff_checkbox.get() + self.w.woff2_checkbox.get() + self.w.eot_checkbox.get() > 0
+		)
 
 	def format_selection(self, sender):  # edits the values in the dictionary based on what boxes are checked
 		self.selected_formats["OTF"]["Export"] = self.w.otf_checkbox.get() == 1
@@ -150,7 +205,6 @@ class ExportWindow:
 					path = self.parent_path + "/" + str(self.selected_formats[output]["Type"]) + "/" + output + "/"
 					self.export_to_location(self.selected_formats[output]["Output"], self.selected_formats[output]["Autohint"], path, self.selected_formats[output]["Containers"])
 		self.w.close()
-
 
 	def export_to_location(self, output, autohint, path, container):
 		if not os.path.exists(path):  # create export directory if it doesn’t exist yet

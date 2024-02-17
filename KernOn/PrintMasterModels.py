@@ -5,20 +5,23 @@ __doc__ = """
 Prints a tab with all Kern On models for each master.
 """
 
+from GlyphsApp import Glyphs, Message, LTR
+
 
 class ModelsForGlyph:
 	def __init__(self):
-		if Font is None:
-			return
 
-		self.font = Font
+		self.font = Glyphs.font
+
+		if self.font is None:
+			return
 
 		did_something = False
 
 		for i, master in enumerate(self.font.masters):
 			if master.userData["KernOnIsInterpolated"]\
-					or not master.userData["KernOnModels"]\
-					or len(master.userData["KernOnModels"]) == 0:
+				or not master.userData["KernOnModels"]\
+				or len(master.userData["KernOnModels"]) == 0:
 				continue
 
 			negative_models = []
@@ -38,8 +41,8 @@ class ModelsForGlyph:
 					negative_models.append(new_model)
 
 			text = master.name + " (" + str(len(master.userData["KernOnModels"])) + " models)\n\nZero:\n" + \
-			       "/space".join(zero_models) + "\n\nPositive:\n" + "/space".join(positive_models) + \
-			       "\n\nNegative:\n" + "/space".join(negative_models)
+				"/space".join(zero_models) + "\n\nPositive:\n" + "/space".join(positive_models) + \
+				"\n\nNegative:\n" + "/space".join(negative_models)
 
 			self.font.newTab(text)
 			self.font.currentTab.masterIndex = i
