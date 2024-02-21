@@ -6,20 +6,23 @@ Interpolate HT Letterspacer values for different masters.
 """
 
 import vanilla
+from GlyphsApp import Glyphs, Message
 
 
 class InterpolateLetterspacer:
 	def __init__(self):
 
-		if Font is None:
+		self.font = Glyphs.font
+
+		if self.font is None:
 			Message("No font selected.", "Select a font project!")
 			return
 
-		if len(Font.axes) > 1:
-			Message("You can still use it to interpolate along the first axis of your project.",
-			        "This script only works for singe-axis setups for the moment.")
-
-		self.font = Font
+		if len(self.font.axes) > 1:
+			Message(
+				"You can still use it to interpolate along the first axis of your project.",
+				"This script only works for singe-axis setups for the moment."
+			)
 
 		self.master_list = [master for master in self.font.masters]
 		self.selected_targets = {}
@@ -40,45 +43,64 @@ class InterpolateLetterspacer:
 		self.w.sourcesTitle = vanilla.TextBox((10, self.ypos, -10, 14), "Source masters", sizeStyle="small")
 
 		self.w.areaTitle = vanilla.TextBox((180, self.ypos, 40, 14), "Area", alignment="center", sizeStyle="small")
-		self.w.depthTitle = vanilla.TextBox((226, self.ypos, 40, 14), "Depth", alignment="center",
-		                                    sizeStyle="small")
+		self.w.depthTitle = vanilla.TextBox((226, self.ypos, 40, 14), "Depth", alignment="center", sizeStyle="small")
 		self.w.overTitle = vanilla.TextBox((272, self.ypos, 40, 14), "Over", alignment="center", sizeStyle="small")
 
 		self.ypos += 24
 
 		self.w.sourceOneTitle = vanilla.TextBox((10, self.ypos + 3, -10, 14), "1:", sizeStyle="small")
-		self.w.sourceOneSelector = vanilla.PopUpButton((32, self.ypos, 140, 20),
-		                                               [master.name for master in self.font.masters],
-		                                               callback=self.pick_first_master)
+		self.w.sourceOneSelector = vanilla.PopUpButton(
+			(32, self.ypos, 140, 20),
+			[master.name for master in self.font.masters],
+			callback=self.pick_first_master
+		)
 
-		self.w.sourceOneArea = vanilla.TextBox((180, self.ypos + 3, 40, 14),
-		                                       str(self.source_one.customParameters["paramArea"] or "0"),
-		                                       alignment="center", sizeStyle="small")
-		self.w.sourceOneDepth = vanilla.TextBox((226, self.ypos + 3, 40, 14),
-		                                        str(self.source_one.customParameters["paramDepth"] or "0"),
-		                                        alignment="center", sizeStyle="small")
-		self.w.sourceOneOver = vanilla.TextBox((272, self.ypos + 3, 40, 14),
-		                                       str(self.source_one.customParameters["paramOver"] or "0"),
-		                                       alignment="center", sizeStyle="small")
+		self.w.sourceOneArea = vanilla.TextBox(
+			(180, self.ypos + 3, 40, 14),
+			str(self.source_one.customParameters["paramArea"] or "0"),
+			alignment="center",
+			sizeStyle="small"
+		)
+		self.w.sourceOneDepth = vanilla.TextBox(
+			(226, self.ypos + 3, 40, 14),
+			str(self.source_one.customParameters["paramDepth"] or "0"),
+			alignment="center", sizeStyle="small"
+		)
+		self.w.sourceOneOver = vanilla.TextBox(
+			(272, self.ypos + 3, 40, 14),
+			str(self.source_one.customParameters["paramOver"] or "0"),
+			alignment="center", sizeStyle="small"
+		)
 
 		self.ypos += 32
 
 		self.w.sourceTwoTitle = vanilla.TextBox((10, self.ypos + 3, -10, 14), "2:", sizeStyle="small")
-		self.w.sourceTwoSelector = vanilla.PopUpButton((32, self.ypos, 140, 20),
-		                                               [master.name for master in self.font.masters],
-		                                               callback=self.pick_second_master)
+		self.w.sourceTwoSelector = vanilla.PopUpButton(
+			(32, self.ypos, 140, 20),
+			[master.name for master in self.font.masters],
+			callback=self.pick_second_master
+		)
 
 		self.w.sourceTwoSelector.set(1)
 
-		self.w.sourceTwoArea = vanilla.TextBox((180, self.ypos + 3, 40, 14),
-		                                       str(self.source_two.customParameters["paramArea"] or "0"),
-		                                       alignment="center", sizeStyle="small")
-		self.w.sourceTwoDepth = vanilla.TextBox((226, self.ypos + 3, 40, 14),
-		                                        str(self.source_two.customParameters["paramDepth"] or "0"),
-		                                        alignment="center", sizeStyle="small")
-		self.w.sourceTwoOver = vanilla.TextBox((272, self.ypos + 3, 40, 14),
-		                                       str(self.source_two.customParameters["paramOver"] or "0"),
-		                                       alignment="center", sizeStyle="small")
+		self.w.sourceTwoArea = vanilla.TextBox(
+			(180, self.ypos + 3, 40, 14),
+			str(self.source_two.customParameters["paramArea"] or "0"),
+			alignment="center",
+			sizeStyle="small"
+		)
+		self.w.sourceTwoDepth = vanilla.TextBox(
+			(226, self.ypos + 3, 40, 14),
+			str(self.source_two.customParameters["paramDepth"] or "0"),
+			alignment="center",
+			sizeStyle="small"
+		)
+		self.w.sourceTwoOver = vanilla.TextBox(
+			(272, self.ypos + 3, 40, 14),
+			str(self.source_two.customParameters["paramOver"] or "0"),
+			alignment="center",
+			sizeStyle="small"
+		)
 
 		self.ypos += 32
 
@@ -91,11 +113,17 @@ class InterpolateLetterspacer:
 		self.ypos += 24
 
 		for i, master in enumerate(self.master_list):
-			check_box = vanilla.CheckBox((10, self.ypos, 162, 20), str(i + 1) + ") " + self.master_list[i].name,
-			                             callback=self.select_interpolation_targets, value=True)
-			pop_up_button = vanilla.PopUpButton((180, self.ypos, -10, 20),
-			                                    ["Interpolate", "Copy from 1", "Copy from 2"],
-			                                    callback=self.pick_interpolation_type)
+			check_box = vanilla.CheckBox(
+				(10, self.ypos, 162, 20),
+				str(i + 1) + ") " + self.master_list[i].name,
+				callback=self.select_interpolation_targets,
+				value=True
+			)
+			pop_up_button = vanilla.PopUpButton(
+				(180, self.ypos, -10, 20),
+				["Interpolate", "Copy from 1", "Copy from 2"],
+				callback=self.pick_interpolation_type
+			)
 			setattr(self.w, str(i) + "CheckBox", check_box)
 			setattr(self.w, str(i) + "PopUpButton", pop_up_button)
 
@@ -103,8 +131,11 @@ class InterpolateLetterspacer:
 			self.popUpButtonList.append(pop_up_button)
 			self.ypos += 32
 
-		self.w.writeParameters = vanilla.Button((10, self.ypos, -10, 20), "Write parameters",
-		                                        callback=self.write_parameters)
+		self.w.writeParameters = vanilla.Button(
+			(10, self.ypos, -10, 20),
+			"Write parameters",
+			callback=self.write_parameters
+		)
 
 		self.update_states()
 

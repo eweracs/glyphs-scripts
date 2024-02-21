@@ -5,6 +5,8 @@ __doc__ = """
 Sets .numr–fraction and fraction–.dnom autopairs for Kern On.
 """
 
+from GlyphsApp import Glyphs, Message
+
 fraction_models = [
 	"one.numr fraction",
 	"two.numr fraction",
@@ -27,6 +29,8 @@ fraction_models = [
 	"fraction nine.dnom",
 	"fraction zero.dnom"
 ]
+
+Font = Glyphs.font
 
 required_glyphs = []
 for glyph in fraction_models:

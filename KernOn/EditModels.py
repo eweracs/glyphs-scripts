@@ -5,12 +5,13 @@ __doc__ = """
 Allows for simplified editing of Kern On models in each master.
 """
 
-from vanilla import *
+from vanilla import FloatingWindow, Group, TextBox, HorizontalLine, SegmentedButton, ComboBox, EditText, Button
+from GlyphsApp import Glyphs, Message, UPDATEINTERFACE
 
 
 class EditModels:
 	def __init__(self):
-		self.font = Font
+		self.font = Glyphs.font
 		if self.font is None:
 			Message("Please open a font project!", "No font selected")
 			return
@@ -18,8 +19,10 @@ class EditModels:
 		# check whether font has class kerning
 		try:
 			if "@MMK" in self.font.kerning[self.font.masters[0].id].items()[0][0]:
-				Message("This script only works on projects before kerning has been generated.",
-				        "Font has class kerning")
+				Message(
+					"This script only works on projects before kerning has been generated.",
+					"Font has class kerning"
+				)
 				return
 		except:
 			pass
@@ -37,8 +40,11 @@ class EditModels:
 
 		self.w.master = Group("auto")
 		self.w.master.title = TextBox("auto", "Master: " + self.font.selectedFontMaster.name, sizeStyle="small")
-		self.w.master.selector = SegmentedButton("auto", [dict(title="←"), dict(title="→")],
-		                                         callback=self.master_switcher)
+		self.w.master.selector = SegmentedButton(
+			"auto",
+			[dict(title="←"), dict(title="→")],
+			callback=self.master_switcher
+		)
 
 		# add a divider
 
@@ -49,10 +55,12 @@ class EditModels:
 
 		self.w.model = Group("auto")
 		self.w.model.title = TextBox("auto", "Model: ", sizeStyle="small")
-		self.w.model.selector = ComboBox("auto",
-		                                 [model for model in self.font.selectedFontMaster.userData["KernOnModels"]],
-		                                 sizeStyle="small",
-		                                 callback=self.model_selector)
+		self.w.model.selector = ComboBox(
+			"auto",
+			[model for model in self.font.selectedFontMaster.userData["KernOnModels"]],
+			sizeStyle="small",
+			callback=self.model_selector
+		)
 		self.w.model.value = EditText("auto", sizeStyle="small")
 		self.w.model.button = Button("auto", "−", sizeStyle="small", callback=self.delete_model)
 
@@ -64,10 +72,18 @@ class EditModels:
 		# make a group with two combo boxes, one for the first glyph of the model and one for the second glyph of the model
 
 		self.w.addModel.selector = Group("auto")
-		self.w.addModel.selector.first = ComboBox("auto", [glyph.name for glyph in self.font.glyphs],
-		                                          sizeStyle="small", callback=self.check_model)
-		self.w.addModel.selector.second = ComboBox("auto", [glyph.name for glyph in self.font.glyphs],
-		                                           sizeStyle="small", callback=self.check_model)
+		self.w.addModel.selector.first = ComboBox(
+			"auto",
+			[glyph.name for glyph in self.font.glyphs],
+			sizeStyle="small",
+			callback=self.check_model
+		)
+		self.w.addModel.selector.second = ComboBox(
+			"auto",
+			[glyph.name for glyph in self.font.glyphs],
+			sizeStyle="small",
+			callback=self.check_model
+		)
 
 		self.w.addModel.value = EditText("auto", "0", sizeStyle="small")
 		self.w.addModel.button = Button("auto", "+", sizeStyle="small", callback=self.add_model)
@@ -126,9 +142,11 @@ class EditModels:
 			self.font.masterIndex -= 1
 
 	def delete_model(self, sender):
-		self.font.removeKerningForPair(self.font.selectedFontMaster.id,
-		                               self.w.model.selector.get().split(" ")[0],
-		                               self.w.model.selector.get().split(" ")[1])
+		self.font.removeKerningForPair(
+			self.font.selectedFontMaster.id,
+			self.w.model.selector.get().split(" ")[0],
+			self.w.model.selector.get().split(" ")[1]
+		)
 		self.font.selectedFontMaster.userData["KernOnModels"].remove(self.w.model.selector.get())
 		self.set_models_items()
 
@@ -136,9 +154,11 @@ class EditModels:
 		if len(self.font.selectedFontMaster.userData["KernOnModels"]) > 0:
 			self.w.model.selector.setItems(self.font.selectedFontMaster.userData["KernOnModels"])
 			self.w.model.selector.set(self.font.selectedFontMaster.userData["KernOnModels"][0])
-			self.w.model.value.set(self.font.kerningForPair(self.font.selectedFontMaster.id,
-			                                                self.w.model.selector.get().split(" ")[0],
-			                                                self.w.model.selector.get().split(" ")[1]))
+			self.w.model.value.set(self.font.kerningForPair(
+				self.font.selectedFontMaster.id,
+				self.w.model.selector.get().split(" ")[0],
+				self.w.model.selector.get().split(" ")[1])
+			)
 		else:
 			self.w.model.selector.setItems(["No models"])
 			self.w.model.selector.set("No models")
@@ -150,15 +170,17 @@ class EditModels:
 	def edit_model(self, sender):
 		if not sender.get().isdigit():
 			return
-		self.font.setKerningForPair(self.font.selectedFontMaster.id,
-		                            self.w.model.selector.get().split(" ")[0],
-		                            self.w.model.selector.get().split(" ")[1],
-		                            self.w.model.value.get())
+		self.font.setKerningForPair(
+			self.font.selectedFontMaster.id,
+			self.w.model.selector.get().split(" ")[0],
+			self.w.model.selector.get().split(" ")[1],
+			self.w.model.value.get()
+		)
 
 	def check_model(self, sender):
 		# check whether both glyphs of the model exist in the font
 		if self.w.addModel.selector.first.get() in self.font.glyphs \
-				and self.w.addModel.selector.second.get() in self.font.glyphs:
+			and self.w.addModel.selector.second.get() in self.font.glyphs:
 			self.w.addModel.button.enable(True)
 			self.w.addModel.value.enable(True)
 		else:
@@ -172,10 +194,12 @@ class EditModels:
 			Message("Please select a different model.", "Model already present")
 			return
 		self.font.selectedFontMaster.userData["KernOnModels"].append(model)
-		self.font.setKerningForPair(self.font.selectedFontMaster.id,
-		                            self.w.addModel.selector.first.get(),
-		                            self.w.addModel.selector.second.get(),
-		                            int(self.w.addModel.value.get()))
+		self.font.setKerningForPair(
+			self.font.selectedFontMaster.id,
+			self.w.addModel.selector.first.get(),
+			self.w.addModel.selector.second.get(),
+			int(self.w.addModel.value.get())
+		)
 
 		self.w.model.selector.setItems(self.font.selectedFontMaster.userData["KernOnModels"])
 
@@ -188,16 +212,20 @@ class EditModels:
 			self.w.model.selector.enable(True)
 			self.w.model.selector.set(self.font.selectedFontMaster.userData["KernOnModels"][0])
 			self.w.model.value.enable(True)
-			self.w.model.value.set(self.font.kerningForPair(self.font.selectedFontMaster.id,
-			                                                self.w.model.selector.get().split(" ")[0],
-			                                                self.w.model.selector.get().split(" ")[1]))
+			self.w.model.value.set(self.font.kerningForPair(
+				self.font.selectedFontMaster.id,
+				self.w.model.selector.get().split(" ")[0],
+				self.w.model.selector.get().split(" ")[1]
+			))
 			self.w.model.button.enable(True)
 
 	def model_selector(self, sender):
 		try:
-			self.w.model.value.set(self.font.kerningForPair(self.font.selectedFontMaster.id,
-			                                                self.w.model.selector.get().split(" ")[0],
-			                                                self.w.model.selector.get().split(" ")[1]))
+			self.w.model.value.set(self.font.kerningForPair(
+				self.font.selectedFontMaster.id,
+				self.w.model.selector.get().split(" ")[0],
+				self.w.model.selector.get().split(" ")[1]
+			))
 		except:
 			pass
 

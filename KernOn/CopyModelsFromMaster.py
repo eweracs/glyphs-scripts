@@ -8,17 +8,18 @@ Copies Kern On models with values between masters.
 import sys
 
 import vanilla
+from GlyphsApp import Glyphs, Message, LTR
 
 
 class CopyMasterModels:
 	def __init__(self):
-		if Font is None:
+
+		self.font = Glyphs.font
+		if self.font is None:
 			Message("No font selected", "Select a font project!")
 			return
 
-		self.font = Font
-
-		if len([master for master in Font.masters if master.userData["KernOnModels"]]) == 0:
+		if len([master for master in self.font.masters if master.userData["KernOnModels"]]) == 0:
 			Message("Please set some models first.", "No Kern On models found")
 			return
 
@@ -33,8 +34,9 @@ class CopyMasterModels:
 		self.ypos += 24
 
 		self.w.sourceSelector = vanilla.PopUpButton(
-			(10, self.ypos, -100, 17), [str(i+1) + ": " + master.name for i, master in enumerate(self.font.masters)],
-			callback=self.select_source)
+			(10, self.ypos, -100, 17), [str(i + 1) + ": " + master.name for i, master in enumerate(self.font.masters)],
+			callback=self.select_source
+		)
 
 		self.w.modelCounter = vanilla.TextBox((-90, self.ypos, -10, 17), str(len(self.font.masters[
 			self.w.sourceSelector.get()].userData["KernOnModels"] or [])) + " models", sizeStyle="regular")
@@ -54,13 +56,17 @@ class CopyMasterModels:
 		self.ypos += 24
 
 		for i, master in enumerate(self.font.masters):
-			setattr(self.w, master.name + str(i), vanilla.CheckBox((10, self.ypos, -10, 17), master.name,
-			                                                       sizeStyle="regular"))
+			masterCheckBox = vanilla.CheckBox(
+				(10, self.ypos, -10, 17),
+				master.name,
+				sizeStyle="regular"
+			)
+			setattr(self.w, master.name + str(i), masterCheckBox)
 			if i == getattr(self.w, "sourceSelector").get():
-				getattr(self.w, master.name + str(i)).enable(False)
+				masterCheckBox.enable(False)
 			if master.userData["KernOnIsInterpolated"]:
-				getattr(self.w, master.name + str(i)).setTitle(master.name + " (Interpolated)")
-				getattr(self.w, master.name + str(i)).enable(False)
+				masterCheckBox.setTitle(master.name + " (Interpolated)")
+				masterCheckBox.enable(False)
 			self.ypos += 24
 
 		self.ypos += 6
