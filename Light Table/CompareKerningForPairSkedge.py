@@ -6,10 +6,7 @@ font = Glyphs.font
 
 glyph = font.glyphs[0]
 
-restoration_font = None
-
-if info := lt.RestorationInfo.info_for(glyph):
-	restoration_font = info.restoration_font
+restoration_font = Glyphs.font.lt_selected_version.font
 
 selected_font_master_index = font.masters.index(font.selectedFontMaster)
 
