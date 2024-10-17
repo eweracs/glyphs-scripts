@@ -1,3 +1,11 @@
+# MenuTitle: Recompose from Components
+# -*- coding: utf-8 -*-
+
+__doc__ = """
+Recompose the selected glyph from its components.
+"""
+
+
 def recompose_from_components():
 	parent = Layer.parent
 
