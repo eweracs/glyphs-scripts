@@ -90,7 +90,7 @@ class AddInktraps:
 		if prev_node is None or next_node is None:
 			print("Node is not connected to other nodes.")
 			return
-		if prev_node.type == "offcurve" or next_node.type == "offcurve":
+		if prev_node.type == OFFCURVE or next_node.type == OFFCURVE:
 			print("Node is an offcurve node.")
 			return
 
