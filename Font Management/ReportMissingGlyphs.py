@@ -5,7 +5,8 @@ __doc__ = """
 Reports glyphs missing in current font based on another font.
 """
 
-from vanilla import *
+from vanilla import FloatingWindow, Group, TextBox, PopUpButton, HorizontalLine, ScrollView, CheckBox, Button
+from GlyphsApp import Glyphs, GSGlyph, Message
 
 
 class ReportMissingGlyphs():
@@ -22,19 +23,24 @@ class ReportMissingGlyphs():
 
 		# add a title to display the name of the currently open font, without the extension
 		self.w.source = Group("auto")
-		self.w.source.title = TextBox("auto", "Font to inspect:",
-		                       sizeStyle="small")
-		self.w.source.select = TextBox("auto",  self.font.filepath.split("/")[-1].split(".")[0], sizeStyle="small")
+		self.w.source.title = TextBox(
+			"auto",
+			"Font to inspect:",
+			sizeStyle="small"
+		)
+		self.w.source.select = TextBox("auto", self.font.filepath.split("/")[-1].split(".")[0], sizeStyle="small")
 
 		# add a vanilla group
 		# add a title for the compare font
 		# add a popup to select the font to compare against
 		self.w.compare = Group("auto")
 		self.w.compare.title = TextBox("auto", "Compare against:", sizeStyle="small")
-		self.w.compare.select = PopUpButton("auto", [font.filepath.split("/")[-1].split(".")[0] for font in
-		                                             Glyphs.fonts if font != self.font],
-		                                    sizeStyle="small",
-		                                    callback=self.select_compare_font)
+		self.w.compare.select = PopUpButton(
+			"auto",
+			[font.filepath.split("/")[-1].split(".")[0] for font in Glyphs.fonts if font != self.font],
+			sizeStyle="small",
+			callback=self.select_compare_font
+		)
 
 		# add a divider
 		self.w.divider1 = HorizontalLine("auto")
@@ -46,23 +52,35 @@ class ReportMissingGlyphs():
 		self.w.missing = ScrollView("auto", self.missing.getNSView())
 
 		# check only exporting glyphs?
-		self.w.onlyExportingGlyphs = CheckBox("auto", "Only check exporting glyphs", sizeStyle="small",
-		                                      callback=self.update_missing_glyphs)
+		self.w.onlyExportingGlyphs = CheckBox(
+			"auto",
+			"Only check exporting glyphs",
+			sizeStyle="small",
+			callback=self.update_missing_glyphs
+		)
 
 		# ignore stylistic sets?
-		self.w.ignoreStylisticSets = CheckBox("auto", "Ignore stylistic set glyphs", sizeStyle="small",
-		                                      callback=self.update_missing_glyphs)
+		self.w.ignoreStylisticSets = CheckBox(
+			"auto",
+			"Ignore stylistic set glyphs",
+			sizeStyle="small",
+			callback=self.update_missing_glyphs
+		)
 
 		# add a divider
 		self.w.divider2 = HorizontalLine("auto")
 
 		# add a checkbox to open a tab with the generated glyphs
-		self.w.openTab = CheckBox("auto", "Open tab with generated glyphs", sizeStyle="small",
-		                          callback=self.save_preferences)
+		self.w.openTab = CheckBox(
+			"auto",
+			"Open tab with generated glyphs",
+			sizeStyle="small",
+			callback=self.save_preferences
+		)
 
 		# add a button to generate the missing glyphs
 		self.w.generate = Button("auto", "Generate missing glyphs", callback=self.generate_missing_glyphs)
-		
+
 		group_rules = [
 			"H:|[title]-margin-[select]|",
 			"V:[title]",

@@ -22,25 +22,38 @@ Copies HTLS Parameters Between Masters.
 # If the second box is selected: copy the parameters from the first half of the masters to the other half of the masters
 # Make the copy button the default button
 
-from vanilla import *
+from vanilla import FloatingWindow, TextBox, CheckBox, PopUpButton, HorizontalLine, Button
+from GlyphsApp import Glyphs, Message
+
 
 class CopyParameters():
 	def __init__(self):
 
-		self.font = Font
-		if self.font == None:
+		self.font = Glyphs.font
+		if self.font is None:
 			Message("No font selected", "Select a font project")
 			return
 
 		self.w = FloatingWindow((1, 1), "Copy Parameters")
 		self.w.title = TextBox("auto", "Copy parameters from:", sizeStyle="small")
 
-		self.w.currentMasterTo = CheckBox("auto", "Current master to", sizeStyle="small",
-		                               callback=self.link_check_boxes)
-		self.w.masterSelector = PopUpButton("auto", [master.name for master in self.font.masters if master is not
-		                                             self.font.selectedFontMaster], sizeStyle="small")
-		self.w.firstHalfMasters = CheckBox("auto", "First half of masters to the other half", sizeStyle="small",
-		                                     callback=self.link_check_boxes)
+		self.w.currentMasterTo = CheckBox(
+			"auto",
+			"Current master to",
+			sizeStyle="small",
+			callback=self.link_check_boxes
+		)
+		self.w.masterSelector = PopUpButton(
+			"auto",
+			[master.name for master in self.font.masters if master is not self.font.selectedFontMaster],
+			sizeStyle="small"
+		)
+		self.w.firstHalfMasters = CheckBox(
+			"auto",
+			"First half of masters to the other half",
+			sizeStyle="small",
+			callback=self.link_check_boxes
+		)
 		self.w.currentMasterTo.set(1)
 		self.w.firstHalfMasters.set(0)
 
@@ -82,8 +95,9 @@ class CopyParameters():
 					master.customParameters = self.font.selectedFontMaster.customParameters
 
 		if self.w.firstHalfMasters.get():
-			for master in self.font.masters[:len(self.font.masters)//2]:
-				other_master = self.font.masters[len(self.font.masters)//2 + self.font.masters.index(master)]
+			for master in self.font.masters[:len(self.font.masters) // 2]:
+				other_master = self.font.masters[len(self.font.masters) // 2 + self.font.masters.index(master)]
 				other_master.customParameters = master.customParameters
+
 
 CopyParameters()

@@ -5,12 +5,14 @@ __doc__ = """
 Adds guides for accents based on the current design.
 """
 
-from vanilla import *
+from vanilla import FloatingWindow, Group, TextBox, CheckBox, PopUpButton, HorizontalLine, Button
 from Foundation import NSPoint
+from GlyphsApp import Glyphs, GSGuide, Message
+
 
 class AddGuides:
 	def __init__(self):
-		self.font = Font
+		self.font = Glyphs.font
 
 		if self.font is None:
 			Message("No font selected", "Select a font project!")

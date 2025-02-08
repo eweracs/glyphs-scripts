@@ -5,6 +5,8 @@ __doc__ = """
 Toggles the activation state of special layers (intermediate or alternate).
 """
 
+from GlyphsApp import Glyphs, Message
+
 
 def toggle_special_layer(layer):
 	if layer.attributes:
@@ -31,5 +33,5 @@ def toggle_special_layer(layer):
 		del layer.userData["attributes"]
 
 
-for layer in Font.selectedLayers:
+for layer in Glyphs.font.selectedLayers:
 	toggle_special_layer(layer)

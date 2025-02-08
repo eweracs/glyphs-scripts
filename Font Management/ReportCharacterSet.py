@@ -5,15 +5,17 @@ __doc__ = """
 Reports the character set of the current font.
 """
 
-from vanilla import *
+from vanilla import FloatingWindow, CheckBox, Group, TextBox, EditText, HorizontalLine, Button
+from GlyphsApp import Glyphs, Message
 
 # Report the glyph names in the current font to the console.
 # Options to exclude non-exporting glyphs, stylistic sets. and suffixed glyphs.
 # auto alignment in vanilla attributes
 
+
 class ReportCharacterSet:
 	def __init__(self):
-		self.font = Font
+		self.font = Glyphs.font
 
 		if self.font is None:
 			Message("No font selected", "Select a font project!")
@@ -27,8 +29,11 @@ class ReportCharacterSet:
 
 		self.w.includeSuffixes = Group("auto")
 		self.w.includeSuffixes.title = TextBox("auto", "Except:", sizeStyle="small")
-		self.w.includeSuffixes.suffixes = EditText("auto", text="case tf dnom numr loclCAT alt notdef",
-		                                           sizeStyle="small")
+		self.w.includeSuffixes.suffixes = EditText(
+			"auto",
+			text="case tf dnom numr loclCAT alt notdef",
+			sizeStyle="small"
+		)
 
 		self.w.divider = HorizontalLine("auto")
 
@@ -61,7 +66,6 @@ class ReportCharacterSet:
 		self.w.addAutoPosSizeRules(rules, metrics)
 		self.w.open()
 		self.w.makeKey()
-
 
 	def report_glyphs(self, sender):
 		character_set = []

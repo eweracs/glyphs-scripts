@@ -6,16 +6,17 @@ Allows to visually interpolate instances or intermediate layers.
 """
 
 import vanilla
+from GlyphsApp import Glyphs, GSInstance, GSLayer, Message
 
 
 class Interpolator:
 	def __init__(self):
 
-		if Font is None:
+		self.font = Glyphs.font
+
+		if self.font is None:
 			Message("No font selected", "Select a font project!")
 			return
-
-		self.font = Font
 
 		self.font.instances.append(GSInstance())
 		self.font.instances[-1].name = "Interpolator Preview"
@@ -71,8 +72,10 @@ class Interpolator:
 				del axisRange[1:-1]  # delete intermediate master coordinates
 
 			if len(self.axesRanges[i]) == 1:
-				Message("Please add more than one axis coordinate in your masters.", "Invalid axis coordinates for "
-				        + axis.name + " axis")
+				Message(
+					"Please add more than one axis coordinate in your masters.",
+					"Invalid axis coordinates for " + axis.name + " axis"
+				)
 				return
 
 			if str(Glyphs.versionNumber)[0] == "3":
@@ -82,14 +85,17 @@ class Interpolator:
 				axis_tag = axis["Tag"]
 				axis_name = axis["Name"]
 
-			setattr(self.w, axis_tag + "title", vanilla.TextBox((10, 20 + i * 30, -10, 14),
-			                                                    axis_name, sizeStyle="small"))
-			s = vanilla.Slider((60, 20 + i * 30, -70, 15),
-			                   minValue=sorted(self.axesRanges[i])[0],
-			                   maxValue=sorted(self.axesRanges[i])[1],
-			                   value=self.currentCoords[i],
-			                   sizeStyle="small",
-			                   callback=self.axis_slider)
+			setattr(self.w, axis_tag + "title", vanilla.TextBox(
+				(10, 20 + i * 30, -10, 14), axis_name, sizeStyle="small")
+			)
+			s = vanilla.Slider(
+				(60, 20 + i * 30, -70, 15),
+				minValue=sorted(self.axesRanges[i])[0],
+				maxValue=sorted(self.axesRanges[i])[1],
+				value=self.currentCoords[i],
+				sizeStyle="small",
+				callback=self.axis_slider
+			)
 			setattr(self.w, axis_tag + "slider", s)
 			self.sliderList.append(s)
 
@@ -100,21 +106,26 @@ class Interpolator:
 		self.ypos = s.getPosSize()[1] + 36
 
 		if self.font.instances:
-			self.w.selectInstanceTitle = vanilla.TextBox((10, self.ypos, -10, 14), "Copy from instance:",
-			                                             sizeStyle="small")
-			setattr(self.w, "instanceSelect", vanilla.PopUpButton((130, self.ypos, -10, 17),
-			                                                      [i.name for i in self.font.instances],
-			                                                      callback=self.instance_selector))
+			self.w.selectInstanceTitle = vanilla.TextBox(
+				(10, self.ypos, -10, 14), "Copy from instance:", sizeStyle="small"
+			)
+			setattr(self.w, "instanceSelect", vanilla.PopUpButton(
+				(130, self.ypos, -10, 17),
+				[i.name for i in self.font.instances],
+				callback=self.instance_selector)
+			)
 			self.ypos += 32
 
 		setattr(self.w, "separator", vanilla.HorizontalLine((10, self.ypos, -10, 1)))
 
 		self.ypos += 16
 
-		setattr(self.w, "addMenu", vanilla.Button((155, self.ypos, -10, 20), "Instance...",
-		                                          callback=self.add_instance_menu))
-		setattr(self.w, "addIntermediate", vanilla.Button((10, self.ypos, -155, 20), "Intermediate...",
-		                                                  callback=self.intermediate_menu))
+		setattr(self.w, "addMenu", vanilla.Button(
+			(155, self.ypos, -10, 20), "Instance...", callback=self.add_instance_menu)
+		)
+		setattr(self.w, "addIntermediate", vanilla.Button(
+			(10, self.ypos, -155, 20), "Intermediate...", callback=self.intermediate_menu)
+		)
 
 		self.w.resize(300, self.w.addMenu.getPosSize()[1] + 30)
 
@@ -141,24 +152,32 @@ class Interpolator:
 
 		try:
 			setattr(self.w, "instanceName", vanilla.TextBox((10, self.ypos, 60, 14), "Name", sizeStyle="small"))
-			setattr(self.w, "nameSelector", vanilla.EditText((60, self.ypos, -10, 19),
-			                                                 placeholder=self.namePlaceholder, sizeStyle="small",
-			                                                 callback=self.instance_name))
+			setattr(self.w, "nameSelector", vanilla.EditText(
+				(60, self.ypos, -10, 19),
+				placeholder=self.namePlaceholder, sizeStyle="small",
+				callback=self.instance_name)
+			)
 
 			self.ypos += 41
 
 			for i, axis in enumerate(self.styleClasses):
-				c = vanilla.PopUpButton((60, self.ypos + i * 30, -10, 17), list(self.styleClasses[axis].values()),
-				                        callback=self.class_selector)
+				c = vanilla.PopUpButton(
+					(60, self.ypos + i * 30, -10, 17), list(self.styleClasses[axis].values()),
+					callback=self.class_selector
+				)
 				c.set(4)
 				setattr(self.w, axis + "classSelector", c)
 				self.popUpButtonList.append(c)
-				setattr(self.w, axis + "ClassTitle", vanilla.TextBox((10, self.ypos + i * 30, 60, 14), axis,
-				                                                     sizeStyle="small"))
+				setattr(self.w, axis + "ClassTitle", vanilla.TextBox(
+					(10, self.ypos + i * 30, 60, 14), axis,
+					sizeStyle="small")
+				)
 				if i == 2:
 					break
-			setattr(self.w, "generate", vanilla.Button((10, c.getPosSize()[1] + 30, -10, 20), "Make Instance",
-			                                           callback=self.write_instance))
+			self.w.generate = vanilla.Button(
+				(10, c.getPosSize()[1] + 30, -10, 20), "Make Instance",
+				callback=self.write_instance
+			)
 			self.w.setDefaultButton(self.w.generate)
 			self.w.resize(300, self.w.generate.getPosSize()[1] + 30)
 		except Exception:
@@ -248,14 +267,20 @@ class Interpolator:
 		self.ypos = self.w.addIntermediate.getPosSize()[1] + 40
 
 		try:
-			setattr(self.w, "intermediateTitle",
-			        vanilla.TextBox((10, self.ypos, 60, 14), "Parent Master", sizeStyle="small"))
-			setattr(self.w, "parentSelector",
-			        vanilla.PopUpButton((60, self.ypos, -10, 17), [master.name for master in self.font.masters],
-			                            callback=self.parent_selector))
+			self.w.intermediateTitle = vanilla.TextBox(
+				(10, self.ypos, 60, 14), "Parent Master", sizeStyle="small"
+			)
+			self.w.parentSelector = vanilla.PopUpButton(
+				(60, self.ypos, -10, 17),
+				[master.name for master in self.font.masters],
+				callback=self.parent_selector
+			)
 			self.ypos += 30
-			setattr(self.w, "makeIntermediate", vanilla.Button((10, self.ypos, -10, 20), "Make Intermediate",
-			                                                   callback=self.make_intermediate))
+			self.w.makeIntermediate = vanilla.Button(
+				(10, self.ypos, -10, 20),
+				"Make Intermediate",
+				callback=self.make_intermediate
+			)
 
 			self.w.setDefaultButton(self.w.makeIntermediate)
 			self.w.resize(300, self.w.makeIntermediate.getPosSize()[1] + 30)
@@ -267,8 +292,9 @@ class Interpolator:
 		for layer in self.font.selectedLayers:
 			new_layer = GSLayer()
 			if str(Glyphs.versionNumber)[0] == "3":
-				new_layer.attributes["coordinates"] = {self.font.axes[i].axisId: coordinate for i, coordinate in
-				                                       enumerate(self.currentCoords)}
+				new_layer.attributes["coordinates"] = {
+					self.font.axes[i].axisId: coordinate for i, coordinate in enumerate(self.currentCoords)
+				}
 			else:
 				new_layer.name = "{" + ", ".join([str(axis) for axis in self.currentCoords]) + "}"
 			new_layer.associatedMasterId = self.font.masters[self.selectedParent].id

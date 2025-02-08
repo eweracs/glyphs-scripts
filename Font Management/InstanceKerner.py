@@ -6,12 +6,17 @@ Writes Replace Feature custom parameter to instances for kern/cpsp
 """
 
 import vanilla
+from GlyphsApp import Glyphs, Message
 
 
 class InstanceKerner:
 
 	def __init__(self):
-		self.font = Font
+		self.font = Glyphs.font
+
+		if self.font is None:
+			Message("No font selected", "Select a font project!")
+			return
 
 		# UI element indents init
 		x = 10
@@ -78,17 +83,18 @@ class InstanceKerner:
 		class1 = str(self.ot_classes[self.w.otClass1.get()])
 		class2 = str(self.ot_classes[self.w.otClass2.get()])
 
-		if not Font.features[self.feature_selection]:  # if the feature to be replaced doesn't exist yet, write it
+		if not self.font.features[self.feature_selection]:  # if the feature to be replaced doesn't exist yet, write it
 			if self.feature_selection == "kern":
-				Font.features["kern"] = "pos @{} {} @{};".format(class1, self.master_1_kern, class2)
+				self.font.features["kern"] = "pos @{} {} @{};".format(class1, self.master_1_kern, class2)
 			elif self.feature_selection == "cpsp":
-				Font.features["cpsp"] = "pos @Uppercase <{} 0 {} 0>;".format(self.master_1_kern, self.master_1_kern*2)
+				self.font.features["cpsp"] = "pos @Uppercase <{} 0 {} 0>;".format(self.master_1_kern, self.master_1_kern * 2)
 
 		number = 0
-		for instance in Font.instances:
+		for instance in self.font.instances:
 			if instance.active:
-				kern = float((self.master_2_kern - self.master_1_kern) / self.axis_1_range
-				             * (instance.axes[0] - self.master1)) + self.master_1_kern
+				kern = float(
+					(self.master_2_kern - self.master_1_kern) / self.axis_1_range * (instance.axes[0] - self.master1)
+				) + self.master_1_kern
 				# calculate the kern value for current instance
 
 				# if Replace Feature already exists, append kern text
@@ -96,24 +102,36 @@ class InstanceKerner:
 					if self.feature_selection == "kern":
 						# check whether kern; is already set (does not work for e.g. kern; cpsp; kern; order, to-do
 						if "kern" in instance.customParameters["Replace Feature"]:
-							kern_text = "{}\npos @{} {} @{};".format(instance.customParameters["Replace Feature"], class1,
-							                                         int(kern), class2)
+							kern_text = "{}\npos @{} {} @{};".format(
+								instance.customParameters["Replace Feature"], class1,
+								int(kern),
+								class2
+							)
 						else:
-							kern_text = "{}\nkern;\npos @{} {} @{};".format(instance.customParameters["replace Feature"],
-							                                                class1, int(kern), class2)
-
+							kern_text = "{}\nkern;\npos @{} {} @{};".format(
+								instance.customParameters["replace Feature"],
+								class1,
+								int(kern),
+								class2
+							)
 					else:
 						if "cpsp" in instance.customParameters["Replace Feature"]:
-							kern_text = "{}\npos @Uppercase <{} 0 {} 0>;".format(instance.customParameters["Replace Feature"],
-							                                                     int(kern), int(kern)*2)
+							kern_text = "{}\npos @Uppercase <{} 0 {} 0>;".format(
+								instance.customParameters["Replace Feature"],
+								int(kern),
+								int(kern) * 2
+							)
 						else:
-							kern_text = "{}\ncpsp;\npos @Uppercase <{} 0 {} 0>;".format(instance.customParameters["Replace Feature"],
-							                                                            int(kern), int(kern)*2)
+							kern_text = "{}\ncpsp;\npos @Uppercase <{} 0 {} 0>;".format(
+								instance.customParameters["Replace Feature"],
+								int(kern),
+								int(kern) * 2
+							)
 				else:
 					if self.feature_selection == "kern":
 						kern_text = "kern;\npos @{} {} @{};".format(class1, int(kern), class2)
 					else:
-						kern_text = "cpsp;\npos @Uppercase <{} 0 {} 0>;".format(int(kern), int(kern)*2)
+						kern_text = "cpsp;\npos @Uppercase <{} 0 {} 0>;".format(int(kern), int(kern) * 2)
 				instance.customParameters["Replace Feature"] = kern_text
 				number += 1
 
