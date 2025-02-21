@@ -22,7 +22,9 @@ for master in Font.masters:
 			all_models.append(model)
 
 for master in Font.masters:
-	if master.userData["KernOnAutoKernedFrom"] or master.userData["KernOnIsInterpolated"]:
+	if master.userData["KernOnAutoKernedFrom"] or master.userData["KernOnIsInterpolated"] or not master.userData["KernOnModels"]:
+		continue
+	if not len(master.userData["KernOnModels"]):
 		continue
 	missing_models = []
 	for model in all_models:
