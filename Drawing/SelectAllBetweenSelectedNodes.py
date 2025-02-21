@@ -7,8 +7,9 @@ Selects all nodes between the first and last selected node in a path.
 
 
 def select_all_nodes_between_selected_nodes():
-	selected_nodes = [selection for selection in Layer.selection if
-					  type(selection) == GSNode]  # get all the selected nodes
+	selected_nodes = [
+		selection for selection in Layer.selection if isinstance(selection, GSNode)
+	]  # get all the selected nodes
 
 	if len(selected_nodes) >= 2:  # if at least two nodes are selected
 		parent_path = selected_nodes[0].parent

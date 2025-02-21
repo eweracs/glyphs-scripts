@@ -9,16 +9,17 @@ Sets base zero models for Kern On.
 #  checkbox for smallcaps, small figures
 #  overwrite or append models
 
-import vanilla
+from vanilla import FloatingWindow, TextBox, TextEditor, Button, CheckBox, EditText
+from GlyphsApp import Glyphs, Message
 
 
 class Modeller:
 	def __init__(self):
-		if Font is None:
+
+		self.font = self.font
+		if self.font is None:
 			Message("No font selected", "Select a font project!")
 			return
-
-		self.font = Font
 
 		self.prefs = {}
 
@@ -105,24 +106,40 @@ class Modeller:
 
 		self.selected_master = self.font.masters[0]
 
-		self.w = vanilla.FloatingWindow((0, 0), "Set base models")
+		self.w = FloatingWindow((0, 0), "Set base models")
 
-		self.w.modelsTitle = vanilla.TextBox((10, 10, -10, 14), "Model list", sizeStyle="small")
-		self.w.editModels = vanilla.TextEditor((10, 32, 145, -40), text="\n".join(self.prefs["modelList"]),
-		                                       callback=self.edit_models)
-		self.w.resetDefaults = vanilla.Button((10, -32, 145, 20), "Restore defaults",
-		                                      callback=self.restore_defaults)
-		self.w.addCapitalSpacingCheckBox = vanilla.CheckBox((165, 8, -10, 20), "Add capital kerning",
-		                                                    sizeStyle="small", value=self.prefs["capitalKerning"],
-		                                                    callback=self.toggle_capital_kerning)
+		self.w.modelsTitle = TextBox((10, 10, -10, 14), "Model list", sizeStyle="small")
+		self.w.editModels = TextEditor(
+			(10, 32, 145, -40),
+			text="\n".join(self.prefs["modelList"]),
+			callback=self.edit_models
+		)
+		self.w.resetDefaults = Button(
+			(10, -32, 145, 20),
+			"Restore defaults",
+			callback=self.restore_defaults
+		)
+		self.w.addCapitalSpacingCheckBox = CheckBox(
+			(165, 8, -10, 20),
+			"Add capital kerning",
+			sizeStyle="small",
+			value=self.prefs["capitalKerning"],
+			callback=self.toggle_capital_kerning
+		)
 
 		self.ypos = 34
 
 		for i, master in enumerate(self.font.masters):
-			setattr(self.w, "master" + str(i), vanilla.TextBox((165, self.ypos, -60, 17), master.name,
-			                                                   sizeStyle="regular"))
-			setattr(self.w, "kern" + str(i), vanilla.EditText((-50, self.ypos - 1, -10, 22), text="0",
-			                                                  callback=self.set_master_kern_value))
+			setattr(self.w, "master" + str(i), TextBox(
+				(165, self.ypos, -60, 17),
+				master.name,
+				sizeStyle="regular"
+			))
+			setattr(self.w, "kern" + str(i), EditText(
+				(-50, self.ypos - 1, -10, 22),
+				text="0",
+				callback=self.set_master_kern_value
+			))
 			self.ypos += 28
 
 		self.w.kern0.selectAll()
@@ -131,9 +148,14 @@ class Modeller:
 		if self.ypos <= 160:
 			self.ypos = 160
 
-		self.w.allMasters = vanilla.CheckBox((165, -56, -10, 18), "Apply to all masters", sizeStyle="small",
-		                                     value=self.allMasters, callback=self.select_all_masters)
-		self.w.setModelsButton = vanilla.Button((165, -32, -10, 20), "Set zero models", callback=self.set_models)
+		self.w.allMasters = CheckBox(
+			(165, -56, -10, 18),
+			"Apply to all masters", 
+			sizeStyle="small",
+			value=self.allMasters,
+			callback=self.select_all_masters
+		)
+		self.w.setModelsButton = Button((165, -32, -10, 20), "Set zero models", callback=self.set_models)
 
 		self.toggle_master_input_fields()
 		self.toggle_default_button()
@@ -209,9 +231,10 @@ class Modeller:
 				master.userData["KernOnModels"].append(model)
 				self.font.setKerningForPair(master.id, model.split(" ")[0], model.split(" ")[1], kern_value)
 
-		Glyphs.showNotification(title="Set Kern on base models",
-		                        message="Zero models set in " + ["current master", "all masters"][self.allMasters] +
-		                                " for " + str(len(self.models)) + " models.")
+		Glyphs.showNotification(
+			title="Set Kern on base models",
+			message="Zero models set in " + ["current master", "all masters"][self.allMasters] + " for " + str(len(self.models)) + " models."
+		)
 
 		self.write_prefs()
 

@@ -5,8 +5,8 @@ __doc__ = """
 Copies a selection of glyphs from a source font to a target font.
 """
 
-from vanilla import *
-
+from vanilla import FloatingWindow, Group, TextBox, PopUpButton, TextEditor, CheckBox, HorizontalLine, Button
+from GlyphsApp import Glyphs, Message
 
 # Build a vanilla UI that has a selector for the source font and a selector for the target font
 # Add a scrolling text field where you can enter the glyphs you want to copy
@@ -16,9 +16,10 @@ from vanilla import *
 # import preferences at the beginning of the script
 # write preferences when the copy button is pressed
 
+
 class CopyGlyphs:
 	def __init__(self):
-		self.font = Font
+		self.font = Glyphs.font
 
 		if self.font is None:
 			Message("No font selected", "Select a font project!")
@@ -34,13 +35,19 @@ class CopyGlyphs:
 		self.w = FloatingWindow((1, 1), "")
 		self.w.sourceFont = Group("auto")
 		self.w.sourceFont.title = TextBox("auto", "Source font:")
-		self.w.sourceFont.selector = PopUpButton("auto", [str(i + 1) + ": " + font for i, font in enumerate(file_list)],
-		                                         callback=self.check_source_target)
+		self.w.sourceFont.selector = PopUpButton(
+			"auto",
+			[str(i + 1) + ": " + font for i, font in enumerate(file_list)],
+			callback=self.check_source_target
+		)
 
 		self.w.targetFont = Group("auto")
 		self.w.targetFont.title = TextBox("auto", "Target font:")
-		self.w.targetFont.selector = PopUpButton("auto", [str(i + 1) + ": " + font for i, font in enumerate(file_list)],
-		                                         callback=self.check_source_target)
+		self.w.targetFont.selector = PopUpButton(
+			"auto",
+			[str(i + 1) + ": " + font for i, font in enumerate(file_list)],
+			callback=self.check_source_target
+		)
 		self.w.targetFont.selector.set(1)
 
 		self.w.glyphs = Group("auto")

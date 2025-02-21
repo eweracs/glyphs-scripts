@@ -5,12 +5,12 @@ __doc__ = """
 Prints a tab with all layers with mixed paths/components, or more than one component with missing automatic alignment.
 """
 
-from vanilla import *
+from GlyphsApp import Glyphs, Message
 
 
 class ReportMissingAutomaticAlignment:
 	def __init__(self):
-		self.font = Font
+		self.font = Glyphs.font
 
 		if self.font is None:
 			Message("No font selected", "Select a font project!")

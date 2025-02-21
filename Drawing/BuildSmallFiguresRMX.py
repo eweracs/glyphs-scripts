@@ -5,14 +5,15 @@ __doc__ = """
 Builds small figures with RMX added to base glyphs.
 """
 
-import vanilla
+from vanilla import FloatingWindow, TextBox, Group, PopUpButton, HorizontalLine, SegmentedButton, EditText, CheckBox, Button
 from Foundation import NSPoint
+from GlyphsApp import Glyphs, GSGlyph, GSComponent, Message, UPDATEINTERFACE
 
 
 class BuildFigures:
 	def __init__(self):
 
-		self.font = Font
+		self.font = Glyphs.font
 		if self.font is None:
 			Message("No font selected", "Select a font project!")
 			return
@@ -21,75 +22,82 @@ class BuildFigures:
 
 		self.base_suffixes = [".dnom", "inferior", ".numr", "superior"]
 
-		self.w = vanilla.FloatingWindow((0, 0), "Build Small Figures RMX")
+		self.w = FloatingWindow((0, 0), "Build Small Figures RMX")
 
-		self.w.descriptionText = vanilla.TextBox("auto",
-		                                         "After defining RMX values for the base figures, these values will be "
-		                                         "written to the glyphs. Open RMX Scaler on these afterwards to scale "
-		                                         "them accordingly.",
-		                                         sizeStyle="small")
+		self.w.descriptionText = TextBox(
+			"auto",
+			"After defining RMX values for the base figures, these values will be "
+			"written to the glyphs. Open RMX Scaler on these afterwards to scale "
+			"them accordingly.",
+			sizeStyle="small"
+		)
 
-		self.w.source = vanilla.Group("auto")
-		self.w.source.title = vanilla.TextBox("auto", "Source figures:", sizeStyle="small")
-		self.w.source.selector = vanilla.PopUpButton("auto", ["Default", "Proportional .lf", "Tabular .tf"],
-		                                             sizeStyle="small", callback=self.select_source)
+		self.w.source = Group("auto")
+		self.w.source.title = TextBox("auto", "Source figures:", sizeStyle="small")
+		self.w.source.selector = PopUpButton(
+			"auto", ["Default", "Proportional .lf", "Tabular .tf"], sizeStyle="small", callback=self.select_source
+		)
 
-		self.w.default = vanilla.Group("auto")
-		self.w.default.title = vanilla.TextBox("auto", "Target figures:", sizeStyle="small")
-		self.w.default.selector = vanilla.PopUpButton("auto", self.base_suffixes,
-		                                              sizeStyle="small",
-		                                              callback=self.select_default)
+		self.w.default = Group("auto")
+		self.w.default.title = TextBox("auto", "Target figures:", sizeStyle="small")
+		self.w.default.selector = PopUpButton(
+			"auto", self.base_suffixes, sizeStyle="small", callback=self.select_default
+		)
 
-		self.w.divider1 = vanilla.HorizontalLine("auto")
+		self.w.divider1 = HorizontalLine("auto")
 
-		self.w.master = vanilla.Group("auto")
-		self.w.master.title = vanilla.TextBox("auto", "Master: " + self.font.selectedFontMaster.name, sizeStyle="small")
-		self.w.master.selector = vanilla.SegmentedButton("auto", [dict(title="←"), dict(title="→")],
-            callback=self.master_switcher)
+		self.w.master = Group("auto")
+		self.w.master.title = TextBox(
+			"auto", "Master: " + self.font.selectedFontMaster.name, sizeStyle="small"
+		)
+		self.w.master.selector = SegmentedButton(
+			"auto", [dict(title="←"), dict(title="→")], callback=self.master_switcher
+		)
 
-		self.w.paramTitles = vanilla.Group("auto")
-		self.w.paramTitles.width = vanilla.TextBox("auto", "Width %", sizeStyle="small")
-		self.w.paramTitles.height = vanilla.TextBox("auto", "Height %", sizeStyle="small")
-		self.w.paramTitles.weight = vanilla.TextBox("auto", "Weight", sizeStyle="small")
+		self.w.paramTitles = Group("auto")
+		self.w.paramTitles.width = TextBox("auto", "Width %", sizeStyle="small")
+		self.w.paramTitles.height = TextBox("auto", "Height %", sizeStyle="small")
+		self.w.paramTitles.weight = TextBox("auto", "Weight", sizeStyle="small")
 
-		self.w.paramEntries = vanilla.Group("auto")
-		self.w.paramEntries.width = vanilla.EditText("auto", sizeStyle="small", text="0", callback=self.param_input)
-		self.w.paramEntries.height = vanilla.EditText("auto", sizeStyle="small", text="0", callback=self.param_input)
-		self.w.paramEntries.weight = vanilla.EditText("auto", sizeStyle="small", text="0", callback=self.param_input)
+		self.w.paramEntries = Group("auto")
+		self.w.paramEntries.width = EditText("auto", sizeStyle="small", text="0", callback=self.param_input)
+		self.w.paramEntries.height = EditText("auto", sizeStyle="small", text="0", callback=self.param_input)
+		self.w.paramEntries.weight = EditText("auto", sizeStyle="small", text="0", callback=self.param_input)
 
-		self.w.divider2 = vanilla.HorizontalLine("auto")
+		self.w.divider2 = HorizontalLine("auto")
 
-		self.w.componentTitles = vanilla.Group("auto")
-		self.w.componentTitles.figures = vanilla.TextBox("auto", "Build components:",
-		                                                 sizeStyle="small")
+		self.w.componentTitles = Group("auto")
+		self.w.componentTitles.figures = TextBox(
+			"auto", "Build components:", sizeStyle="small"
+		)
 
-		self.w.componentTitles.yShift = vanilla.TextBox("auto", "y shift:",
-		                                                sizeStyle="small", alignment="left")
+		self.w.componentTitles.yShift = TextBox(
+			"auto", "y shift:", sizeStyle="small", alignment="left"
+		)
 
-		self.w.dnom = vanilla.Group("auto")
-		self.w.dnom.select = vanilla.CheckBox("auto", ".dnom", sizeStyle="small")
-		self.w.dnom.shift = vanilla.EditText("auto", text="0", sizeStyle="small")
+		self.w.dnom = Group("auto")
+		self.w.dnom.select = CheckBox("auto", ".dnom", sizeStyle="small")
+		self.w.dnom.shift = EditText("auto", text="0", sizeStyle="small")
 
-		self.w.inferior = vanilla.Group("auto")
-		self.w.inferior.select = vanilla.CheckBox("auto", "inferior", sizeStyle="small")
-		self.w.inferior.shift = vanilla.EditText("auto", text="-100", sizeStyle="small")
+		self.w.inferior = Group("auto")
+		self.w.inferior.select = CheckBox("auto", "inferior", sizeStyle="small")
+		self.w.inferior.shift = EditText("auto", text="-100", sizeStyle="small")
 
-		self.w.numr = vanilla.Group("auto")
-		self.w.numr.select = vanilla.CheckBox("auto", ".numr", sizeStyle="small")
-		self.w.numr.shift = vanilla.EditText("auto", text="300", sizeStyle="small")
+		self.w.numr = Group("auto")
+		self.w.numr.select = CheckBox("auto", ".numr", sizeStyle="small")
+		self.w.numr.shift = EditText("auto", text="300", sizeStyle="small")
 
-		self.w.superior = vanilla.Group("auto")
-		self.w.superior.select = vanilla.CheckBox("auto", "superior", sizeStyle="small")
-		self.w.superior.shift = vanilla.EditText("auto", text="350", sizeStyle="small")
+		self.w.superior = Group("auto")
+		self.w.superior.select = CheckBox("auto", "superior", sizeStyle="small")
+		self.w.superior.shift = EditText("auto", text="350", sizeStyle="small")
 
-		self.w.divider3 = vanilla.HorizontalLine("auto")
+		self.w.divider3 = HorizontalLine("auto")
 
-		# self.w.allMasters = vanilla.Group("auto")
-		# self.w.allMasters.select = vanilla.CheckBox("auto", "Apply to all masters", sizeStyle="small")
-		# self.w.allMasters.shift = vanilla.TextBox("auto", "")
+		# self.w.allMasters = Group("auto")
+		# self.w.allMasters.select = CheckBox("auto", "Apply to all masters", sizeStyle="small")
+		# self.w.allMasters.shift = TextBox("auto", "")
 
-
-		self.w.writeButton = vanilla.Button("auto", "Make figures", callback=self.make_figures)
+		self.w.writeButton = Button("auto", "Make figures", callback=self.make_figures)
 
 		self.load_preferences()
 
@@ -110,10 +118,12 @@ class BuildFigures:
 			]
 		]
 
-		rules.append("V:|-border-[descriptionText]-space-[source]-margin-[default(==source)]-margin-[divider1]-margin-"
-		             "[master]-margin-[paramTitles]-margin-[paramEntries]-margin-[divider2]-margin-"
-		             "[componentTitles]-margin-[dnom]-thin-[inferior]-thin-[numr]-thin-[superior]-margin-[divider3]"
-		             "-margin-[writeButton]-border-|")
+		rules.append(
+			"V:|-border-[descriptionText]-space-[source]-margin-[default(==source)]-margin-[divider1]-margin-"
+			"[master]-margin-[paramTitles]-margin-[paramEntries]-margin-[divider2]-margin-"
+			"[componentTitles]-margin-[dnom]-thin-[inferior]-thin-[numr]-thin-[superior]-margin-[divider3]"
+			"-margin-[writeButton]-border-|"
+		)
 
 		metrics = {
 			"buttonWidth": 70,
@@ -207,7 +217,7 @@ class BuildFigures:
 
 		self.write_preferences()
 		self.select_source(None)
-		if self.select_source(None) == False:
+		if not self.select_source(None):
 			return
 
 		RMX_layers = []
@@ -222,14 +232,14 @@ class BuildFigures:
 				for layer in glyph.layers:
 					layer.userData["RMXScaler"] = {}
 					for name in self.masterParams[layer.master.id]:
-							layer.userData["RMXScaler"][name] = int(self.masterParams[layer.master.id][name])
+						layer.userData["RMXScaler"][name] = int(self.masterParams[layer.master.id][name])
 					RMX_layers.append(layer)
 
 		try:
 			RMXScaler = self.filter_for_name("RMXScaler")
 			RMXScaler.runFilterWithLayers_error_(RMX_layers, None)
 		except:
-			Message("Please run the RMX scaler manually for all %s figures." %base_suffix, "Couldn’t run RMX Scaler")
+			Message("Please run the RMX scaler manually for all %s figures." % base_suffix, "Couldn’t run RMX Scaler")
 
 		selected_targets = []
 		if self.w.dnom.select:
@@ -244,18 +254,18 @@ class BuildFigures:
 		component_groups = [figure for figure in selected_targets if figure != base_suffix]
 		component_targets = [number + "/" + suffix for suffix in component_groups for number in [
 			"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"
-		]
-		                     ]
+		]]
 
 		print("Building components:\n")
 		for glyph in component_targets:
 			glyph_name = glyph.replace("/", "")
 			component_shift = int(Glyphs.defaults[
-				                      "com.eweracs.BuildSmallFiguresRMX." +
-				                      glyph.split("/")[1].replace(".", "") + "Shift"
-				                      ])
-			print(glyph.replace("/", ""), "from",
-			      glyph.split("/")[0] + base_suffix, "with y shift", component_shift)
+				self.domain(glyph.split("/")[1].replace(".", "") + "Shift")
+			])
+			print(
+				glyph.replace("/", ""), "from",
+				glyph.split("/")[0] + base_suffix, "with y shift", component_shift
+			)
 			if glyph_name not in self.font.glyphs:
 				self.font.glyphs.append(GSGlyph(glyph_name))
 			for layer in self.font[glyph_name].layers:
@@ -281,35 +291,37 @@ class BuildFigures:
 	def window_close(self, sender):
 		Glyphs.removeCallback(self.ui_update, UPDATEINTERFACE)
 
+	def domain(key):
+		return "com.eweracs.BuildSmallFiguresRMX." + key
+
 	def write_preferences(self):
-		Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX.source"] = self.w.source.selector.get()
-		Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX.default"] = self.w.default.selector.get()
-		Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX.width"] = int(self.w.paramEntries.width.get())
-		Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX.height"] = int(self.w.paramEntries.height.get())
-		Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX.weight"] = int(self.w.paramEntries.weight.get())
+		Glyphs.defaults[self.domain("source")] = self.w.source.selector.get()
+		Glyphs.defaults[self.domain("default")] = self.w.default.selector.get()
+		Glyphs.defaults[self.domain("width")] = int(self.w.paramEntries.width.get())
+		Glyphs.defaults[self.domain("height")] = int(self.w.paramEntries.height.get())
+		Glyphs.defaults[self.domain("weight")] = int(self.w.paramEntries.weight.get())
 
 		for suffix in self.base_suffixes:
 			suffix = suffix.replace(".", "")
-			Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX." + suffix] = getattr(self.w, suffix).select.get()
-			Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX." + suffix + "Shift"] = getattr(self.w,
-			                                                                                  suffix).shift.get()
+			Glyphs.defaults[self.domain(suffix)] = getattr(self.w, suffix).select.get()
+			Glyphs.defaults[self.domain(suffix + "Shift")] = getattr(self.w, suffix).shift.get()
 
-		# Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX.allMasters"] = self.w.allMasters.select.get()
+		# Glyphs.defaults[self.domain("allMasters"] = self.w.allMasters.select.get()
 
 	def load_preferences(self):
-		self.w.source.selector.set(Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX.source"] or 0)
-		self.w.default.selector.set(Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX.default"] or 0)
-		self.w.paramEntries.width.set(Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX.width"] or 0)
-		self.w.paramEntries.height.set(Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX.height"] or 0)
-		self.w.paramEntries.weight.set(Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX.weight"] or 0)
+		self.w.source.selector.set(Glyphs.defaults[self.domain("source")] or 0)
+		self.w.default.selector.set(Glyphs.defaults[self.domain("default")] or 0)
+		self.w.paramEntries.width.set(Glyphs.defaults[self.domain("width")] or 0)
+		self.w.paramEntries.height.set(Glyphs.defaults[self.domain("height")] or 0)
+		self.w.paramEntries.weight.set(Glyphs.defaults[self.domain("weight")] or 0)
 
 		for i, suffix in enumerate(self.base_suffixes):
 			suffix = suffix.replace(".", "")
-			getattr(self.w, suffix).select.set(Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX." + suffix] or 0)
-			getattr(self.w, suffix).shift.set(Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX." + suffix + "Shift"]
-			                                  or [0, -150, 280, 320][i])
+			control = getattr(self.w, suffix)
+			control.select.set(Glyphs.defaults[self.domain(suffix)] or 0)
+			control.shift.set(Glyphs.defaults[self.domain(suffix + "Shift")] or [0, -150, 280, 320][i])
 
-		# self.w.allMasters.select.set(Glyphs.defaults["com.eweracs.BuildSmallFiguresRMX.allMasters"] or 1)
+		# self.w.allMasters.select.set(Glyphs.defaults[self.domain("allMasters"] or 1)
 
 
 BuildFigures()
