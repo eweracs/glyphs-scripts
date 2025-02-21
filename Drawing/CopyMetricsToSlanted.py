@@ -25,9 +25,10 @@ class SyncMetricsForSlanted:
 		self.slantedMasters = []
 		self.romanMasters = []
 		for master in self.font.masters:
-			for metric in master.metrics():
-				if metric.name == "Italic Angle":
-					if metric.position != 0:
+			for metric in master.metrics:
+				this_metric = master.metrics[metric]
+				if this_metric.name == "Italic Angle":
+					if this_metric.position != 0:
 						self.slantedMasters.append(master)
 					else:
 						self.romanMasters.append(master)
