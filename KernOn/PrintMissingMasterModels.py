@@ -17,8 +17,6 @@ all_models = []
 for master in Font.masters:
 	if master.userData["KernOnAutoKernedFrom"] or master.userData["KernOnIsInterpolated"] or not master.userData["KernOnModels"]:
 		continue
-	if not len(master.userData["KernOnModels"]):
-		continue
 	for model in master.userData["KernOnModels"]:
 		if model not in all_models:
 			all_models.append(model)
