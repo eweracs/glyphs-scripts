@@ -16,8 +16,11 @@ def recompose_from_components():
 	component_glyph.name = AskString("Please pick a valid name for the component:", value="_%s." % parent.name,
 	                                 title="Component Name", OKButton="Next", placeholder="_component.name")
 
-	if not component_glyph.name or component_glyph.name in Font.glyphs:
-		print("Invalid glyph name.")
+	if not component_glyph.name:
+		print("No glyph name provided")
+		return
+	if component_glyph.name in Font.glyphs:
+		print("Glyph already in font.")
 		return
 
 	# Set to non-exporting
@@ -32,6 +35,9 @@ def recompose_from_components():
 		associated_base_layer = base_glyph.layers[layer.associatedMasterId]
 
 		base_offset = layer.components[0].position
+		
+		parent_layer = parent.layers[layer.associatedMasterId]
+		parent_layer.leftMetricsKey = "==+%s" % int(base_offset.x)
 
 		for component in [remove for remove in layer.components]:
 			layer.shapes.remove(component)
