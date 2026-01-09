@@ -30,25 +30,34 @@ def recompose_from_components():
 		return
 	for layer in component_glyph.layers:
 		associated_base_layer = base_glyph.layers[layer.associatedMasterId]
+
+		base_offset = layer.components[0].position
+
 		for component in [remove for remove in layer.components]:
 			layer.shapes.remove(component)
 		if not associated_base_layer.anchors[anchor_name]:
 			if anchor_name == "bottom":
 				associated_base_layer.anchors[anchor_name] = GSAnchor(
-					pt=(associated_base_layer.bounds.size.width / 2 + associated_base_layer.bounds.origin.x, 0))
+					pt=(associated_base_layer.bounds.size.width / 2 + associated_base_layer.bounds.origin.x + base_offset.x, base_offset.y))
 			if anchor_name == "center":
 				associated_base_layer.anchors[anchor_name] = GSAnchor(pt=(
-				associated_base_layer.bounds.size.width / 2 + associated_base_layer.bounds.origin.x,
-				associated_base_layer.bounds.size.height / 2))
+				associated_base_layer.bounds.size.width / 2 + associated_base_layer.bounds.origin.x + base_offset.x,
+				associated_base_layer.bounds.size.height / 2 + base_offset.y))
 			if anchor_name == "bottomright":
 				associated_base_layer.anchors[anchor_name] = GSAnchor(
-					pt=(associated_base_layer.bounds.size.width + associated_base_layer.bounds.origin.x, 0))
+					pt=(associated_base_layer.bounds.size.width + associated_base_layer.bounds.origin.x + base_offset.x, base_offset.y))
 			if anchor_name == "topright":
 				associated_base_layer.anchors[anchor_name] = GSAnchor(pt=(
-				associated_base_layer.bounds.size.width + associated_base_layer.bounds.origin.x,
-				associated_base_layer.bounds.size.height))
+				associated_base_layer.bounds.size.width + associated_base_layer.bounds.origin.x + base_offset.x,
+				associated_base_layer.bounds.size.height + base_offset.y))
 		if associated_base_layer.anchors[anchor_name]:
-			layer.anchors["_%s" % anchor_name] = associated_base_layer.anchors[anchor_name].copy()
+			base_anchor = associated_base_layer.anchors[anchor_name]
+			new_anchor = GSAnchor()
+			new_anchor.name = "_%s" % anchor_name
+			new_anchor.position = (base_anchor.position.x + base_offset.x, base_anchor.position.y + base_offset.y)
+			layer.anchors.append(new_anchor)
+
+
 
 	# Add glyph to font
 	Font.glyphs.append(component_glyph)
@@ -61,10 +70,14 @@ def recompose_from_components():
 
 	component_glyph.leftMetricsKey = "=40"
 	component_glyph.rightMetricsKey = "=40"
+
 	for layer in component_glyph.layers:
 		layer.syncMetrics()
 	component_glyph.leftKerningGroup = None
 	component_glyph.rightKerningGroup = None
+	component_glyph.setCategory_(None)
+	component_glyph.setSubCategory_(None)
+	component_glyph.updateGlyphInfo()
 
 
 recompose_from_components()
