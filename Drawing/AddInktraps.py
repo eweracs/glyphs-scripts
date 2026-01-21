@@ -5,14 +5,15 @@ __doc__ = """
 Adds rudimentary inktraps for the selected nodes.
 """
 
-from vanilla import *
+from vanilla import FloatingWindow, Group, TextBox, EditText, HorizontalLine, Button
 from math import dist, sin, acos, radians, degrees, sqrt
 from Foundation import NSPoint
+from GlyphsApp import Glyphs, GSNode, Message
 
 
 class AddInktraps:
 	def __init__(self):
-		self.font = Font
+		self.font = Glyphs.font
 
 		if self.font is None:
 			Message("No font selected", "Select a font project!")
@@ -127,13 +128,17 @@ class AddInktraps:
 			# calculate the path time at which the intersection with line b is reached
 			factor_b = distance_to_intersections / b
 			# calculate the coordinates of intersection b using the coordinates of the selected node and of the left node
-			intersection_b = NSPoint(node.position.x + (prev_node.position.x - node.position.x) * factor_b,
-			                         node.position.y + (prev_node.position.y - node.position.y) * factor_b)
+			intersection_b = NSPoint(
+				node.position.x + (prev_node.position.x - node.position.x) * factor_b,
+				node.position.y + (prev_node.position.y - node.position.y) * factor_b
+			)
 			# calculate the path time at which the intersection with line c is reached
 			factor_c = distance_to_intersections / c
 			# calculate the coordinates of intersection c using the coordinates of the selected node and of the right node
-			intersection_c = NSPoint(node.position.x + (next_node.position.x - node.position.x) * factor_c,
-			                         node.position.y + (next_node.position.y - node.position.y) * factor_c)
+			intersection_c = NSPoint(
+				node.position.x + (next_node.position.x - node.position.x) * factor_c,
+				node.position.y + (next_node.position.y - node.position.y) * factor_c
+			)
 
 			path.insertNode_atIndex_(GSNode(intersection_b), node.index)
 			path.insertNode_atIndex_(GSNode(intersection_c), node.index + 1)
@@ -144,8 +149,10 @@ class AddInktraps:
 			node_1_position = path.nodes[node.index].position
 			node_2_position = path.nodes[node.index - 1].position
 			middle_node = GSNode()
-			middle_node.position = NSPoint(node_1_position.x + (node_2_position.x - node_1_position.x) / 2,
-			                               node_1_position.y + (node_2_position.y - node_1_position.y) / 2)
+			middle_node.position = NSPoint(
+				node_1_position.x + (node_2_position.x - node_1_position.x) / 2,
+				node_1_position.y + (node_2_position.y - node_1_position.y) / 2
+			)
 			path.insertNode_atIndex_(middle_node, node.index)
 			path.removeNodeAtIndex_(node.index - 2)
 			path.removeNodeAtIndex_(node.index)

@@ -61,13 +61,13 @@ class CleanGroups:
 				f = open(kernfile)
 				filedata = f.read()
 				f.close()
-        		
+
 				newdata = filedata.replace("KO_", "")
-        		
+
 				f = open(kernfile, "w")
 				f.write(newdata)
 				f.close()
-	
+
 			self.font.close()
 			if self.w.reopen.get():
 				Glyphs.open(self.filePath)

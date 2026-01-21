@@ -5,10 +5,12 @@ __doc__ = """
 Copies the metrics from the roman masters to the slanted masters for the selected glyphs.
 """
 
+from GlyphsApp import Glyphs, Message
+
 
 class SyncMetricsForSlanted:
 	def __init__(self):
-		self.font = Font
+		self.font = Glyphs.font
 
 		if self.font is None:
 			Message("Select a font project!", "No font selected")
@@ -51,12 +53,10 @@ class SyncMetricsForSlanted:
 		for selected in self.font.selectedLayers:
 			for romanMaster in self.romanMasters:
 				# find all special layers in the glyph that are linked to the roman masters
-				roman_special_layers = [layer for layer in selected.parent.layers if layer.associatedMasterId ==
-				                 romanMaster.id]
+				roman_special_layers = [layer for layer in selected.parent.layers if layer.associatedMasterId == romanMaster.id]
 
 				# find all special layers in the glyph that are linked to the slanted masters
-				slanted_special_layers = [layer for layer in selected.parent.layers if layer.associatedMasterId in
-				                          self.romanToSlanted[romanMaster.id]]
+				slanted_special_layers = [layer for layer in selected.parent.layers if layer.associatedMasterId in self.romanToSlanted[romanMaster.id]]
 
 				# find the slanted special layers that have the same attributes as the roman special layers
 				for roman_special_layer in roman_special_layers:
@@ -68,7 +68,6 @@ class SyncMetricsForSlanted:
 									continue
 								if roman_special_layer.attributes["axisRules"][axis] != slanted_special_layer.attributes["axisRules"][axis]:
 									break
-
 
 				for slantedCounterpart in self.romanToSlanted[romanMaster.id]:
 					selected.parent.layers[slantedCounterpart].LSB = selected.parent.layers[romanMaster.id].LSB

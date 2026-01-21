@@ -8,24 +8,30 @@ Create glyphs files to export subset variable fonts.
 import vanilla
 import itertools
 
+from GlyphsApp import Glyphs, GSInstance, Message, GetFolder
+
 
 class CreateSubsets:
 	def __init__(self):
 
-		Message("This script is still heavily experimental, especially for managing special layers. Use at your own "
-		        "risk.",
-		        "Warning")
+		Message(
+			"This script is still heavily experimental, especially for managing special layers. Use at your own "
+			"risk.",
+			"Warning"
+		)
 
-		if Font is None:
+		self.font = Glyphs.font
+
+		if self.font is None:
 			Message("No font selected", "Select a font project!")
 			return
 
-		self.font = Font
-
 		self.preferred_directory = Glyphs.defaults["com.eweracs.subsetVariableFont.saveLocation"] or None
 
-		self.axisRanges = {axis.name: sorted(set(master.axes[i] for master in self.font.masters))
-		                   for i, axis in enumerate(self.font.axes)}
+		self.axisRanges = {
+			axis.name: sorted(set(master.axes[i] for master in self.font.masters))
+			for i, axis in enumerate(self.font.axes)
+		}
 
 		self.axisIndices = {axisIndex: axis.axisTag for axisIndex, axis in enumerate(self.font.axes)}
 
@@ -60,24 +66,41 @@ class CreateSubsets:
 			axis_group = vanilla.Group("auto")
 
 			axis_group.title = vanilla.TextBox("auto", axis.name, sizeStyle="small")
-			axis_group.min = vanilla.EditText("auto", text=self.axisRanges[axis.name][0], sizeStyle="small",
-			                             callback=self.define_axis_ranges)
-			axis_group.max = vanilla.EditText("auto", text=self.axisRanges[axis.name][1], sizeStyle="small",
-			                           callback=self.define_axis_ranges)
+			axis_group.min = vanilla.EditText(
+				"auto",
+				text=self.axisRanges[axis.name][0],
+				sizeStyle="small",
+				callback=self.define_axis_ranges
+			)
+			axis_group.max = vanilla.EditText(
+				"auto",
+				text=self.axisRanges[axis.name][1],
+				sizeStyle="small",
+				callback=self.define_axis_ranges
+			)
 			axis_group.separator = vanilla.TextBox("auto", ":", alignment="center")
 			axis_group.bracketleft = vanilla.TextBox("auto", "[", alignment="center")
-			axis_group.default = vanilla.EditText("auto",
-			                                text=self.variable_font_origin_master.axes[i], sizeStyle="small",
-			                                callback=self.define_axis_ranges)
+			axis_group.default = vanilla.EditText(
+				"auto",
+				text=self.variable_font_origin_master.axes[i],
+				sizeStyle="small",
+				callback=self.define_axis_ranges
+			)
 			axis_group.bracketright = vanilla.TextBox("auto", "]", alignment="center")
-			axis_group.reset = vanilla.SquareButton("auto", u"↺", sizeStyle="small",
-			                              callback=self.reset_value)
+			axis_group.reset = vanilla.SquareButton(
+				"auto",
+				u"↺",
+				sizeStyle="small",
+				callback=self.reset_value
+			)
 
 			setattr(self.w, axis.axisTag, axis_group)
 
-			self.subsetValues[axis.name] = [int(axis_group.min.get()),
-			                                int(axis_group.max.get()),
-			                                int(axis_group.default.get())]
+			self.subsetValues[axis.name] = [
+				int(axis_group.min.get()),
+				int(axis_group.max.get()),
+				int(axis_group.default.get())
+			]
 
 		self.w.removeName = vanilla.Group("auto")
 		self.w.removeName.title = vanilla.TextBox("auto", "Remove in instance names:", sizeStyle="small")
@@ -88,9 +111,11 @@ class CreateSubsets:
 		self.w.enterRecipe = vanilla.TextEditor("auto", callback=self.edit_recipes)
 		self.w.locationPicker = vanilla.Group("auto")
 		self.w.locationPicker.title = vanilla.TextBox("auto", "Save files in:", sizeStyle="small")
-		self.w.locationPicker.entry = vanilla.PopUpButton("auto", ["Current file directory", "Choose..."],
-		                                                  sizeStyle="small",
-		                                                  callback = self.file_chooser)
+		self.w.locationPicker.entry = vanilla.PopUpButton(
+			"auto", ["Current file directory", "Choose..."],
+			sizeStyle="small",
+			callback=self.file_chooser
+		)
 
 		if self.preferred_directory:
 			items = [
@@ -168,9 +193,9 @@ class CreateSubsets:
 		recipe_text = self.w.newName.entry.get() + "\n"
 		for axis in self.font.axes:
 			recipe_text += str(self.subsetValues[axis.name][0]) + ":" \
-			               + str(self.subsetValues[axis.name][1]) + "[" \
-			               + str(self.subsetValues[axis.name][2]) + "]" \
-			               + "\n"
+				+ str(self.subsetValues[axis.name][1]) + "[" \
+				+ str(self.subsetValues[axis.name][2]) + "]" \
+				+ "\n"
 		remove_entry = self.w.removeName.entry.get()
 		if remove_entry == "":
 			remove_entry = "-"
@@ -180,19 +205,22 @@ class CreateSubsets:
 
 	def recipe_help(self, sender):
 		self.helpView = vanilla.Popover((1, 1))
-		self.helpView.description = vanilla.TextBox("auto", "Recipe structure:\n\n"
-		                                                    "New family name\n"
-		                                                    "min : max [ default ] for each axis\n"
-		                                                    "Particle to remove in instance names\n"
-		                                                    "(write \"-\" for none)\n\n"
-		                                                    "Leave blank line before new file")
+		self.helpView.description = vanilla.TextBox(
+			"auto",
+			"Recipe structure:\n\n"
+			"New family name\n"
+			"min : max [ default ] for each axis\n"
+			"Particle to remove in instance names\n"
+			"(write \"-\" for none)\n\n"
+			"Leave blank line before new file"
+		)
 
 		rules = [
 			"H:|-border-[description]-border-|",
 			"V:|-border-[description]-border-|"
 		]
 
-		metrics= {
+		metrics = {
 			"border": 10
 		}
 
@@ -206,12 +234,14 @@ class CreateSubsets:
 		if not sender.get().isnumeric() or len(sender.get()) == 0:
 			return
 		for axis in self.font.axes:
-			self.subsetValues[axis.name] = [int(getattr(self.w, axis.axisTag).min.get() or 0),
-			                                int(getattr(self.w, axis.axisTag).max.get() or 0),
-			                                int(getattr(self.w, axis.axisTag).default.get() or 0)]
+			self.subsetValues[axis.name] = [
+				int(getattr(self.w, axis.axisTag).min.get() or 0),
+				int(getattr(self.w, axis.axisTag).max.get() or 0),
+				int(getattr(self.w, axis.axisTag).default.get() or 0)
+			]
 
 	def reset_value(self, sender):
-		for i, axis in enumerate(Font.axes):
+		for i, axis in enumerate(self.font.axes):
 			if sender is getattr(getattr(self.w, axis.axisTag), "reset"):
 				getattr(getattr(self.w, axis.axisTag), "min").set(self.axisRanges[axis.name][0])
 				getattr(getattr(self.w, axis.axisTag), "max").set(self.axisRanges[axis.name][1])
@@ -473,9 +503,11 @@ class CreateSubsets:
 			replace_name = recipe.split("\n")[len(recipe.split("\n")) - 1]
 			subset_values = {}
 			for i, line in enumerate(recipe.split("\n")[1:len(recipe.split("\n")) - 1]):
-				subset_values[self.current_font.axes[i].name] = [int(line.split(":")[0]),
-				                                                           int(line.split(":")[1].split("[")[0]),
-				                                                           int(line.split("[")[1].replace("]", ""))]
+				subset_values[self.current_font.axes[i].name] = [
+					int(line.split(":")[0]),
+					int(line.split(":")[1].split("[")[0]),
+					int(line.split("[")[1].replace("]", ""))
+				]
 
 			print("\nNew family name:", family_name)
 

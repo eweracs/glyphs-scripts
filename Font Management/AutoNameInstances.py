@@ -6,12 +6,13 @@ Names active instances based on set weight and width classes and user-defined ex
 """
 
 import vanilla
+from GlyphsApp import Glyphs, Message
 
 
 class AutoNamer:
 	def __init__(self):
 
-		self.font = Font
+		self.font = Glyphs.font
 
 		self.Exceptions = {"width": {}, "weight": {}}
 
@@ -40,14 +41,20 @@ class AutoNamer:
 
 		self.w = vanilla.FloatingWindow((0, 0), "Auto-name Instances")
 
-		setattr(self.w, "widthExceptionsTitle", vanilla.TextBox((10, 10, -10, 14), "Add width name exceptions",
-		                                                        sizeStyle="small"))
+		self.w.widthExceptionsTitle = vanilla.TextBox(
+			(10, 10, -10, 14),
+			"Add width name exceptions",
+			sizeStyle="small"
+		)
 
 		self.new_exception_line("width", self.widths)
 		self.new_exception_line("weight", self.weights)
 
-		setattr(self.w, "autoname", vanilla.Button((10, self.ypos, -10, 20), "Auto-name instances",
-		                                           callback=self.auto_name_instances))
+		self.w.autoname = vanilla.Button(
+			(10, self.ypos, -10, 20),
+			"Auto-name instances",
+			callback=self.auto_name_instances
+		)
 
 		self.redraw()
 
@@ -123,8 +130,11 @@ class AutoNamer:
 		self.ypos = button.getPosSize()[1] + 32
 
 	def new_exception_line(self, type, items):
-		add_exception_popup = vanilla.PopUpButton((10, self.ypos, 140, 20), items,
-		                                          callback=self.pick_exception_from_list)
+		add_exception_popup = vanilla.PopUpButton(
+			(10, self.ypos, 140, 20),
+			items,
+			callback=self.pick_exception_from_list
+		)
 		add_exception_input = vanilla.EditText((190, self.ypos - 1, 130, 22), callback=self.exception_name)
 		add_exception_button = vanilla.Button((330, self.ypos, 50, 20), "Add", callback=self.add)
 
@@ -153,8 +163,11 @@ class AutoNamer:
 		self.clearExceptionButtonList = []
 
 		for i in range(len(self.Exceptions["width"])):
-			self.exception_line(str(i), list(self.Exceptions["width"])[i],
-			                    list(self.Exceptions["width"].items())[i][1])
+			self.exception_line(
+				str(i),
+				list(self.Exceptions["width"])[i],
+				list(self.Exceptions["width"].items())[i][1]
+			)
 
 		self.w.addwidthException.show(len(self.widths) > 0)
 		self.w.addwidthArrow.show(len(self.widths) > 0)
@@ -174,8 +187,11 @@ class AutoNamer:
 
 		for i in range(len(self.Exceptions["weight"])):
 			buttonindex = i + len(self.Exceptions["width"])
-			self.exception_line(str(buttonindex), list(self.Exceptions["weight"])[i],
-								list(self.Exceptions["weight"].items())[i][1])
+			self.exception_line(
+				str(buttonindex),
+				list(self.Exceptions["weight"])[i],
+				list(self.Exceptions["weight"].items())[i][1]
+			)
 
 		self.w.addweightException.show(len(self.weights) > 0)
 		self.w.addweightArrow.show(len(self.weights) > 0)

@@ -5,6 +5,10 @@ __doc__ = """
 Sets special spacing groups for Kern On.
 """
 
+from GlyphsApp import Glyphs, Message
+
+Font = Glyphs.font
+
 found_special_spacing = True
 for glyph in Font.glyphs:
 	if not glyph.userData["KernOnSpecialSpacing"]:
@@ -13,8 +17,10 @@ for glyph in Font.glyphs:
 	break
 
 if found_special_spacing:
-	Message("Please run Kern On once to build basic special spacing, as it will otherwise not be written.",
-	        "No existing special spacing found")
+	Message(
+		"Please run Kern On once to build basic special spacing, as it will otherwise not be written.",
+		"No existing special spacing found"
+	)
 else:
 	defaults = {
 		# No kerning on both sides
@@ -149,6 +155,7 @@ else:
 
 	print("\n...Done.")
 
-	Glyphs.showNotification(title="Set special spacing groups",
-	                        message="Special spacing groups set for "
-	                                + str(len(set_glyphs)) + " glyphs. Detailed report in Macro window.")
+	Glyphs.showNotification(
+		title="Set special spacing groups",
+		message=f"Special spacing groups set for {len(set_glyphs)} glyphs. Detailed report in Macro window."
+	)

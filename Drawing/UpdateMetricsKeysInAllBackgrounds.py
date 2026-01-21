@@ -5,7 +5,9 @@ __doc__ = """
 Updates the metrics keys in all backgrounds of the selected glyphs.
 """
 
-for layer in Font.selectedLayers:
+from GlyphsApp import Glyphs
+
+for layer in Glyphs.font.selectedLayers:
 	parent = layer.parent
 	for layer in parent.layers:
 		layer.background.syncMetrics()
