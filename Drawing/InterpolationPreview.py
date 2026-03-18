@@ -17,6 +17,10 @@ class Interpolator:
 
 		self.font = Font
 
+		if not self.font:
+			Message(title="No font open.", message="Please open a font in order to preview interpolations.")
+			return
+
 		self.font.instances.append(GSInstance())
 		self.font.instances[-1].name = "Interpolator Preview"
 
@@ -59,6 +63,10 @@ class Interpolator:
 				9: "Ultra Expanded"
 			}
 		}
+
+		if not self.font.axes:
+			Message(title="No axes found.", message="The font contains no axes, which are necessary to perform interpolation.")
+			return
 
 		for coord in self.font.selectedFontMaster.axes:
 			self.currentCoords.append(int(coord))
@@ -211,7 +219,11 @@ class Interpolator:
 	def preview_instance(self):
 		self.font.instances[-1].axes = self.currentCoords
 		if not self.font.currentTab:  # open up a new tab with the new instance in preview
-			self.font.newTab("a")
+			if self.font.glyphs:
+				self.font.newTab(self.font.glyphs[0].name)
+			else:
+				Message(title="No glyphs", message="No glyphs present. Add some glyphs to the font to preview interpolation.")
+				return
 		if self.font.currentTab.previewHeight <= 20:
 			self.font.currentTab.previewHeight = 200
 		self.font.currentTab.previewInstances = self.font.instances[-1]
