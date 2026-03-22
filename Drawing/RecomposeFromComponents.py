@@ -37,7 +37,7 @@ def recompose_from_components():
 		base_offset = layer.components[0].position
 		
 		parent_layer = parent.layers[layer.associatedMasterId]
-		parent_layer.leftMetricsKey = "==+%s" % int(base_offset.x)
+		parent_layer.leftMetricsKey = "==+%s" % int(base_offset.x) if base_offset.x else None
 
 		for component in [remove for remove in layer.components]:
 			layer.shapes.remove(component)
